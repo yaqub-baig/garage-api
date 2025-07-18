@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.autoadda.apis.garage.test.AvailableServiceManagementServiceTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.637 s -- in com.autoadda.apis.garage.test.AvailableServiceManagementServiceTest

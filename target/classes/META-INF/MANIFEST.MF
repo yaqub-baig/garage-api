@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Build-Jdk-Spec: 23
+Implementation-Title: GarageManagementService
+Implementation-Version: 0.1
+Main-Class: com.autoadda.apis.garage.GarageManagementServiceApplication
+Created-By: Maven Integration for Eclipse
+
