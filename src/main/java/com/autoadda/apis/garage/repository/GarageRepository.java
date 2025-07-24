@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.util.Status;
 
 @Repository
@@ -41,7 +42,6 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 	List<Garage> findByChainId(Integer chainId);
 
 	List<Garage> findByGarageType(String garageType);
-
 
 	Optional<Garage> findByEmailId(String emailId);
 
@@ -76,4 +76,6 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 	Optional<Garage> findByIdAndAccountStatusAndGarageType(Integer id, Status status, String garageType);
 
 	Optional<Garage> findByIdAndAccountStatusAndLegalName(Integer id, Status status, String legalName);
+
+	Garage save(GarageRequest any);
 }

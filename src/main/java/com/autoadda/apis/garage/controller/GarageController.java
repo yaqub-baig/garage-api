@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.service.GarageManagementService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -27,7 +28,7 @@ public class GarageController {
 	private final GarageManagementService garageService;
 
 	@PostMapping
-	public ResponseEntity<Garage> createGarage(@RequestBody Garage garage) {
+	public ResponseEntity<Garage> createGarage(@RequestBody GarageRequest garage) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(garageService.createGarage(garage));
 	}
 
@@ -42,7 +43,7 @@ public class GarageController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Garage> updateGarage(@PathVariable Integer id, @RequestBody Garage garage) {
+	public ResponseEntity<Garage> updateGarage(@PathVariable Integer id, @RequestBody GarageRequest garage) {
 		return ResponseEntity.ok(garageService.updateGarage(id, garage));
 	}
 

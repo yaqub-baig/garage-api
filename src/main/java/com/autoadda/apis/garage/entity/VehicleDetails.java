@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,8 +19,9 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class VehicleDetails {
 
 	@Id
@@ -31,13 +33,13 @@ public class VehicleDetails {
 	private String vin;
 
 	@Column(name = "year")
-	private String year;
+	private Integer year;
 
 	@Column(name = "name")
 	private String name;
 
 	@Column(name = "odometer")
-	private String odometer;
+	private Integer odometer;
 
 	@Column(name = "color")
 	private String color;
@@ -46,16 +48,16 @@ public class VehicleDetails {
 	private String engineSize;
 
 	@Column(name = "no_of_doors")
-	private String noOfDoors;
+	private Integer noOfDoors;
 
 	@Column(name = "no_of_seats")
-	private String noOfSeats;
+	private Integer noOfSeats;
 
 	@Column(name = "no_of_cylinders")
-	private String noOfCylinders;
+	private Integer noOfCylinders;
 
 	@Column(name = "no_of_speeds")
-	private String noOfSpeeds;
+	private Integer noOfSpeeds;
 
 	@Column(name = "fuel_type")
 	private String fuelType;
@@ -71,19 +73,19 @@ public class VehicleDetails {
 
 	@Column(name = "make")
 	private String make;
-	
+
 	@Column(name = "model")
 	private String model;
-	
+
 	@Column(name = "preferred_garage_id")
 	private String preferredGarageId;
-	
+
 	@Column(name = "customer_id")
 	private Integer customerId;
 
-//	@OneToOne(cascade = CascadeType.ALL)
-//	@JoinColumn(name = "insurance_id", referencedColumnName = "id")
-//	private InsuranceDetails insurance;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "insurance_id", referencedColumnName = "id")
+	private InsuranceDetails insurance;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "registration_id", referencedColumnName = "id")

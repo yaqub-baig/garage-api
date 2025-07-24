@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -9,16 +10,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.entity.AppointmentServices;
 import com.autoadda.apis.garage.entity.Garage;
-import com.autoadda.apis.garage.entity.GarageTechnician;
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.JobCardStatusActivity;
+import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.exception.MemberNotFoundException;
 import com.autoadda.apis.garage.repository.AppointmentDetailsRepository;
 import com.autoadda.apis.garage.repository.AppointmentServiceRepository;
 import com.autoadda.apis.garage.repository.GarageRepository;
-import com.autoadda.apis.garage.repository.GarageTechnicianRepository;
 import com.autoadda.apis.garage.repository.JobCardRepository;
 import com.autoadda.apis.garage.repository.JobcardStatusActivityRepository;
+import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
 import com.autoadda.apis.garage.request.JobCardStatusRequest;
 import com.autoadda.apis.garage.util.BusinessValidator;
@@ -35,7 +36,7 @@ public class JobCardService {
 	private final JobcardStatusActivityRepository jobcardStatusActivityRepo;
 	private final AppointmentServiceRepository appointmentServiceRepo;
 	private final GarageRepository garageRepo;
-	private final GarageTechnicianRepository technicianRepo;
+	private final TechnicianRepository technicianRepo;
 	private final AppointmentDetailsRepository appointmentRepo;
 
 	private final BusinessValidator validator;
@@ -51,11 +52,11 @@ public class JobCardService {
 		Garage garage = garageRepo.findById(request.getGarageId())
 				.orElseThrow(() -> new RuntimeException("Garage not found"));
 
-		GarageTechnician technician = technicianRepo.findById(request.getTechnicianId())
+		Technician technician = technicianRepo.findById(request.getTechnicianId())
 				.orElseThrow(() -> new RuntimeException("Technician not found"));
 
 		JobCard jobCard = JobCard.builder().appointment(appointment).garage(garage).technician(technician)
-				.service(service).status(Status.ASSIGNED).insert_tms(DateHelper.dbDate())
+				.service(service).status(Status.ASSIGNED).createdAt(DateHelper.dbDate())
 				.serviceStartTime(DateHelper.dbTime()).comments(request.getComments()).build();
 
 		jobCardRepo.save(jobCard);
@@ -113,5 +114,19 @@ public class JobCardService {
 	@Transactional(readOnly = true)
 	public List<JobCard> getJobCardsByAppointmentId(Integer appointmentId) {
 		return jobCardRepo.findByAppointmentId(appointmentId);
+	}
+
+	public JobCard markJobCardComplete(Integer jobCardId) {
+		JobCard jobCard = jobCardRepo.findById(jobCardId)
+				.orElseThrow(() -> new RuntimeException("JobCard not found with ID: " + jobCardId));
+
+		if (jobCard.getStatus() == Status.COMPLETED) {
+			throw new IllegalStateException("JobCard is already completed.");
+		}
+
+		jobCard.setStatus(Status.COMPLETED);
+		jobCard.setServiceEndTime(LocalTime.now());
+
+		return jobCardRepo.save(jobCard);
 	}
 }

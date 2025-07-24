@@ -1,14 +1,18 @@
 package com.autoadda.apis.garage.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.autoadda.apis.garage.util.Status;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +29,7 @@ public class GarageOwner {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Integer id;
-	
+
 	@Column(name = "emirates_id")
 	private String emiratesId;
 
@@ -46,10 +50,10 @@ public class GarageOwner {
 
 	@Column(name = "account_status")
 	private Status accountStatus;
-	
-	@Column(name = "garage_id")
-	private Integer garageId;
-	
+
+	@OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Garage> ownedGarages = new ArrayList<>();
+
 	@Column(name = "ownership_per")
 	private Integer ownershipPer;
 

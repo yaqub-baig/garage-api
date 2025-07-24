@@ -1,0 +1,148 @@
+-------------------------------------------------------------------------------
+Test set: com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest
+-------------------------------------------------------------------------------
+Tests run: 14, Failures: 8, Errors: 4, Skipped: 0, Time elapsed: 0.356 s <<< FAILURE! -- in com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetActiveSubscriptions -- Time elapsed: 0.026 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetActiveSubscriptions(VehicleOwnerSubscriptionServiceTest.java:145)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testCancelSubscription -- Time elapsed: 0.003 s <<< ERROR!
+jakarta.persistence.EntityNotFoundException: Subscription not found
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.lambda$cancelSubscription$2(VehicleOwnerSubscriptionService.java:50)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.cancelSubscription(VehicleOwnerSubscriptionService.java:50)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testCancelSubscription(VehicleOwnerSubscriptionServiceTest.java:122)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionById_Success -- Time elapsed: 0.005 s <<< ERROR!
+jakarta.persistence.EntityNotFoundException: Subscription not found
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.lambda$getSubscriptionById$3(VehicleOwnerSubscriptionService.java:58)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.getSubscriptionById(VehicleOwnerSubscriptionService.java:58)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionById_Success(VehicleOwnerSubscriptionServiceTest.java:130)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByOwner -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByOwner(VehicleOwnerSubscriptionServiceTest.java:116)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testSubscribeToPlan_PlanNotFound -- Time elapsed: 0.004 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <Subscription plan not found> but was: <Vehicle owner not found>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1145)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testSubscribeToPlan_PlanNotFound(VehicleOwnerSubscriptionServiceTest.java:107)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByDateRange -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByDateRange(VehicleOwnerSubscriptionServiceTest.java:157)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testUpdateSubscriptionStatus -- Time elapsed: 0.003 s <<< ERROR!
+jakarta.persistence.EntityNotFoundException: Subscription not found
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.lambda$updateSubscriptionStatus$4(VehicleOwnerSubscriptionService.java:88)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.updateSubscriptionStatus(VehicleOwnerSubscriptionService.java:88)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testUpdateSubscriptionStatus(VehicleOwnerSubscriptionServiceTest.java:201)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByOwnerAndStatus -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByOwnerAndStatus(VehicleOwnerSubscriptionServiceTest.java:183)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByPlan -- Time elapsed: 0.003 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByPlan(VehicleOwnerSubscriptionServiceTest.java:164)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testSubscribeToPlan_Success -- Time elapsed: 0.005 s <<< ERROR!
+jakarta.persistence.EntityNotFoundException: Vehicle owner not found
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.lambda$subscribeToPlan$0(VehicleOwnerSubscriptionService.java:29)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService.subscribeToPlan(VehicleOwnerSubscriptionService.java:29)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testSubscribeToPlan_Success(VehicleOwnerSubscriptionServiceTest.java:81)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByPlanAndStatus -- Time elapsed: 0.002 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByPlanAndStatus(VehicleOwnerSubscriptionServiceTest.java:193)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByOwnerAndPlan -- Time elapsed: 0.001 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at com.autoadda.apis.garage.test.VehicleOwnerSubscriptionServiceTest.testGetSubscriptionsByOwnerAndPlan(VehicleOwnerSubscriptionServiceTest.java:173)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+

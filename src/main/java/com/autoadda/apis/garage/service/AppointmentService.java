@@ -77,7 +77,7 @@ public class AppointmentService {
 			GarageService service = garageServiceRepo.findById(serviceId)
 					.orElseThrow(() -> new RuntimeException("Service not found"));
 			return AppointmentServices.builder().appointmentId(appointment.getId()).service(service).status(Status.NEW)
-					.insert_tms(DateHelper.dbDate()).build();
+					.build();
 		}).collect(Collectors.toList());
 
 		serviceRepo.saveAll(services);

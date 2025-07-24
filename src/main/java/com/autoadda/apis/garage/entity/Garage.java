@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -56,10 +57,15 @@ public class Garage {
 	@Column(name = "chain_id")
 	private Integer chainId;
 
-	@Column(name = "insert_tms")
-	private LocalDate insertTms;
-	
-	@OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GarageService> services = new ArrayList<>();
+	@Column(name = "created_at")
+	private LocalDate createdAt;
 
+	@OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<GarageService> services = new ArrayList<>();
+
+	@OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Technician> technicians = new ArrayList<>();
+
+	@OneToOne(mappedBy = "garage_owner_id", cascade = CascadeType.ALL, orphanRemoval = true)
+	private GarageOwner garageOwner;
 }

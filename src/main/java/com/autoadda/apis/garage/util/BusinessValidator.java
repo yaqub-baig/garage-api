@@ -13,7 +13,7 @@ import com.autoadda.apis.garage.exception.MemberNotFoundException;
 import com.autoadda.apis.garage.repository.AuthenticationDetailsRepository;
 import com.autoadda.apis.garage.repository.CustomerRepository;
 import com.autoadda.apis.garage.repository.GarageRepository;
-import com.autoadda.apis.garage.repository.GarageTechnicianRepository;
+import com.autoadda.apis.garage.repository.TechnicianRepository;
 
 @Component
 public class BusinessValidator {
@@ -25,7 +25,7 @@ public class BusinessValidator {
 	private CustomerRepository customerRepository;
 
 	@Autowired
-	private GarageTechnicianRepository garageTechnicianRepository;
+	private TechnicianRepository garageTechnicianRepository;
 
 	@Autowired
 	private AuthenticationDetailsRepository authenticationDetailsRepository;

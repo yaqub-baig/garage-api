@@ -1,131 +1,170 @@
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/GarageManagementServiceApplication.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/config/OpenAPIConfig.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/AdditionalRequestController.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/AppointmentController.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/AvailableServiceController.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/GarageController.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/GarageServiceController.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/InvoiceController.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/JobCardController.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentInvoice.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentInvoiceBreakDown.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentServices.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentStatusActivity.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AuthenticationDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AvailableService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Customer.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/CustomerAddress.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/FutureAppointment.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Garage.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageBreakTime.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageDocumentDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageHolidayOverride.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageLicenseDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageMemberRole.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageOwner.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GaragePaymentDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GaragePendingActions.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageRole.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageSubscription.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageTechnician.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageWorkingHours.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/InsuranceDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/JobCard.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/JobCardAdditionalRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/JobCardStatusActivity.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/MaintenanceScheduleRule.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Manufacturer.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Model.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/ServiceCategory.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleCategory.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleRegistration.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleType.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/AlreadyExistException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/ConflictException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/CustomerNotFoundException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/ErrorMessage.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/GarageNotFoundException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/GlobalExceptionHandler.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/MemberAlreadyExistException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/MemberNotFoundException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/ResourceNotFoundException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/UnauthorizedAccessException.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/mapper/InvoiceMapper.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentDetailsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentInvoiceBreakDownRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentInvoiceRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentServiceRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentStatusActivityRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AuthenticationDetailsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AvailableServiceRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/CustomerAddressRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/CustomerRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/FutureAppointmentRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageBreakTimeRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageDocumentDetailsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageHolidayOverrideRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageLicenseDetailsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageOwnerRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GaragePaymentRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GaragePendingActionsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageServiceRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageSubscriptionRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageTechnicianRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageWorkingHoursRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/InsuranceDetailsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/JobCardAdditionalRequestRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/JobCardRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/JobcardStatusActivityRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/MaintenanceScheduleRuleRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/ManufacturerRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/ModelRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/ServiceCategoryRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleDetailsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleRegistrationDetailsRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleTypeRepository.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentDetailsRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentInvoiceRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentPayRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentStatusRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AssignServiceRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AvailableServiceRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/CustomerAppointmentRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/GarageServiceRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/JobCardAdditionalAPIRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/JobCardStatusRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/MaintenanceScheduleRuleRequest.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/ServiceInvoice.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AppointmentDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AppointmentResponse.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AppointmentServices.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AvailableServiceResponse.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/Customer.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/Garage.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/GarageService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/GarageTechnician.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/GenericResponse.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/JobCard.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/VehicleDetails.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/VehicleRegistration.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AdditionalRequestService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AppointmentService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AppointmentSlotService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AvailableServiceManagementService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/GarageManagementService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/GarageServiceManagementService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/InvoiceService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/JobCardService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/RuleEngineService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/TechnicianService.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/BusinessValidator.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/Constants.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/DateHelper.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/GUIDGenerator.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/IntervalType.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/SKUGenerator.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/Status.java
-/Users/Yaqub/Documents/Car Service/Work/GarageManagementService/src/main/java/com/autoadda/garage/scheduler/AutoAppointmentScheduler.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/GarageManagementServiceApplication.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/config/OpenAPIConfig.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/AdditionalRequestController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/AppointmentController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/AvailableServiceController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/GarageController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/GarageServiceController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/GarageSubscriptionController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/InvoiceController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/JobCardController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/controller/VehicleSubscriptionController.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentInvoice.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentInvoiceBreakDown.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentServices.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AppointmentStatusActivity.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AuthenticationDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/AvailableService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/CompanyOwner.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Customer.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/CustomerAddress.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/FutureAppointment.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Garage.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageBreakTime.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageDocumentDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageHolidayOverride.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageLicenseDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageMemberRole.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageOwner.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GaragePaymentDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GaragePendingActions.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageRole.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageSubscription.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageTechnician.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/GarageWorkingHours.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/IndividualOwner.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/InspectionReport.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/InsuranceDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Invoice.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/InvoiceLineItem.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/JobCard.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/JobCardAdditionalRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/JobCardStatusActivity.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/MaintenanceScheduleRule.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Manufacturer.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/Model.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/ServiceCategory.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/SubscriptionUsageLog.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleCategory.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleListing.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleOwner.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleOwnerSubscription.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleRegistration.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleSale.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleSaleInvoice.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/VehicleType.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/entity/WorkOrder.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/AlreadyExistException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/ConflictException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/CustomerNotFoundException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/ErrorMessage.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/GarageNotFoundException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/GlobalExceptionHandler.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/MemberAlreadyExistException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/MemberNotFoundException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/ResourceNotFoundException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/exception/UnauthorizedAccessException.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/mapper/InvoiceMapper.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentDetailsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentInvoiceBreakDownRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentInvoiceRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentServiceRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AppointmentStatusActivityRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AuthenticationDetailsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/AvailableServiceRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/CompanyOwnerRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/CustomerAddressRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/CustomerRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/FutureAppointmentRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageBreakTimeRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageDocumentDetailsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageHolidayOverrideRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageLicenseDetailsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageOwnerRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GaragePaymentRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GaragePendingActionsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageServiceRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageSubscriptionRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageTechnicianRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/GarageWorkingHoursRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/IndividualOwnerRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/InsuranceDetailsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/InvoiceLineItemRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/InvoiceRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/JobCardAdditionalRequestRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/JobCardRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/JobcardStatusActivityRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/MaintenanceScheduleRuleRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/ManufacturerRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/ModelRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/ServiceCategoryRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/SubscriptionUsageLogRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleDetailsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleListingRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleOwnerRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleOwnerSubscriptionRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleRegistrationDetailsRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleSaleInvoiceRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleSaleRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/VehicleTypeRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/repository/WorkOrderRepository.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentDetailsRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentInvoiceRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentPayRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AppointmentStatusRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AssignServiceRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/AvailableServiceRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/CustomerAppointmentRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/GarageRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/GarageServiceRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/InspectionReportRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/JobCardAdditionalAPIRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/JobCardStatusRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/MaintenanceScheduleRuleRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/ServiceInvoice.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/SubscriptionRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/VehicleListingRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/VehicleSaleInvoiceRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/request/VehicleSaleRequest.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AppointmentDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AppointmentResponse.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AppointmentServices.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/AvailableServiceResponse.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/Customer.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/Garage.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/GarageService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/GarageTechnician.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/GenericResponse.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/JobCard.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/VehicleDetails.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/response/VehicleRegistration.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AdditionalRequestService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AppointmentService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AppointmentSlotService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/AvailableServiceManagementService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/GarageManagementService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/GarageServiceManagementService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/GarageSubscriptionService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/GarageTechnicianService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/InvoiceService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/JobCardService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/RuleEngineService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/SubscriptionUsageLogService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/TechnicianService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/VehicleOwnerSubscriptionService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/VehicleSaleService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/service/WorkOrderService.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/BusinessValidator.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/Constants.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/DateHelper.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/GUIDGenerator.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/IntervalType.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/OwnerType.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/SKUGenerator.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/Status.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/apis/garage/util/SubscriptionStatus.java
+/Users/Yaqub/Desktop/AutoAdda/Work/GarageManagementService/src/main/java/com/autoadda/garage/scheduler/AutoAppointmentScheduler.java

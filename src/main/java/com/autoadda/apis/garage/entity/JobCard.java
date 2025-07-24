@@ -5,14 +5,13 @@ import java.time.LocalTime;
 
 import com.autoadda.apis.garage.util.Status;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,24 +40,24 @@ public class JobCard {
 	@Column(name = "status")
 	private Status status;
 
-	@Column(name = "insert_tms")
-	private LocalDate insert_tms;
+	@Column(name = "created_at")
+	private LocalDate createdAt;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "appointment_id", referencedColumnName = "id")
+	@ManyToOne
+	private Garage garage;
+
+	@ManyToOne
+	private Technician technician;
+
+	@ManyToOne
 	private AppointmentDetails appointment;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "technician_id", referencedColumnName = "id")
-	private GarageTechnician technician;
-
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "apnt_service_id", referencedColumnName = "id")
+	@ManyToOne
 	private AppointmentServices service;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "garage_id", referencedColumnName = "id")
-	private Garage garage;
+	@ManyToOne
+	@JoinColumn(name = "work_order_id")
+	private WorkOrder workOrder;
 
 	@Column(name = "comments")
 	private String comments;

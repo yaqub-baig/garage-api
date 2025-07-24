@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -9,8 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.repository.GarageRepository;
+import com.autoadda.apis.garage.repository.TechnicianRepository;
+import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.util.Status;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class GarageManagementService {
@@ -18,10 +24,26 @@ public class GarageManagementService {
 	@Autowired
 	private GarageRepository garageRepository;
 
+	@Autowired
+	private TechnicianRepository technicianRepository;
+
+	Garage mapToEntity(GarageRequest garageRequest) {
+		Garage garage = new Garage();
+		garage.setLegalName(garageRequest.getLegalName());
+		garage.setGarageName(garageRequest.getGarageName());
+		garage.setEmailId(garageRequest.getEmailId());
+		garage.setContactNumber(garageRequest.getContactNumber());
+		garage.setWebSite(garageRequest.getWebSite());
+		garage.setAccountStatus(Status.PENDING); // Default status
+		garage.setGarageType(garageRequest.getGarageType());
+		garage.setChainId(garageRequest.getChainId());
+		return garage;
+	}
+
 	// Create a new Garage
-	public Garage createGarage(Garage garage) {
-		garage.setInsertTms(LocalDate.now());
-		return garageRepository.save(garage);
+	public Garage createGarage(GarageRequest garageRequest) {
+		garageRequest.setCreatedAt(LocalDate.now());
+		return garageRepository.save(mapToEntity(garageRequest));
 	}
 
 	// Get all garages
@@ -47,7 +69,7 @@ public class GarageManagementService {
 	}
 
 	// Update existing garage
-	public Garage updateGarage(Integer id, Garage updatedGarage) {
+	public Garage updateGarage(Integer id, GarageRequest updatedGarage) {
 		Garage existing = garageRepository.findById(id)
 				.orElseThrow(() -> new NoSuchElementException("Garage not found with id: " + id));
 		existing.setLegalName(updatedGarage.getLegalName());
@@ -150,4 +172,21 @@ public class GarageManagementService {
 	public Optional<Garage> findGarageByIdStatusLegalName(Integer id, Status status, String legalName) {
 		return garageRepository.findByIdAndAccountStatusAndLegalName(id, status, legalName);
 	}
+
+	public Technician onboardTechnician(Integer garageId, Technician technician, Integer ownerId)
+			throws AccessDeniedException {
+		Garage garage = garageRepository.findById(garageId)
+				.orElseThrow(() -> new EntityNotFoundException("Garage not found"));
+
+		if (!garage.getGarageOwner().getId().equals(ownerId)) {
+			throw new AccessDeniedException("Only garage owner can onboard technicians");
+		}
+
+		// You may check for duplicate email, phone etc.
+		technician.setStatus(Status.ACTIVE);
+		technician.setGarage(garage);
+
+		return technicianRepository.save(technician);
+	}
+
 }

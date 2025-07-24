@@ -1,7 +1,5 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDate;
-
 import com.autoadda.apis.garage.util.Status;
 
 import jakarta.persistence.CascadeType;
@@ -30,23 +28,19 @@ public class AppointmentServices {
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
-	
+
 	@Column(name = "status")
 	private Status status;
-	
+
 	@Column(name = "appointment_id")
 	private Integer appointmentId;
-	
-	@Column(name = "insert_tms")
-	private LocalDate insert_tms;
-	
+
 	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "service_id", referencedColumnName = "id")
-    private GarageService service;
-	
-	
+	@JoinColumn(name = "service_id", referencedColumnName = "id")
+	private GarageService service;
+
 	@OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "technician_id", referencedColumnName = "id")
-    private GarageTechnician technician;
-	
+	@JoinColumn(name = "technician_id", referencedColumnName = "id")
+	private Technician technician;
+
 }
