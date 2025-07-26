@@ -73,8 +73,9 @@ public class AppointmentSlotService {
 
         List<LocalTime> slots = new ArrayList<>();
         for (LocalTime t = openTime; t.plusMinutes(slotDuration).compareTo(closeTime) <= 0; t = t.plusMinutes(slotDuration)) {
+            LocalTime finalT = t;
             boolean inBreak = breaks.stream()
-                    .anyMatch(b -> !t.isBefore(b.getBreakStart()) && t.isBefore(b.getBreakEnd()));
+                    .anyMatch(b -> ! finalT.isBefore(b.getBreakStart()) && finalT.isBefore(b.getBreakEnd()));
             if (!booked.contains(t) && !inBreak) {
                 slots.add(t);
             }

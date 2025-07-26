@@ -6,14 +6,7 @@ import java.util.List;
 
 import com.autoadda.apis.garage.util.Status;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,7 +58,7 @@ public class Garage {
 
 	@OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Technician> technicians = new ArrayList<>();
-
-	@OneToOne(mappedBy = "garage_owner_id", cascade = CascadeType.ALL, orphanRemoval = true)
+	@ManyToOne
+	@JoinColumn(name = "garage_owner_id")
 	private GarageOwner garageOwner;
 }

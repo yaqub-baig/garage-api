@@ -21,9 +21,9 @@ public interface AvailableServiceRepository extends JpaRepository<AvailableServi
 
 	List<AvailableService> findByLaborPriceBetween(Double minLaborPrice, Double maxLaborPrice);
 
-	List<AvailableService> findByInsertTmsAfter(java.util.Date date);
+//	List<AvailableService> findByInsertTmsAfter(java.util.Date date);
 
-	List<AvailableService> findByInsertTmsBefore(java.util.Date date);
+//	List<AvailableService> findByInsertTmsBefore(java.util.Date date);
 
 	List<AvailableService> findByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(String name,
 			String description);

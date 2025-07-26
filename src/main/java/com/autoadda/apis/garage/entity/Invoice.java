@@ -6,16 +6,7 @@ import java.util.List;
 
 import com.autoadda.apis.garage.util.Status;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +36,7 @@ public class Invoice {
 
 	private Double taxRate; // e.g., 10.0 means 10%
 	private Double taxAmount;
+	private Double amountPaid;
 
 	private int loyaltyPointsUsed;
 	private int loyaltyPointsEarned;
@@ -52,11 +44,15 @@ public class Invoice {
 	@Enumerated(EnumType.STRING)
 	private Status paymentStatus;
 
+	@ManyToOne
+	@JoinColumn(name = "job_card_id")
+	private JobCard jobCard;
+
 	private String paymentMethod; // e.g., "CASH", "CREDIT_CARD", "ONLINE"
 
 	private Boolean isPaid;
 
 	private String notes;
 
-	private LocalDateTime createdDate;
+	private LocalDateTime createdAt;
 }

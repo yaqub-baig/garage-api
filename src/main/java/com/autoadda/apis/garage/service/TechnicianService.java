@@ -10,7 +10,9 @@ import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.request.TechnicianRequest;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TechnicianService {
 	@Autowired
 	private TechnicianRepository technicianRepository;
@@ -39,7 +41,7 @@ public class TechnicianService {
 	}
 
 	public Optional<Technician> findByEmail(String email) {
-		return technicianRepository.findByEmail(email);
+		return technicianRepository.findByEmailId (email);
 	}
 
 	public void deleteTechnician(Integer id) {
@@ -59,7 +61,7 @@ public class TechnicianService {
 	}
 
 	public Optional<Technician> findByPhone(String phone) {
-		return technicianRepository.findByPhone(phone);
+		return technicianRepository.findByMobileNumber (phone);
 	}
 
 	public Technician updateTechnician(TechnicianRequest technicianRequest) {

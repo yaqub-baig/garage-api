@@ -93,7 +93,7 @@ public class InvoiceService {
 
 		Invoice invoice = new Invoice();
 		invoice.setWorkOrder(workOrder);
-		invoice.setCreatedDate(LocalDateTime.now());
+		invoice.setCreatedAt (LocalDateTime.now());
 
 		for (InvoiceLineItem item : lineItems) {
 			if (item.getPrice() < 0 || item.getQuantity() <= 0) {
@@ -131,11 +131,11 @@ public class InvoiceService {
 
 	@Transactional
 	public List<Invoice> getInvoicesForGarage(Integer garageId) {
-		return invoiceRepository.findByWorkOrderJobCardGarageId(garageId);
+		return invoiceRepository.findByJobCardGarageId (garageId);
 	}
 
 	@Transactional
 	public List<Invoice> getInvoicesByDateRange(LocalDate startDate, LocalDate endDate) {
-		return invoiceRepository.findByCreatedDateBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+		return invoiceRepository.findByCreatedAtBetween (startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
 	}
 }

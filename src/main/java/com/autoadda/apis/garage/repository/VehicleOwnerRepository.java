@@ -23,5 +23,5 @@ public interface VehicleOwnerRepository extends JpaRepository<VehicleOwner, Inte
 	List<VehicleOwner> findByEmailContainingIgnoreCaseAndOwnerTypeAndIdNot(String email, OwnerType ownerType,
 			Integer id);
 
-	List<VehicleOwner> findByMobileNumberContainingIgnoreCase(String mobileNumber);
+//	List<VehicleOwner> findByMobileNumberContainingIgnoreCase(String mobileNumber);
 }

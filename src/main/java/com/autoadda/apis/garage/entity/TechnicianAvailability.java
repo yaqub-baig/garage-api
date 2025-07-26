@@ -43,5 +43,7 @@ public class TechnicianAvailability {
 	@JoinColumn(name = "technician_id")
 	private Technician technician;
 
+	private Integer availableHours;
+
 	// Getters and setters
 }

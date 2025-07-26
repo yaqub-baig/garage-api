@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class JobCardService {
 				.orElseThrow(() -> new RuntimeException("Technician not found"));
 
 		JobCard jobCard = JobCard.builder().appointment(appointment).garage(garage).technician(technician)
-				.service(service).status(Status.ASSIGNED).createdAt(DateHelper.dbDate())
+				.service(service).status(Status.ASSIGNED).createdAt(DateHelper.dbDate().atTime(LocalTime.now()))
 				.serviceStartTime(DateHelper.dbTime()).comments(request.getComments()).build();
 
 		jobCardRepo.save(jobCard);
@@ -125,7 +126,7 @@ public class JobCardService {
 		}
 
 		jobCard.setStatus(Status.COMPLETED);
-		jobCard.setServiceEndTime(LocalTime.now());
+		jobCard.setServiceEndTime( LocalTime.now());
 
 		return jobCardRepo.save(jobCard);
 	}

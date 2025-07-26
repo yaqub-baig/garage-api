@@ -13,7 +13,7 @@ import com.autoadda.apis.garage.entity.Invoice;
 import com.autoadda.apis.garage.util.Status;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
-	List<Invoice> findByWorkOrderJobCardGarageId(Integer garageId);
+	List<Invoice> findByJobCardGarageId(Integer garageId);
 
 	// Find invoices by Work Order
 	Optional<Invoice> findByWorkOrderId(Integer workOrderId);
@@ -26,7 +26,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
 	List<Invoice> findByPaymentStatus(Status status);
 
 	// Filter by creation date range
-	List<Invoice> findByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+	List<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
 	// Search by partial note content
 	List<Invoice> findByNotesContainingIgnoreCase(String keyword);

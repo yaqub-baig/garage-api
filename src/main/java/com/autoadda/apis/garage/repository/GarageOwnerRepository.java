@@ -10,5 +10,5 @@ import com.autoadda.apis.garage.entity.GarageOwner;
 @Repository
 public interface GarageOwnerRepository extends JpaRepository<GarageOwner, Integer> {
 
-	List<GarageOwner> findByGarageId(Integer garageId);
+//	List<GarageOwner> findByGarageId(Integer garageId);
 }

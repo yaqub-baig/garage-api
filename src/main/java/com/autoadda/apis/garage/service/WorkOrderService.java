@@ -45,6 +45,6 @@ public class WorkOrderService {
 	}
 
 	public List<WorkOrder> getWorkOrdersForGarage(Integer garageId) {
-		return workOrderRepository.findByJobCardGarageId(garageId);
+		return workOrderRepository.findByGarageId (garageId);
 	}
 }

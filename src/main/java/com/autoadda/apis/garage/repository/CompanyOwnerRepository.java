@@ -13,6 +13,6 @@ public interface CompanyOwnerRepository extends JpaRepository<CompanyOwner, Inte
 
 	Optional<CompanyOwner> findByEmail(String email);
 
-	Optional<CompanyOwner> findByMobileNumber(String mobileNumber);
+	Optional<CompanyOwner> findByPhone(String mobileNumber);
 
 }
