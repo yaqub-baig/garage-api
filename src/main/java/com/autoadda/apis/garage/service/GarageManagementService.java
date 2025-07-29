@@ -36,6 +36,7 @@ public class GarageManagementService {
         garage.setName ( garageRequest.getName ( ) );
         garage.setEmail ( garageRequest.getEmail ( ) );
         garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
+        garage.setTrnNumber ( garageRequest.getTrnNumber ( ) );
         garage.setWebSite ( garageRequest.getWebSite ( ) );
         garage.setAccountStatus ( Status.PENDING ); // Default status
         garage.setGarageType ( garageRequest.getGarageType ( ) );
@@ -88,11 +89,11 @@ public class GarageManagementService {
 
     // Get all garages
     public List<Garage> getAllGarages() {
-        return garageRepository.findAll ( );
+        return garageRepository.findAll ( ).stream ().filter ( Garage::isActive ).toList ();
     }
 
     public List<Garage> getAllGaragesByOwnerId(String autoAddaId) {
-        return garageRepository.findByGarageOwner (Integer.parseInt ( autoAddaId ) );
+        return garageRepository.findByGarageOwner (Integer.parseInt ( autoAddaId ) ).stream ().filter ( Garage::isActive ).toList ();
     }
     // Get all garages with services
     public List<Garage> getAllGaragesWithServices() {
@@ -194,7 +195,9 @@ public class GarageManagementService {
 
     // Delete garage
     public void deleteGarage(Integer id) {
-        garageRepository.deleteById ( id );
+        Garage garage = garageRepository.findById ( id ).orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
+        garage.setActive ( false );
+        garageRepository.save ( garage );
     }
 
     // Search/filter methods

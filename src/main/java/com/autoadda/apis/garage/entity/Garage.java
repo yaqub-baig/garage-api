@@ -72,6 +72,8 @@ public class Garage {
     @Column(name = "garage_owner_id")
     private Integer garageOwner;
 
+    private boolean isActive;
+
     @OneToMany
     @JoinColumn(name = "garage_trade_license")
     private List<MediaFile> tradeLicenseAttachment = new ArrayList<> ( );
@@ -92,6 +94,7 @@ public class Garage {
 
     @PrePersist
     public void prePersist() {
+        isActive = true;
         createdAt = LocalDateTime.now ( );
     }
 }
