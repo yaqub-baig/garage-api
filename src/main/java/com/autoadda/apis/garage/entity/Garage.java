@@ -1,17 +1,12 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDate;
+import com.autoadda.apis.garage.util.Status;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.autoadda.apis.garage.util.Status;
-
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
@@ -21,44 +16,84 @@ import lombok.Setter;
 @Builder
 public class Garage {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Integer id;
 
-	@Column(name = "legal_name")
-	private String legalName;
+    @Column(name = "garage_brand_name")
+    private String garageBrandName;
 
-	@Column(name = "garage_name")
-	private String garageName;
+    @Column(name = "garage_arabic_name")
+    private String garageArabicName;
 
-	@Column(name = "email_id")
-	private String emailId;
+    @Column(name = "garage_name")
+    private String name;
 
-	@Column(name = "contact_number")
-	private String contactNumber;
+    @Column(name = "trn_number")
+    private String trnNumber;
 
-	@Column(name = "website")
-	private String webSite;
+    @Column(name = "website")
+    private String webSite;
 
-	@Column(name = "account_status")
-	private Status accountStatus;
+    @Column(name = "email_id")
+    private String email;
 
-	@Column(name = "garage_type")
-	private String garageType;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
-	@Column(name = "chain_id")
-	private Integer chainId;
+    @Column(name = " mobile_number")
+    private String mobileNumber;
 
-	@Column(name = "created_at")
-	private LocalDate createdAt;
+    @OneToOne
+    @JoinColumn(name = "garage_logo")
+    private MediaFile garageLogo;
 
-	@OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<GarageService> services = new ArrayList<>();
+    @OneToOne
+    private Location garageLocation;
 
-	@OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Technician> technicians = new ArrayList<>();
-	@ManyToOne
-	@JoinColumn(name = "garage_owner_id")
-	private GarageOwner garageOwner;
+    @Column(name = "account_status")
+    private Status accountStatus;
+
+    @Column(name = "garage_type")
+    private String garageType;
+
+    @Column(name = "chain_id")
+    private Integer chainId;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "brands")
+    private String brands;
+
+    @Column(name = "models")
+    private String models;
+
+    @ManyToOne
+    @JoinColumn(name = "garage_owner_id")
+    private User garageOwner;
+
+    @OneToMany
+    @JoinColumn(name = "garage_trade_license")
+    private List<MediaFile> tradeLicenseAttachment = new ArrayList<> ( );
+
+    @OneToMany
+    @JoinColumn(name = "garage_vat_certificate")
+    private List<MediaFile> vatCertificate = new ArrayList<> ( );
+
+    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GarageService> services = new ArrayList<> ( );
+
+    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Technician> technicians = new ArrayList<> ( );
+
+    @OneToMany
+    @JoinColumn(name = "garage_images")
+    private List<MediaFile> garageImages = new ArrayList<> ( );
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now ( );
+    }
 }

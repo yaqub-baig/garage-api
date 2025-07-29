@@ -51,8 +51,8 @@ public class GarageOwner {
 	@Column(name = "account_status")
 	private Status accountStatus;
 
-	@OneToMany(mappedBy = "garageOwner", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Garage> ownedGarages = new ArrayList<>();
+//	@OneToMany(mappedBy = "garageOwner", cascade = CascadeType.ALL, orphanRemoval = true)
+//	private List<Garage> ownedGarages = new ArrayList<>();
 
 	@Column(name = "ownership_per")
 	private Integer ownershipPer;

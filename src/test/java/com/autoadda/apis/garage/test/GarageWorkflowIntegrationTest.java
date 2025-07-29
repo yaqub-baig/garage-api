@@ -81,7 +81,7 @@ class GarageWorkflowIntegrationTest {
 	@BeforeEach
 	void setup() {
 		garage = new Garage();
-		garage.setGarageName("FastFix Garage");
+		garage.setName ("FastFix Garage");
 		garageRepository.save(garage);
 
 		technician = new Technician();

@@ -1,8 +1,11 @@
 package com.autoadda.apis.garage.exception;
 
 import java.nio.file.AccessDeniedException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.fileupload.FileCountLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import com.autoadda.apis.garage.response.GenericResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartException;
 
 @Slf4j
 @RestControllerAdvice
@@ -30,6 +34,20 @@ public class GlobalExceptionHandler {
 		return buildResponse(ex, HttpStatus.BAD_REQUEST, ErrorMessage.ERROR_VALIDATION_FAILED + ": " + errors);
 	}
 
+	@ExceptionHandler(MultipartException.class)
+	public ResponseEntity<Map<String, String>> handleMultipartException(MultipartException ex) {
+		Map<String, String> response = new HashMap<> ();
+
+		if (ex.getCause() instanceof FileCountLimitExceededException ) {
+			response.put("error", "Too many files in the request");
+			response.put("message", "Maximum file count exceeded. Please reduce the number of files.");
+			return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(response);
+		}
+
+		response.put("error", "File upload error");
+		response.put("message", ex.getMessage());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<GenericResponse> handleConstraintViolation(ConstraintViolationException ex) {
 		log.warn("Constraint violation: {}", ex.getMessage());

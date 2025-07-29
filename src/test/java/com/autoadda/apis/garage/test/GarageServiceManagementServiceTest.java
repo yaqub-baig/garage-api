@@ -39,7 +39,7 @@ class GarageServiceManagementServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		garage = Garage.builder().id(1).garageName("My Garage").build();
+		garage = Garage.builder().id(1).name ("My Garage").build();
 		availableService = AvailableService.builder().id(1).name("Oil Change").build();
 		garageService = GarageService.builder().id(1).garage(garage).availableService(availableService).isActive(true)
 				.build();

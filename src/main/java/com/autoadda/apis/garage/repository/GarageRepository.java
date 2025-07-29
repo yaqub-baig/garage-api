@@ -28,14 +28,14 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 	List<Garage> findGaragesByAvailableServiceId(@Param("serviceId") Integer serviceId);
 
 	// Optional: Find garages by legal name, ignoring case
-	@Query("SELECT g FROM Garage g WHERE LOWER(g.legalName) LIKE LOWER(CONCAT('%', :legalName, '%'))")
-	List<Garage> findByLegalNameIgnoreCase(@Param("legalName") String legalName);
+	@Query("SELECT g FROM Garage g WHERE LOWER(g.garageBrandName) LIKE LOWER(CONCAT('%', :legalName, '%'))")
+	List<Garage> findByGarageBrandNameIgnoreCase(@Param("legalName") String legalName);
 
-	List<Garage> findByLegalNameContaining(String legalName);
+	List<Garage> findByGarageBrandNameContaining(String legalName);
 
-	List<Garage> findByLegalNameContainingIgnoreCase(String legalName);
+	List<Garage> findByGarageBrandNameContainingIgnoreCase(String legalName);
 
-	List<Garage> findByGarageNameContainingIgnoreCase(String garageName);
+	List<Garage> findByNameContainingIgnoreCase(String garageName);
 
 	List<Garage> findByAccountStatus(Status status);
 
@@ -43,17 +43,17 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
 	List<Garage> findByGarageType(String garageType);
 
-	Optional<Garage> findByEmailId(String emailId);
+	Optional<Garage> findByEmail(String emailId);
 
-	Optional<Garage> findByContactNumber(String contactNumber);
+	Optional<Garage> findByPhoneNumber(String contactNumber);
 
 	Optional<Garage> findById(Integer id);
 
-	Optional<Garage> findByLegalName(String legalName);
+	Optional<Garage> findByGarageBrandName(String legalName);
 
 	Optional<Garage> findByWebSite(String webSite);
 
-	Optional<Garage> findByGarageName(String garageName);
+	Optional<Garage> findByName(String garageName);
 
 	Optional<Garage> findByIdAndAccountStatus(Integer id, Status status);
 
@@ -61,21 +61,21 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
 	Optional<Garage> findByIdAndGarageType(Integer id, String garageType);
 
-	Optional<Garage> findByIdAndLegalName(Integer id, String legalName);
+	Optional<Garage> findByIdAndGarageBrandName(Integer id, String legalName);
 
 	Optional<Garage> findByIdAndWebSite(Integer id, String webSite);
 
-	Optional<Garage> findByIdAndEmailId(Integer id, String emailId);
+	Optional<Garage> findByIdAndEmail(Integer id, String emailId);
 
-	Optional<Garage> findByIdAndContactNumber(Integer id, String contactNumber);
+	Optional<Garage> findByIdAndPhoneNumber(Integer id, String contactNumber);
 
-	Optional<Garage> findByIdAndGarageName(Integer id, String garageName);
+	Optional<Garage> findByIdAndName(Integer id, String garageName);
 
 	Optional<Garage> findByIdAndAccountStatusAndChainId(Integer id, Status status, Integer chainId);
 
 	Optional<Garage> findByIdAndAccountStatusAndGarageType(Integer id, Status status, String garageType);
 
-	Optional<Garage> findByIdAndAccountStatusAndLegalName(Integer id, Status status, String legalName);
+	Optional<Garage> findByIdAndAccountStatusAndGarageBrandName(Integer id, Status status, String legalName);
 
-	Garage save(GarageRequest any);
+//	Garage save(GarageRequest any);
 }

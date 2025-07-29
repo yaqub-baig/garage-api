@@ -43,7 +43,7 @@ class GarageSubscriptionServiceTest {
 	void setUp() {
 		garage = new Garage();
 		garage.setId(1);
-		garage.setGarageName("Test Garage");
+		garage.setName ("Test Garage");
 
 		plan = new GarageSubscription();
 		plan.setId(1);
