@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/additional-requests")
+@RequestMapping("/additional-requests")
 @RequiredArgsConstructor
 public class AdditionalRequestController {
 

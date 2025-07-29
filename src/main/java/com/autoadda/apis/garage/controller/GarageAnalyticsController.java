@@ -17,7 +17,7 @@ import com.autoadda.apis.garage.request.TechnicianSummaryDTO;
 import com.autoadda.apis.garage.service.GarageAnalyticsService;
 
 @RestController
-@RequestMapping("/api/garage-analytics")
+@RequestMapping("/garage-analytics")
 public class GarageAnalyticsController {
 
 	private final GarageAnalyticsService analyticsService;

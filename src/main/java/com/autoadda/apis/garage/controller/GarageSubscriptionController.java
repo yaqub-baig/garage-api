@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/garage-subscriptions")
+@RequestMapping("/garage-subscriptions")
 @RequiredArgsConstructor
 public class GarageSubscriptionController {
 

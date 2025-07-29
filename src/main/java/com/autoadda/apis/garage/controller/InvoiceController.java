@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/invoices")
+@RequestMapping("/invoices")
 @RequiredArgsConstructor
 public class InvoiceController {
 

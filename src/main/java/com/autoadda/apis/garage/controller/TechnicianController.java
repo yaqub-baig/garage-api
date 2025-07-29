@@ -19,7 +19,7 @@ import com.autoadda.apis.garage.service.TechnicianService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
-@RequestMapping("/api/technicians")
+@RequestMapping("/technicians")
 public class TechnicianController {
 
 	@Autowired

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/garages")
+@RequestMapping("/garages")
 @RequiredArgsConstructor
 public class GarageController {
 
@@ -68,8 +68,8 @@ public class GarageController {
                                                @RequestHeader(value = "X-User-Id") String userId,
                                                @RequestHeader(value = "X-User-Role") String userRole,
                                                @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
-                                               @RequestPart(value = "garage", required = false) @Valid GarageRequest garage,
-                                               @RequestPart(value = "garageLogo", required = false) @NotNull MultipartFile garageLogo,
+                                               @RequestPart(value = "garage", required = false)  GarageRequest garage,
+                                               @RequestPart(value = "garageLogo", required = false)  MultipartFile garageLogo,
                                                @RequestPart(value = "vatCertificate", required = false)
                                                @Size(max = 5, message = "Maximum 5 VAT certificate files allowed")
                                                List<MultipartFile> vatCertificate,
@@ -88,7 +88,7 @@ public class GarageController {
             requestData.put ( "vatCertificate", vatCertificate );
         if ( garageImages != null && ! garageImages.isEmpty ( ) )
             requestData.put ( "garageImages", garageImages );
-        if ( garageLogo != null  )
+        if ( garageLogo != null && ! garageLogo.isEmpty ( ) )
             requestData.put ( "garageLogo", garageLogo );
         return ResponseEntity.ok ( garageService.updateGarage ( id, requestData ) );
     }

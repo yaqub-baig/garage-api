@@ -15,7 +15,7 @@ import com.autoadda.apis.garage.entity.LoyaltyTransaction;
 import com.autoadda.apis.garage.service.LoyaltyService;
 
 @RestController
-@RequestMapping("/api/loyalty")
+@RequestMapping("/loyalty")
 public class LoyaltyController {
 
 	@Autowired

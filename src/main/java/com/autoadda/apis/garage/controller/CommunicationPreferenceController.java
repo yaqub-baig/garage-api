@@ -16,7 +16,7 @@ import com.autoadda.apis.garage.service.CommunicationPreferenceService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
-@RequestMapping("/api/preferences")
+@RequestMapping("/preferences")
 public class CommunicationPreferenceController {
 
 	@Autowired

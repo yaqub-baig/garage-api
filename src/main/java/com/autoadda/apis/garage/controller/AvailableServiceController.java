@@ -20,7 +20,7 @@ import com.autoadda.apis.garage.service.AvailableServiceManagementService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
-@RequestMapping("/api/available-services")
+@RequestMapping("/available-services")
 public class AvailableServiceController {
 
 	@Autowired
