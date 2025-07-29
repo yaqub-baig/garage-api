@@ -30,7 +30,7 @@ public class GarageController {
             @RequestHeader(value = "X-User-Role") String userRole,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
             @RequestPart("garage") @Valid GarageRequest garage,
-            @RequestPart("garageLogo") @NotNull MultipartFile garageLogo,
+            @RequestPart(value = "garageLogo",required = true) MultipartFile garageLogo,
             @RequestPart(value = "vatCertificate", required = false)
             @Size(max = 5, message = "Maximum 5 VAT certificate files allowed")
             List<MultipartFile> vatCertificate,
