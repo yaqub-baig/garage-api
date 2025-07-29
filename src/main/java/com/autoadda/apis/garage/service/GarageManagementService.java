@@ -36,6 +36,7 @@ public class GarageManagementService {
         garage.setName ( garageRequest.getName ( ) );
         garage.setEmail ( garageRequest.getEmail ( ) );
         garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
+        garage.setMobileNumber ( garageRequest.getMobileNumber ( ) );
         garage.setTrnNumber ( garageRequest.getTrnNumber ( ) );
         garage.setWebSite ( garageRequest.getWebSite ( ) );
         garage.setAccountStatus ( Status.PENDING ); // Default status
