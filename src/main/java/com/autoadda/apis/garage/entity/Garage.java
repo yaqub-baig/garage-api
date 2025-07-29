@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 @Builder
 public class Garage {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -70,9 +69,8 @@ public class Garage {
     @Column(name = "models")
     private String models;
 
-    @ManyToOne
-    @JoinColumn(name = "garage_owner_id")
-    private User garageOwner;
+    @Column(name = "garage_owner_id")
+    private Integer garageOwner;
 
     @OneToMany
     @JoinColumn(name = "garage_trade_license")

@@ -77,5 +77,7 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
 	Optional<Garage> findByIdAndAccountStatusAndGarageBrandName(Integer id, Status status, String legalName);
 
+	List<Garage> findByGarageOwner(Integer ownerId);
+
 //	Garage save(GarageRequest any);
 }

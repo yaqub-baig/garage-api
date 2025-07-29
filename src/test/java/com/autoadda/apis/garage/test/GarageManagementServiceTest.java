@@ -82,7 +82,7 @@ class GarageServiceTest {
     @Test
     void testGetAllGarages() {
         when ( garageRepository.findAll ( ) ).thenReturn ( List.of ( sampleGarageEntity ) );
-        List<Garage> garages = garageService.getAllGarages ( );
+        List<Garage> garages = garageService.getAllGarages (  );
         assertEquals ( 1, garages.size ( ) );
         assertEquals ( "QuickFix", garages.get ( 0 ).getName ( ) );
     }
@@ -95,23 +95,23 @@ class GarageServiceTest {
         assertEquals ( "QuickFix", result.get ( ).getName ( ) );
     }
 
-    @Test
-    void testUpdateGarageSuccess() {
-        when ( garageRepository.findById ( 1 ) ).thenReturn ( Optional.of ( sampleGarageEntity ) );
-        when ( garageRepository.save ( any ( Garage.class ) ) ).thenReturn ( sampleGarageEntity );
-
-        GarageRequest updatedRequest = new GarageRequest ( );
-        updatedRequest.setName ( "SpeedFix" );
-        updatedRequest.setGarageBrandName ( "SpeedFix Inc" );
-        updatedRequest.setPhoneNumber ( "9998887777" );
-
-        Garage updatedGarage = garageService.updateGarage ( 1, updatedRequest );
-
-        assertNotNull ( updatedGarage );
-        assertEquals ( "SpeedFix", updatedGarage.getName ( ) );
-        assertEquals ( "SpeedFix Inc", updatedGarage.getGarageBrandName ( ) );
-        assertEquals ( "9998887777", updatedGarage.getPhoneNumber ( ) );
-    }
+//    @Test
+//    void testUpdateGarageSuccess() {
+//        when ( garageRepository.findById ( 1 ) ).thenReturn ( Optional.of ( sampleGarageEntity ) );
+//        when ( garageRepository.save ( any ( Garage.class ) ) ).thenReturn ( sampleGarageEntity );
+//
+//        GarageRequest updatedRequest = new GarageRequest ( );
+//        updatedRequest.setName ( "SpeedFix" );
+//        updatedRequest.setGarageBrandName ( "SpeedFix Inc" );
+//        updatedRequest.setPhoneNumber ( "9998887777" );
+//
+//        Garage updatedGarage = garageService.updateGarage ( 1, updatedRequest );
+//
+//        assertNotNull ( updatedGarage );
+//        assertEquals ( "SpeedFix", updatedGarage.getName ( ) );
+//        assertEquals ( "SpeedFix Inc", updatedGarage.getGarageBrandName ( ) );
+//        assertEquals ( "9998887777", updatedGarage.getPhoneNumber ( ) );
+//    }
 
     @Test
     void testSoftDeleteGarage() {

@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.config.AuthClient;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.entity.MediaFile;
@@ -17,10 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +28,7 @@ public class GarageManagementService {
     private final LocationService locationService;
     private final MediaFileRepository mediaFileRepository;
     private final MediaFileService mediaFileService;
+    private final AuthClient authClient;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage ( );
@@ -49,37 +48,38 @@ public class GarageManagementService {
     }
 
     public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId, MultipartFile garageLogo, List<MultipartFile> vatCertificate, List<MultipartFile> tradeLicenseAttachment, List<MultipartFile> garageImages) throws IOException {
-        System.out.println("1");
+
         Garage garage = mapToEntity ( garageRequest );
-        System.out.println("2");
+
         Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
-        System.out.println("3");
+
         garage.setGarageLocation ( location );
+        garage.setGarageOwner ( Integer.parseInt ( autoAddaId  ));
 //      =================================================================================================================
-        System.out.println("4");
+
         List<MediaFile> logo = mediaFileService.upload ( Collections.singletonList ( garageLogo ) );
-        System.out.println("5");
+
         MediaFile logoMediaFile = logo.get ( 0 );
-        System.out.println("6");
+
         garage.setGarageLogo ( logoMediaFile );
-        System.out.println("7");
+
         if ( logoMediaFile != null ) {
-        System.out.println("8");
+
         List<MediaFile> vatCertificates = mediaFileService.upload ( vatCertificate );
-        System.out.println("9");
+
         garage.setVatCertificate ( vatCertificates );
         }
         if ( tradeLicenseAttachment != null ) {
             List<MediaFile> tradeLicenseAttachments = mediaFileService.upload ( tradeLicenseAttachment );
-            System.out.println("10");
+
             garage.setTradeLicenseAttachment ( tradeLicenseAttachments );
-            System.out.println("11");
+
         }
         if (tradeLicenseAttachment != null) {
             List<MediaFile> garageImagess = mediaFileService.upload ( garageImages );
-            System.out.println("12");
+
             garage.setGarageImages ( garageImagess);
-            System.out.println("13");
+
         }
 //=====================================================================================================================================================
         return garageRepository.save ( garage );
@@ -91,6 +91,9 @@ public class GarageManagementService {
         return garageRepository.findAll ( );
     }
 
+    public List<Garage> getAllGaragesByOwnerId(String autoAddaId) {
+        return garageRepository.findByGarageOwner (Integer.parseInt ( autoAddaId ) );
+    }
     // Get all garages with services
     public List<Garage> getAllGaragesWithServices() {
         return garageRepository.findAllWithServices ( );
@@ -109,17 +112,83 @@ public class GarageManagementService {
     }
 
     // Update existing garage
-    public Garage updateGarage(Integer id, GarageRequest updatedGarage) {
+    public Garage updateGarage(Integer id, Map<String,Object> request) throws IOException {
         Garage existing = garageRepository.findById ( id )
                 .orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
-//        existing.setGarageBrandName ( updatedGarage.getLegalName ( ) );
-//        existing.setName ( updatedGarage.getGarageName ( ) );
-//        existing.setEmail ( updatedGarage.getEmailId ( ) );
-//        existing.setPhoneNumber ( updatedGarage.getContactNumber ( ) );
-//        existing.setAccountStatus ( updatedGarage.getAccountStatus ( ) );
-        existing.setWebSite ( updatedGarage.getWebSite ( ) );
-        existing.setGarageType ( updatedGarage.getGarageType ( ) );
-        existing.setChainId ( updatedGarage.getChainId ( ) );
+        if(request.containsKey ( "data" )) {
+            GarageRequest data = (GarageRequest) request.get ( "data" );
+            if(data.getGarageLocation() != null) {
+                Location existingGarageLocation = existing.getGarageLocation ( );
+                Location location = locationService.updateLocation ( existingGarageLocation.getId ( ),data.getGarageLocation ( ) );
+                existing.setGarageLocation ( location );
+            }
+            if(data.getGarageType ()!=null) {
+                existing.setGarageType ( data.getGarageType ( ) );
+            }
+            if(data.getBrands ()!=null) {
+                existing.setBrands ( data.getBrands ( ) );
+            }
+            if(data.getModels ()!=null) {
+                existing.setModels ( data.getModels ( ) );
+            }
+            if(data.getGarageArabicName ()!=null) {
+                existing.setGarageArabicName ( data.getGarageArabicName ( ) );
+            }
+            if (data.getChainId ()!=null) {
+                existing.setChainId ( data.getChainId ( ) );
+            }
+            if(data.getGarageBrandName ()!=null) {
+                existing.setGarageBrandName ( data.getGarageBrandName ( ) );
+            }
+            if(data.getTrnNumber ()!=null) {
+                existing.setTrnNumber ( data.getTrnNumber ( ) );
+            }
+            if(data.getPhoneNumber ()!=null) {
+                existing.setPhoneNumber ( data.getPhoneNumber ( ) );
+            }
+            if(data.getWebSite ()!=null) {
+                existing.setWebSite ( data.getWebSite ( ) );
+            }
+            if(data.getName ()!=null) {
+                existing.setName ( data.getName ( ) );
+            }
+           if(data.getMobileNumber ()!=null) {
+               existing.setMobileNumber ( data.getMobileNumber ( ) );
+           }
+        }
+        if (request.containsKey("garageLogo")) {
+                // 1. First upload the new logo
+                MultipartFile garageLogo = (MultipartFile) request.get("garageLogo");
+                List<MediaFile> logo = mediaFileService.upload(Collections.singletonList(garageLogo));
+                if (logo == null || logo.isEmpty()) {
+                    throw new RuntimeException("Failed to upload new logo");
+                }
+                // 2. Only after successful upload, delete the old one
+                MediaFile oldLogo = existing.getGarageLogo();
+                if (oldLogo != null) {
+                        mediaFileService.delete(oldLogo.getId());
+                }
+                // 3. Update the reference
+                existing.setGarageLogo(logo.get(0));
+        }
+        if(request.containsKey ( "garageImages" )) {
+            List<MultipartFile> garageImages = (List<MultipartFile>) request.get ( "garageImages" );
+            List<MediaFile> mediaFiles = mediaFileService.upload ( garageImages );
+            existing.getGarageImages ( ).clear ( );
+            existing.getGarageImages ( ).addAll ( mediaFiles );
+        }
+        if(request.containsKey ( "tradeLicenseAttachment" )) {
+            List<MultipartFile> tradeLicenseAttachment = (List<MultipartFile>) request.get ( "tradeLicenseAttachment" );
+            List<MediaFile> mediaFiles = mediaFileService.upload ( tradeLicenseAttachment );
+            existing.getTradeLicenseAttachment ( ).clear ( );
+            existing.getTradeLicenseAttachment (  ).addAll ( mediaFiles );
+        }
+        if(request.containsKey ( "vatCertificate" )) {
+            List<MultipartFile> vatCertificate = (List<MultipartFile>) request.get ( "vatCertificate" );
+            List<MediaFile> mediaFiles = mediaFileService.upload ( vatCertificate );
+            existing.getVatCertificate ( ).clear ( );
+            existing.getVatCertificate (  ).addAll ( mediaFiles );
+        }
         return garageRepository.save ( existing );
     }
 
@@ -218,7 +287,7 @@ public class GarageManagementService {
         Garage garage = garageRepository.findById ( garageId )
                 .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found" ) );
 
-        if ( ! garage.getGarageOwner ( ).getId ( ).equals ( ownerId ) ) {
+        if ( ! garage.getGarageOwner ( ).equals ( ownerId ) ) {
             throw new AccessDeniedException ( "Only garage owner can onboard technicians" );
         }
 

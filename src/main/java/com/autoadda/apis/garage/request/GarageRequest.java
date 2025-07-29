@@ -21,14 +21,11 @@ public class GarageRequest {
     private String email;
     private String phoneNumber;
     private String mobileNumber;
-    private MediaFile garageLogo;
     private LocationRequest garageLocation;
     private String garageType;
     private Integer chainId;
     private String brands;
     private String models;
     private Integer garageOwnerId;
-    private List<MediaFile> tradeLicenseAttachment;
-    private List<MediaFile> vatCertificate;
-    private List<MediaFile> garageImages;
+
 }
