@@ -38,7 +38,6 @@ public class OtherServiceController {
             @RequestPart(value = "companyImages", required = false)
             @Size(max = 10, message = "Maximum 10 company images allowed")
             List<MultipartFile> companyImages) throws IOException {
-
         return ResponseEntity.status ( HttpStatus.CREATED )
                 .body ( otherService.createOtherService (
                         otherServiceRequest,

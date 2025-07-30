@@ -72,19 +72,19 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         // Handle VAT certificates
         if (vatCertificate != null && !vatCertificate.isEmpty()) {
             List<MediaFile> vatCertificates = mediaFileService.upload(vatCertificate);
-            otherService.getVatCertificate().addAll ( vatCertificates );
+            otherService.setVatCertificate( vatCertificates );
         }
         
         // Handle trade license attachments
-        if (tradeLicenseAttachment != null && !tradeLicenseAttachment.isEmpty()) {
+        if (tradeLicenseAttachment != null ) {
             List<MediaFile> tradeLicenseAttachments = mediaFileService.upload(tradeLicenseAttachment);
-            otherService.getTradeLicenseAttachment().addAll ( tradeLicenseAttachments );
+            otherService.setTradeLicenseAttachment( tradeLicenseAttachments );
         }
         
         // Handle company images
-        if (companyImages != null && !companyImages.isEmpty()) {
+        if (companyImages != null ) {
             List<MediaFile> uploadedCompanyImages = mediaFileService.upload(companyImages);
-            otherService.getCompanyImages().addAll(uploadedCompanyImages);
+            otherService.setCompanyImages(uploadedCompanyImages);
         }
         
         return otherServiceRepository.save(otherService);
@@ -94,14 +94,14 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
     public List<OtherService> getAllOtherServices() {
         return otherServiceRepository.findAll().stream()
                 .filter(OtherService::isActive)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<OtherService> getAllOtherServicesByOwnerId(String autoAddaId) {
         return otherServiceRepository.findByCompanyOwner(Integer.parseInt(autoAddaId)).stream()
                 .filter(OtherService::isActive)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

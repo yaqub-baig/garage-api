@@ -25,7 +25,7 @@ public class MediaFileController {
     }
 
     @DeleteMapping("/delete-image/{id}")
-    public ResponseEntity<GenericResponse> deleteImage(@RequestParam("id") Long id) {
+    public ResponseEntity<GenericResponse> deleteImage(@PathVariable("id") Long id) {
         return ResponseEntity.ok ( mediaFileService.delete ( id ) );
     }
 

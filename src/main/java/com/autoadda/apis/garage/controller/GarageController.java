@@ -96,7 +96,7 @@ public class GarageController {
         return garageService.getGarageById ( id ).map ( ResponseEntity::ok ).orElse ( ResponseEntity.notFound ( ).build ( ) );
     }
 
-    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/{id}")
     public ResponseEntity<Garage> updateGarage(@PathVariable Integer id,
                                                @RequestHeader(value = "X-User-Id") String userId,
                                                @RequestHeader(value = "X-User-Role") String userRole,
