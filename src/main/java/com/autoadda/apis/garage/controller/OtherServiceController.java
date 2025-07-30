@@ -21,32 +21,18 @@ public class OtherServiceController {
 
     private final OtherServiceManagementService otherService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<?> createOtherService(
             @RequestHeader(value = "X-User-Id") String userId,
             @RequestHeader(value = "X-User-Role") String userRole,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
-            @RequestPart("otherService") OtherServiceRequest otherServiceRequest,
-            @RequestPart(value = "companyLogo", required = true) MultipartFile companyLogo,
-            @RequestPart(value = "vatCertificate", required = false)
-            @Size(max = 5, message = "Maximum 5 VAT certificate files allowed")
-            List<MultipartFile> vatCertificate,
-            @RequestPart(value = "tradeLicenseAttachment", required = false)
-            @Size(max = 5, message = "Maximum 5 trade license files allowed")
-            List<MultipartFile> tradeLicenseAttachment,
-            @RequestPart(value = "companyImages", required = false)
-            @Size(max = 10, message = "Maximum 10 company images allowed")
-            List<MultipartFile> companyImages) throws IOException {
+            @RequestBody OtherServiceRequest otherServiceRequest) {
         return ResponseEntity.status ( HttpStatus.CREATED )
                 .body ( otherService.createOtherService (
                         otherServiceRequest,
                         userId,
                         userRole,
-                        autoAddaId,
-                        companyLogo,
-                        vatCertificate,
-                        tradeLicenseAttachment,
-                        companyImages
+                        autoAddaId
                 ) );
     }
 

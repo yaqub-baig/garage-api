@@ -18,11 +18,8 @@ public interface OtherServiceManagementService {
     OtherService createOtherService(OtherServiceRequest otherServiceRequest, 
                                   String userId, 
                                   String userRole, 
-                                  String autoAddaId,
-                                  MultipartFile companyLogo,
-                                  List<MultipartFile> vatCertificate,
-                                  List<MultipartFile> tradeLicenseAttachment,
-                                  List<MultipartFile> companyImages) throws IOException;
+                                  String autoAddaId
+                                    );
     
     /**
      * Get all other services

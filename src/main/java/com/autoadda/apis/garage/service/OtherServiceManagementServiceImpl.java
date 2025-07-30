@@ -53,11 +53,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
     public OtherService createOtherService(OtherServiceRequest otherServiceRequest,
                                            String userId,
                                            String userRole,
-                                           String autoAddaId,
-                                           MultipartFile companyLogo,
-                                           List<MultipartFile> vatCertificate,
-                                           List<MultipartFile> tradeLicenseAttachment,
-                                           List<MultipartFile> companyImages) throws IOException {
+                                           String autoAddaId) {
 
         OtherService otherService = mapToEntity ( otherServiceRequest );
 
@@ -67,26 +63,35 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         otherService.setCompanyOwner ( Integer.parseInt ( autoAddaId ) );
 
         // Handle company logo
-        List<MediaFile> logo = mediaFileService.upload ( Collections.singletonList ( companyLogo ) );
-        MediaFile logoMediaFile = logo.get ( 0 );
-        otherService.setCompanyLogo ( logoMediaFile );
+        MediaFile  logo = mediaFileRepository.findById ( otherServiceRequest.getLogoId () ).orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + otherServiceRequest.getLogoId () ) );
+        otherService.setCompanyLogo ( logo );
 
         // Handle VAT certificates
-        if ( vatCertificate != null && ! vatCertificate.isEmpty ( ) ) {
-            List<MediaFile> vatCertificates = mediaFileService.upload ( vatCertificate );
-            otherService.setVatCertificate ( vatCertificates );
+        if ( otherServiceRequest.getVatCertificateIds () != null && !otherServiceRequest.getVatCertificateIds ().isEmpty ( ) ) {
+           otherServiceRequest.getVatCertificateIds ().forEach ( id -> {
+               MediaFile mediaFile = mediaFileRepository.findById ( id )
+                       .orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + id ) );
+               otherService.getVatCertificate ().add ( mediaFile );
+           } );
         }
 
         // Handle trade license attachments
-        if ( tradeLicenseAttachment != null ) {
-            List<MediaFile> tradeLicenseAttachments = mediaFileService.upload ( tradeLicenseAttachment );
-            otherService.setTradeLicenseAttachment ( tradeLicenseAttachments );
+        if ( otherServiceRequest.getTradeLicenseAttachmentIds () != null && !otherServiceRequest.getTradeLicenseAttachmentIds ().isEmpty ( ) ) {
+            otherServiceRequest.getTradeLicenseAttachmentIds ().forEach ( id -> {
+                MediaFile mediaFile = mediaFileRepository.findById ( id )
+                        .orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + id ) );
+                otherService.getTradeLicenseAttachment ().add ( mediaFile );
+            } );
         }
 
+
         // Handle company images
-        if ( companyImages != null ) {
-            List<MediaFile> uploadedCompanyImages = mediaFileService.upload ( companyImages );
-            otherService.setCompanyImages ( uploadedCompanyImages );
+        if ( otherServiceRequest.getCompanyImagesIds () != null && !otherServiceRequest.getCompanyImagesIds ().isEmpty ( ) ) {
+            otherServiceRequest.getCompanyImagesIds ().forEach ( id -> {
+                MediaFile mediaFile = mediaFileRepository.findById ( id )
+                        .orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + id ) );
+                otherService.getCompanyImages ().add ( mediaFile );
+            } );
         }
 
         return otherServiceRepository.save ( otherService );
