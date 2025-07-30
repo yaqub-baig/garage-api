@@ -1,6 +1,5 @@
 package com.autoadda.apis.garage.request;
 
-import com.autoadda.apis.garage.entity.MediaFile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +25,9 @@ public class GarageRequest {
     private Integer chainId;
     private String brands;
     private String models;
-    private Integer garageOwnerId;
+    private Long logoId;
+    private List<Long> vatCertificateIds;
+    private List<Long> tradeLicenseAttachmentIds;
+    private List<Long> garageImagesIds;
 
 }

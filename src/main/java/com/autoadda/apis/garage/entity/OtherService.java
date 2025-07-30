@@ -55,8 +55,6 @@ public class OtherService {
     @Column(name = "service_type")
     private String serviceType;
 
-    @Column(name = "chain_id")
-    private Integer chainId;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -5,6 +5,7 @@ import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.Technician;
+import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.MediaFileRepository;
 import com.autoadda.apis.garage.repository.TechnicianRepository;
@@ -119,60 +120,57 @@ public class GarageManagementService {
 
     // Update existing garage
     @Transactional
-    public Garage updateGarage(Integer id, Map<String,Object> request) throws IOException {
+    public Garage updateGarage(Integer id, GarageRequest request) throws IOException {
         Garage existing = garageRepository.findById ( id )
                 .orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
-        if(request.containsKey ( "data" )) {
-            GarageRequest data = (GarageRequest) request.get ( "data" );
-            if(data.getGarageLocation() != null) {
+
+
+            if(request.getGarageLocation() != null) {
                 Location existingGarageLocation = existing.getGarageLocation ( );
-                Location location = locationService.updateLocation ( existingGarageLocation.getId ( ),data.getGarageLocation ( ) );
+                Location location = locationService.updateLocation ( existingGarageLocation.getId ( ),request.getGarageLocation ( ) );
                 existing.setGarageLocation ( location );
             }
-            if(data.getGarageType ()!=null) {
-                existing.setGarageType ( data.getGarageType ( ) );
+            if(request.getGarageType ()!=null) {
+                existing.setGarageType ( request.getGarageType ( ) );
             }
-            if(data.getBrands ()!=null) {
-                existing.setBrands ( data.getBrands ( ) );
+            if(request.getBrands ()!=null) {
+                existing.setBrands ( request.getBrands ( ) );
             }
-            if(data.getModels ()!=null) {
-                existing.setModels ( data.getModels ( ) );
+            if(request.getModels ()!=null) {
+                existing.setModels ( request.getModels ( ) );
             }
-            if(data.getGarageArabicName ()!=null) {
-                existing.setGarageArabicName ( data.getGarageArabicName ( ) );
+            if(request.getGarageArabicName ()!=null) {
+                existing.setGarageArabicName ( request.getGarageArabicName ( ) );
             }
-            if (data.getChainId ()!=null) {
-                existing.setChainId ( data.getChainId ( ) );
+            if (request.getChainId ()!=null) {
+                existing.setChainId ( request.getChainId ( ) );
             }
-            if(data.getGarageBrandName ()!=null) {
-                existing.setGarageBrandName ( data.getGarageBrandName ( ) );
+            if(request.getGarageBrandName ()!=null) {
+                existing.setGarageBrandName ( request.getGarageBrandName ( ) );
             }
-            if(data.getTrnNumber ()!=null) {
-                existing.setTrnNumber ( data.getTrnNumber ( ) );
+            if(request.getTrnNumber ()!=null) {
+                existing.setTrnNumber ( request.getTrnNumber ( ) );
             }
-            if(data.getPhoneNumber ()!=null) {
-                existing.setPhoneNumber ( data.getPhoneNumber ( ) );
+            if(request.getPhoneNumber ()!=null) {
+                existing.setPhoneNumber ( request.getPhoneNumber ( ) );
             }
-            if(data.getWebSite ()!=null) {
-                existing.setWebSite ( data.getWebSite ( ) );
+            if(request.getWebSite ()!=null) {
+                existing.setWebSite ( request.getWebSite ( ) );
             }
-            if(data.getName ()!=null) {
-                existing.setName ( data.getName ( ) );
+            if(request.getName ()!=null) {
+                existing.setName ( request.getName ( ) );
             }
-           if(data.getMobileNumber ()!=null) {
-               existing.setMobileNumber ( data.getMobileNumber ( ) );
+           if(request.getMobileNumber ()!=null) {
+               existing.setMobileNumber ( request.getMobileNumber ( ) );
            }
-        }
+
         List<Long> filesToCleanup = new ArrayList<> ();
 
         // Handle garage logo update
-        if (request.containsKey("garageLogo")) {
+        if (request.getLogoId ()!=null) {
             Long prevLogoId = existing.getGarageLogo() != null ? existing.getGarageLogo().getId() : null;
-            MultipartFile garageLogo = (MultipartFile) request.get("garageLogo");
-            List<MediaFile> garageLogo1 = mediaFileService.upload(Collections.singletonList(garageLogo));
-            MediaFile mediaFile = garageLogo1.get ( 0 );
+            MediaFile mediaFile = mediaFileRepository.findById ( request.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
             existing.setGarageLogo(mediaFile);
-
             // Schedule old logo for cleanup if changed
             if (prevLogoId != null && !prevLogoId.equals(mediaFile.getId())) {
                 filesToCleanup.add(prevLogoId);
@@ -181,29 +179,33 @@ public class GarageManagementService {
         }
 
 
-        if(request.containsKey ( "tradeLicenseAttachment" )) {
-            List<MultipartFile> tradeLicenseAttachment = (List<MultipartFile>) request.get ( "tradeLicenseAttachment" );
+        if(request.getTradeLicenseAttachmentIds ()!=null && !request.getTradeLicenseAttachmentIds ().isEmpty ()) {
+
             filesToCleanup.addAll ( existing.getTradeLicenseAttachment ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
             existing.getTradeLicenseAttachment ( ).clear ( );
-            List<MediaFile> mediaFiles = mediaFileService.upload ( tradeLicenseAttachment );
-            existing.getTradeLicenseAttachment (  ).addAll ( mediaFiles );
+            request.getTradeLicenseAttachmentIds ().forEach ( mediaFileId -> {
+                MediaFile mediaFile = mediaFileRepository.findById ( mediaFileId ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
+                existing.getTradeLicenseAttachment ( ).add ( mediaFile );
+            } );
         }
 
 
-        if(request.containsKey ( "garageImages" )) {
+        if(request.getGarageImagesIds ()!=null && !request.getGarageImagesIds ().isEmpty ()){
             filesToCleanup.addAll ( existing.getGarageImages ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
             existing.getGarageImages ( ).clear ( );
-            List<MultipartFile> garageImages = (List<MultipartFile>) request.get ( "garageImages" );
-            List<MediaFile> mediaFiles = mediaFileService.upload ( garageImages );
-            existing.getGarageImages ( ).addAll ( mediaFiles );
+            request.getGarageImagesIds ().forEach ( mediaFileId -> {
+                MediaFile mediaFile = mediaFileRepository.findById ( mediaFileId ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
+                existing.getGarageImages ( ).add ( mediaFile );
+            } );
         }
 
-        if(request.containsKey ( "vatCertificate" )) {
+        if(request.getVatCertificateIds ()!=null && !request.getVatCertificateIds ().isEmpty()) {
             filesToCleanup.addAll ( existing.getVatCertificate ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
             existing.getVatCertificate ( ).clear ( );
-            List<MultipartFile> vatCertificate = (List<MultipartFile>) request.get ( "vatCertificate" );
-            List<MediaFile> mediaFiles = mediaFileService.upload ( vatCertificate );
-            existing.getVatCertificate (  ).addAll ( mediaFiles );
+            request.getVatCertificateIds ().forEach ( mediaFileId -> {
+                MediaFile mediaFile = mediaFileRepository.findById ( mediaFileId ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
+                existing.getVatCertificate ( ).add ( mediaFile );
+            } );
         }
         if (!filesToCleanup.isEmpty()) {
             scheduleMediaFileCleanup(filesToCleanup);

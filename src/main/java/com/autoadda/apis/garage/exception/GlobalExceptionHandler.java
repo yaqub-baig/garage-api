@@ -21,6 +21,7 @@ import com.autoadda.apis.garage.response.GenericResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 
 @Slf4j
@@ -53,6 +54,16 @@ public class GlobalExceptionHandler {
 		log.warn("Constraint violation: {}", ex.getMessage());
 		return buildResponse(ex, HttpStatus.BAD_REQUEST,
 				ErrorMessage.ERROR_CONSTRAINT_VIOLATION + ": " + ex.getMessage());
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<Map<String, String>> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+		Map<String, String> error = new HashMap<>();
+		error.put("error", "File size exceeded");
+		error.put("message", "Maximum upload size exceeded");
+		error.put("maxSize", ex.getMaxUploadSize() + " bytes");
+
+		return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
 	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)
