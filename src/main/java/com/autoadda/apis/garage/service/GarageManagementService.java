@@ -118,6 +118,7 @@ public class GarageManagementService {
     }
 
     // Update existing garage
+    @Transactional
     public Garage updateGarage(Integer id, Map<String,Object> request) throws IOException {
         Garage existing = garageRepository.findById ( id )
                 .orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
@@ -162,22 +163,6 @@ public class GarageManagementService {
                existing.setMobileNumber ( data.getMobileNumber ( ) );
            }
         }
-//        if (request.containsKey("garageLogo")) {
-//                // 1. First upload the new logo
-//            MediaFile oldLogo = existing.getGarageLogo();
-//            MultipartFile garageLogo = (MultipartFile) request.get("garageLogo");
-//
-//                List<MediaFile> logo = mediaFileService.upload(Collections.singletonList(garageLogo));
-//                if (logo == null || logo.isEmpty()) {
-//                    throw new RuntimeException("Failed to upload new logo");
-//                }
-//                // 2. Only after successful upload, delete the old one
-//                if (oldLogo != null) {
-//                        mediaFileService.delete(oldLogo.getId());
-//                }
-//                // 3. Update the reference
-//                existing.setGarageLogo(logo.get(0));
-//        }
         List<Long> filesToCleanup = new ArrayList<> ();
 
         // Handle garage logo update
@@ -198,6 +183,7 @@ public class GarageManagementService {
 
         if(request.containsKey ( "tradeLicenseAttachment" )) {
             List<MultipartFile> tradeLicenseAttachment = (List<MultipartFile>) request.get ( "tradeLicenseAttachment" );
+            filesToCleanup.addAll ( existing.getTradeLicenseAttachment ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
             existing.getTradeLicenseAttachment ( ).clear ( );
             List<MediaFile> mediaFiles = mediaFileService.upload ( tradeLicenseAttachment );
             existing.getTradeLicenseAttachment (  ).addAll ( mediaFiles );
@@ -205,6 +191,7 @@ public class GarageManagementService {
 
 
         if(request.containsKey ( "garageImages" )) {
+            filesToCleanup.addAll ( existing.getGarageImages ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
             existing.getGarageImages ( ).clear ( );
             List<MultipartFile> garageImages = (List<MultipartFile>) request.get ( "garageImages" );
             List<MediaFile> mediaFiles = mediaFileService.upload ( garageImages );
@@ -212,6 +199,7 @@ public class GarageManagementService {
         }
 
         if(request.containsKey ( "vatCertificate" )) {
+            filesToCleanup.addAll ( existing.getVatCertificate ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
             existing.getVatCertificate ( ).clear ( );
             List<MultipartFile> vatCertificate = (List<MultipartFile>) request.get ( "vatCertificate" );
             List<MediaFile> mediaFiles = mediaFileService.upload ( vatCertificate );
