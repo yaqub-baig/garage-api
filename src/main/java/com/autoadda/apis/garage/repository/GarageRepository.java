@@ -79,5 +79,7 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
 	List<Garage> findByGarageOwner(Integer ownerId);
 
+	long countByGarageLogoId(Long mediaFileId);
+
 //	Garage save(GarageRequest any);
 }

@@ -12,14 +12,18 @@ import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.*;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GarageManagementService {
@@ -65,7 +69,7 @@ public class GarageManagementService {
 
         garage.setGarageLogo ( logoMediaFile );
 
-        if ( logoMediaFile != null ) {
+        if ( vatCertificate != null ) {
 
         List<MediaFile> vatCertificates = mediaFileService.upload ( vatCertificate );
 
@@ -77,7 +81,7 @@ public class GarageManagementService {
             garage.setTradeLicenseAttachment ( tradeLicenseAttachments );
 
         }
-        if (tradeLicenseAttachment != null) {
+        if (garageImages != null) {
             List<MediaFile> garageImagess = mediaFileService.upload ( garageImages );
 
             garage.setGarageImages ( garageImagess);
@@ -158,40 +162,100 @@ public class GarageManagementService {
                existing.setMobileNumber ( data.getMobileNumber ( ) );
            }
         }
+//        if (request.containsKey("garageLogo")) {
+//                // 1. First upload the new logo
+//            MediaFile oldLogo = existing.getGarageLogo();
+//            MultipartFile garageLogo = (MultipartFile) request.get("garageLogo");
+//
+//                List<MediaFile> logo = mediaFileService.upload(Collections.singletonList(garageLogo));
+//                if (logo == null || logo.isEmpty()) {
+//                    throw new RuntimeException("Failed to upload new logo");
+//                }
+//                // 2. Only after successful upload, delete the old one
+//                if (oldLogo != null) {
+//                        mediaFileService.delete(oldLogo.getId());
+//                }
+//                // 3. Update the reference
+//                existing.setGarageLogo(logo.get(0));
+//        }
+        List<Long> filesToCleanup = new ArrayList<> ();
+
+        // Handle garage logo update
         if (request.containsKey("garageLogo")) {
-                // 1. First upload the new logo
-                MultipartFile garageLogo = (MultipartFile) request.get("garageLogo");
-                List<MediaFile> logo = mediaFileService.upload(Collections.singletonList(garageLogo));
-                if (logo == null || logo.isEmpty()) {
-                    throw new RuntimeException("Failed to upload new logo");
-                }
-                // 2. Only after successful upload, delete the old one
-                MediaFile oldLogo = existing.getGarageLogo();
-                if (oldLogo != null) {
-                        mediaFileService.delete(oldLogo.getId());
-                }
-                // 3. Update the reference
-                existing.setGarageLogo(logo.get(0));
+            Long prevLogoId = existing.getGarageLogo() != null ? existing.getGarageLogo().getId() : null;
+            MultipartFile garageLogo = (MultipartFile) request.get("garageLogo");
+            List<MediaFile> garageLogo1 = mediaFileService.upload(Collections.singletonList(garageLogo));
+            MediaFile mediaFile = garageLogo1.get ( 0 );
+            existing.setGarageLogo(mediaFile);
+
+            // Schedule old logo for cleanup if changed
+            if (prevLogoId != null && !prevLogoId.equals(mediaFile.getId())) {
+                filesToCleanup.add(prevLogoId);
+            }
+
         }
-        if(request.containsKey ( "garageImages" )) {
-            List<MultipartFile> garageImages = (List<MultipartFile>) request.get ( "garageImages" );
-            List<MediaFile> mediaFiles = mediaFileService.upload ( garageImages );
-            existing.getGarageImages ( ).clear ( );
-            existing.getGarageImages ( ).addAll ( mediaFiles );
-        }
+
+
         if(request.containsKey ( "tradeLicenseAttachment" )) {
             List<MultipartFile> tradeLicenseAttachment = (List<MultipartFile>) request.get ( "tradeLicenseAttachment" );
-            List<MediaFile> mediaFiles = mediaFileService.upload ( tradeLicenseAttachment );
             existing.getTradeLicenseAttachment ( ).clear ( );
+            List<MediaFile> mediaFiles = mediaFileService.upload ( tradeLicenseAttachment );
             existing.getTradeLicenseAttachment (  ).addAll ( mediaFiles );
         }
+
+
+        if(request.containsKey ( "garageImages" )) {
+            existing.getGarageImages ( ).clear ( );
+            List<MultipartFile> garageImages = (List<MultipartFile>) request.get ( "garageImages" );
+            List<MediaFile> mediaFiles = mediaFileService.upload ( garageImages );
+            existing.getGarageImages ( ).addAll ( mediaFiles );
+        }
+
         if(request.containsKey ( "vatCertificate" )) {
+            existing.getVatCertificate ( ).clear ( );
             List<MultipartFile> vatCertificate = (List<MultipartFile>) request.get ( "vatCertificate" );
             List<MediaFile> mediaFiles = mediaFileService.upload ( vatCertificate );
-            existing.getVatCertificate ( ).clear ( );
             existing.getVatCertificate (  ).addAll ( mediaFiles );
         }
+        if (!filesToCleanup.isEmpty()) {
+            scheduleMediaFileCleanup(filesToCleanup);
+        }
+
+
         return garageRepository.save ( existing );
+    }
+
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void scheduleMediaFileCleanup(List<Long> mediaFileIds) {
+        // Small delay to ensure transaction is committed
+        try {
+            Thread.sleep(3000);
+
+            for (Long fileId : mediaFileIds) {
+                try {
+                    // Check if file is still referenced elsewhere before deleting
+                    if (!isMediaFileStillReferenced(fileId)) {
+                        mediaFileRepository.deleteById(fileId);
+                        log.info("Successfully cleaned up media file: {}", fileId);
+                    } else {
+                        log.info("Media file {} still referenced, skipping cleanup", fileId);
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to cleanup media file {}: {}", fileId, e.getMessage());
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Media file cleanup interrupted");
+        }
+    }
+
+    private boolean isMediaFileStillReferenced(Long mediaFileId) {
+        // Check if this media file is still referenced by any garage
+        // This is a safety check to prevent deleting files that might still be in use
+        long count = garageRepository.countByGarageLogoId(mediaFileId);
+        return count > 0;
     }
 
     // Delete garage
