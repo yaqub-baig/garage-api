@@ -42,7 +42,7 @@ public interface OtherServiceManagementService {
     /**
      * Update an existing other service
      */
-    OtherService updateOtherService(Integer id, Map<String, Object> request) throws IOException;
+    OtherService updateOtherService(Integer id, OtherServiceRequest request) ;
     
     /**
      * Delete an other service
