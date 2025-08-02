@@ -3,6 +3,7 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.OtherService;
+import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.MediaFileRepository;
 import com.autoadda.apis.garage.repository.OtherServiceRepository;
@@ -15,12 +16,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -40,6 +38,10 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         otherService.setPhoneNumber ( request.getPhoneNumber ( ) );
         otherService.setMobileNumber ( request.getMobileNumber ( ) );
         otherService.setTrnNumber ( request.getTrnNumber ( ) );
+        otherService.setTradeLicenceNumber ( request.getTradeLicenceNumber ( ) );
+        otherService.setOpeningTime ( request.getOpeningTime ( ) );
+        otherService.setClosingTime ( request.getClosingTime ( ) );
+        otherService.setWorkingDays ( request.getWorkingDays ( ) );
         otherService.setWebSite ( request.getWebSite ( ) );
         otherService.setAccountStatus ( Status.PENDING ); // Default status
         otherService.setServiceType ( request.getServiceType ( ) );
@@ -63,34 +65,34 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         otherService.setCompanyOwner ( Integer.parseInt ( autoAddaId ) );
 
         // Handle company logo
-        MediaFile  logo = mediaFileRepository.findById ( otherServiceRequest.getLogoId () ).orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + otherServiceRequest.getLogoId () ) );
+        MediaFile logo = mediaFileRepository.findById ( otherServiceRequest.getLogoId ( ) ).orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + otherServiceRequest.getLogoId ( ) ) );
         otherService.setCompanyLogo ( logo );
 
         // Handle VAT certificates
-        if ( otherServiceRequest.getVatCertificateIds () != null && !otherServiceRequest.getVatCertificateIds ().isEmpty ( ) ) {
-           otherServiceRequest.getVatCertificateIds ().forEach ( id -> {
-               MediaFile mediaFile = mediaFileRepository.findById ( id )
-                       .orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + id ) );
-               otherService.getVatCertificate ().add ( mediaFile );
-           } );
+        if ( otherServiceRequest.getVatCertificateIds ( ) != null && ! otherServiceRequest.getVatCertificateIds ( ).isEmpty ( ) ) {
+            otherServiceRequest.getVatCertificateIds ( ).forEach ( id -> {
+                MediaFile mediaFile = mediaFileRepository.findById ( id )
+                        .orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + id ) );
+                otherService.getVatCertificate ( ).add ( mediaFile );
+            } );
         }
 
         // Handle trade license attachments
-        if ( otherServiceRequest.getTradeLicenseAttachmentIds () != null && !otherServiceRequest.getTradeLicenseAttachmentIds ().isEmpty ( ) ) {
-            otherServiceRequest.getTradeLicenseAttachmentIds ().forEach ( id -> {
+        if ( otherServiceRequest.getTradeLicenseAttachmentIds ( ) != null && ! otherServiceRequest.getTradeLicenseAttachmentIds ( ).isEmpty ( ) ) {
+            otherServiceRequest.getTradeLicenseAttachmentIds ( ).forEach ( id -> {
                 MediaFile mediaFile = mediaFileRepository.findById ( id )
                         .orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + id ) );
-                otherService.getTradeLicenseAttachment ().add ( mediaFile );
+                otherService.getTradeLicenseAttachment ( ).add ( mediaFile );
             } );
         }
 
 
         // Handle company images
-        if ( otherServiceRequest.getCompanyImagesIds () != null && !otherServiceRequest.getCompanyImagesIds ().isEmpty ( ) ) {
-            otherServiceRequest.getCompanyImagesIds ().forEach ( id -> {
+        if ( otherServiceRequest.getCompanyImagesIds ( ) != null && ! otherServiceRequest.getCompanyImagesIds ( ).isEmpty ( ) ) {
+            otherServiceRequest.getCompanyImagesIds ( ).forEach ( id -> {
                 MediaFile mediaFile = mediaFileRepository.findById ( id )
                         .orElseThrow ( () -> new EntityNotFoundException ( "Media file not found with id: " + id ) );
-                otherService.getCompanyImages ().add ( mediaFile );
+                otherService.getCompanyImages ( ).add ( mediaFile );
             } );
         }
 
@@ -129,6 +131,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
             existing.setCompanyLocation ( location );
         }
 
+
         // Update other fields if provided
         if ( request.getServiceType ( ) != null ) {
             existing.setServiceType ( request.getServiceType ( ) );
@@ -138,6 +141,22 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         }
         if ( request.getCompanyBrandName ( ) != null ) {
             existing.setCompanyBrandName ( request.getCompanyBrandName ( ) );
+        }
+        if ( request.getOpeningTime ( ) != null ) {
+            existing.setOpeningTime ( request.getOpeningTime ( ) );
+        }
+        if ( request.getClosingTime ( ) != null ) {
+            existing.setClosingTime ( request.getClosingTime ( ) );
+        }
+        if ( request.getClosingTime ( ) != null ) {
+            existing.setClosingTime ( request.getClosingTime ( ) );
+        }
+        if ( request.getWorkingDays ( ) != null ) {
+            existing.setWorkingDays ( request.getWorkingDays ( ) );
+        }
+        if(request.getTradeLicenceNumber() != null) {
+            validateTradeLicenceNumber ( request.getTradeLicenceNumber ( ) );
+            existing.setTradeLicenceNumber ( request.getTradeLicenceNumber ( ) );
         }
         if ( request.getTrnNumber ( ) != null ) {
             existing.setTrnNumber ( request.getTrnNumber ( ) );
@@ -190,11 +209,11 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         }
 
         // Handle trade license update
-        if ( request.getTradeLicenseAttachmentIds (  )!=null ) {
+        if ( request.getTradeLicenseAttachmentIds ( ) != null ) {
             // Schedule old trade licenses for cleanup
             List<Long> oldTradeLicenseIds = existing.getTradeLicenseAttachment ( ).stream ( )
                     .map ( MediaFile::getId )
-                    .toList ( ) ;
+                    .toList ( );
             if ( ! oldTradeLicenseIds.isEmpty ( ) ) {
                 scheduleMediaFileCleanup ( oldTradeLicenseIds );
             }
@@ -207,11 +226,11 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         }
 
         // Handle company images update
-        if ( request.getCompanyImagesIds (  )!=null ) {
+        if ( request.getCompanyImagesIds ( ) != null ) {
             // Schedule old company images for cleanup
             List<Long> oldCompanyImageIds = existing.getCompanyImages ( ).stream ( )
                     .map ( MediaFile::getId )
-                    .toList (  );
+                    .toList ( );
             if ( ! oldCompanyImageIds.isEmpty ( ) ) {
                 scheduleMediaFileCleanup ( oldCompanyImageIds );
             }
@@ -225,6 +244,12 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         }
 
         return otherServiceRepository.save ( existing );
+    }
+
+    private void validateTradeLicenceNumber(String tradeLicenceNumber) {
+        otherServiceRepository.findByTradeLicenceNumber(tradeLicenceNumber).ifPresent(otherService -> {
+          throw new AlreadyExistsException ("Other service with trade licence number " + tradeLicenceNumber + " already exists");
+        });
     }
 
     @Override
@@ -246,15 +271,15 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
 
         mediaFileIds.addAll ( otherService.getVatCertificate ( ).stream ( )
                 .map ( MediaFile::getId )
-                .toList ( ) ) ;
+                .toList ( ) );
 
         mediaFileIds.addAll ( otherService.getTradeLicenseAttachment ( ).stream ( )
                 .map ( MediaFile::getId )
-                .toList ( ) ) ;
+                .toList ( ) );
 
         mediaFileIds.addAll ( otherService.getCompanyImages ( ).stream ( )
                 .map ( MediaFile::getId )
-                .toList ( ) ) ;
+                .toList ( ) );
 
         if ( ! mediaFileIds.isEmpty ( ) ) {
             scheduleMediaFileCleanup ( mediaFileIds );

@@ -34,6 +34,11 @@ public class GlobalExceptionHandler {
 		log.warn("Validation failed: {}", errors);
 		return buildResponse(ex, HttpStatus.BAD_REQUEST, ErrorMessage.ERROR_VALIDATION_FAILED + ": " + errors);
 	}
+	@ExceptionHandler(AlreadyExistsException.class)
+	public ResponseEntity<GenericResponse> handleAlreadyExist(AlreadyExistsException ex) {
+		log.warn("Already exist", ex);
+		return buildResponse(ex, HttpStatus.CONFLICT, ex.getMessage());
+	}
 
 	@ExceptionHandler(MultipartException.class)
 	public ResponseEntity<Map<String, String>> handleMultipartException(MultipartException ex) {

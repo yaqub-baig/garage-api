@@ -82,4 +82,6 @@ public interface OtherServiceRepository extends JpaRepository<OtherService, Inte
     // Find by company brand name containing and active (case-insensitive)
     @Query("SELECT o FROM OtherService o WHERE LOWER(o.companyBrandName) LIKE LOWER(CONCAT('%', :brandName, '%')) AND o.isActive = true")
     List<OtherService> findByCompanyBrandNameContainingIgnoreCaseAndIsActiveTrue(@Param("brandName") String brandName);
+
+    Optional<OtherService> findByTradeLicenceNumber(String tradeLicenceNumber);
 }

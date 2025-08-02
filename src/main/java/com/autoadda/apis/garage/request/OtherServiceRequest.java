@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.request;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,10 @@ public class OtherServiceRequest {
     private String mobileNumber;
     private LocationRequest companyLocation;
     private String serviceType;
+    private String tradeLicenceNumber;
+    private String openingTime;
+    private String closingTime;
+    private String workingDays;
     private Long logoId;
     private List<Long> vatCertificateIds;
     private List<Long> tradeLicenseAttachmentIds;

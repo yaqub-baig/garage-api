@@ -42,6 +42,18 @@ public class OtherService {
     @Column(name = " mobile_number")
     private String mobileNumber;
 
+    @Column(name ="trade_licence_number", unique = true)
+    private String tradeLicenceNumber;
+
+    @Column(name ="opening_time")
+    private String openingTime;
+
+    @Column(name ="closing_time")
+    private String closingTime;
+
+    @Column(name = "working_days")
+    private String workingDays;
+
     @OneToOne
     @JoinColumn(name = "company_logo")
     private MediaFile companyLogo;

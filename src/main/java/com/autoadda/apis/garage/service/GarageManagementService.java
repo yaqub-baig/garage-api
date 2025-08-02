@@ -5,6 +5,7 @@ import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.Technician;
+import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.MediaFileRepository;
@@ -63,7 +64,7 @@ public class GarageManagementService {
     }
 
     public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId) {
-
+        validateTradingLicenseNumber ( garageRequest.getTradeLicenceNumber ( ) );
         Garage garage = mapToEntity ( garageRequest );
         Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
         garage.setGarageLocation ( location );
@@ -75,6 +76,11 @@ public class GarageManagementService {
         garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
 //=====================================================================================================================================================
         return garageRepository.save ( garage );
+    }
+    private void validateTradingLicenseNumber(String tradeLicenceNumber) {
+        garageRepository.findByTradeLicenceNumber(tradeLicenceNumber).ifPresent(garage -> {
+            throw new AlreadyExistsException ("A garage with the same trading license number already exists.");
+        });
     }
 
 
@@ -127,6 +133,10 @@ public class GarageManagementService {
         }
         if ( request.getGarageArabicName ( ) != null ) {
             existing.setGarageArabicName ( request.getGarageArabicName ( ) );
+        }
+        if ( request.getTradeLicenceNumber ( ) != null ) {
+            validateTradingLicenseNumber ( request.getTradeLicenceNumber ( ) );
+            existing.setTradeLicenceNumber ( request.getTradeLicenceNumber ( ) );
         }
         if(request.getOpeningTime() != null) {
             existing.setOpeningTime ( request.getOpeningTime ( ) );

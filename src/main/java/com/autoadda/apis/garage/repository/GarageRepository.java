@@ -93,5 +93,6 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 	// Check if media file is referenced in VAT certificates
 	@Query("SELECT COUNT(g) FROM Garage g JOIN g.vatCertificate vc WHERE vc.id = :mediaFileId")
 	long countByVatCertificateId(@Param("mediaFileId") Long mediaFileId);
-//	Garage save(GarageRequest any);
+
+	Optional<Garage> findByTradeLicenceNumber(String tradeLicenceNumber);
 }
