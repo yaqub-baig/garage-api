@@ -29,6 +29,18 @@ public class Garage {
     @Column(name = "garage_name")
     private String name;
 
+    @Column(name ="trade_licence_number", unique = true)
+    private String tradeLicenceNumber;
+
+    @Column(name ="opening_time")
+    private String openingTime;
+
+    @Column(name ="closing_time")
+    private String closingTime;
+
+    @Column(name = "working_days")
+    private String workingDays;
+
     @Column(name = "trn_number")
     private String trnNumber;
 

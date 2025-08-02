@@ -28,55 +28,19 @@ public class GarageController {
     private final GarageManagementService garageService;
     private final MediaFileService mediaFileService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<?> createGarage(
             HttpServletRequest request,
             @RequestHeader(value = "X-User-Id") String userId,
             @RequestHeader(value = "X-User-Role") String userRole,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
-            @RequestPart("garage") @Valid GarageRequest garage,
-            @RequestPart(value = "garageLogo", required = true) MultipartFile garageLogo,
-            @RequestPart(value = "vatCertificate", required = false)
-            @Size(max = 5, message = "Maximum 5 VAT certificate files allowed")
-            List<MultipartFile> vatCertificate,
-            @RequestPart(value = "tradeLicenseAttachment", required = false)
-            @Size(max = 5, message = "Maximum 5 trade license files allowed")
-            List<MultipartFile> tradeLicenseAttachment,
-            @RequestPart(value = "garageImages", required = false)
-            @Size(max = 10, message = "Maximum 10 garage images allowed")
-            List<MultipartFile> garageImages
-
-    ) throws IOException {
+            @RequestBody @Valid GarageRequest garage
+    )  {
         //fall back params
         log.info("Content-Length: {}", request.getHeader("Content-Length"));
         log.info("Content-Type: {}", request.getContentType());
-        if (garageLogo != null) {
-            log.info("Garage Logo - Name: {}, Size: {} bytes",
-                    garageLogo.getOriginalFilename(), garageLogo.getSize());
-        }
 
-        if (vatCertificate != null) {
-            log.info("VAT Certificate files: {}", vatCertificate.size());
-            vatCertificate.forEach(file ->
-                    log.info("VAT file - Name: {}, Size: {} bytes",
-                            file.getOriginalFilename(), file.getSize())
-            );
-        }
-        if (tradeLicenseAttachment != null) {
-            log.info("Trade License files: {}", tradeLicenseAttachment.size());
-            tradeLicenseAttachment.forEach(file ->
-                    log.info("Trade License file - Name: {}, Size: {} bytes",
-                            file.getOriginalFilename(), file.getSize())
-            );
-        }
-        if (garageImages != null) {
-            log.info("Garage Images files: {}", garageImages.size());
-            garageImages.forEach(file ->
-                    log.info("Garage Image file - Name: {}, Size: {} bytes",
-                            file.getOriginalFilename(), file.getSize())
-            );
-        }
-        return ResponseEntity.status ( HttpStatus.CREATED ).body ( garageService.createGarage ( garage, userId, userRole, autoAddaId, garageLogo, vatCertificate, tradeLicenseAttachment, garageImages ) );
+        return ResponseEntity.status ( HttpStatus.CREATED ).body ( garageService.createGarage ( garage, userId, userRole, autoAddaId) );
     }
 
     @GetMapping("all")

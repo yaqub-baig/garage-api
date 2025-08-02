@@ -79,7 +79,19 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
 	List<Garage> findByGarageOwner(Integer ownerId);
 
-	long countByGarageLogoId(Long mediaFileId);
+	@Query("SELECT COUNT(g) FROM Garage g WHERE g.garageLogo.id = :mediaFileId")
+	long countByGarageLogoId(@Param("mediaFileId") Long mediaFileId);
 
+	// Check if media file is referenced in garage images
+	@Query("SELECT COUNT(g) FROM Garage g JOIN g.garageImages gi WHERE gi.id = :mediaFileId")
+	long countByGarageImageId(@Param("mediaFileId") Long mediaFileId);
+
+	// Check if media file is referenced in trade license attachments
+	@Query("SELECT COUNT(g) FROM Garage g JOIN g.tradeLicenseAttachment tla WHERE tla.id = :mediaFileId")
+	long countByTradeLicenseId(@Param("mediaFileId") Long mediaFileId);
+
+	// Check if media file is referenced in VAT certificates
+	@Query("SELECT COUNT(g) FROM Garage g JOIN g.vatCertificate vc WHERE vc.id = :mediaFileId")
+	long countByVatCertificateId(@Param("mediaFileId") Long mediaFileId);
 //	Garage save(GarageRequest any);
 }

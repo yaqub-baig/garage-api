@@ -18,12 +18,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,10 @@ public class GarageManagementService {
         garage.setGarageBrandName ( garageRequest.getGarageBrandName ( ) );
         garage.setName ( garageRequest.getName ( ) );
         garage.setEmail ( garageRequest.getEmail ( ) );
+        garage.setTradeLicenceNumber ( garageRequest.getTradeLicenceNumber ( ) );
+        garage.setOpeningTime ( garageRequest.getOpeningTime ( ) );
+        garage.setClosingTime ( garageRequest.getClosingTime ( ) );
+        garage.setWebSite ( garageRequest.getWebSite ( ) );
         garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
         garage.setMobileNumber ( garageRequest.getMobileNumber ( ) );
         garage.setTrnNumber ( garageRequest.getTrnNumber ( ) );
@@ -54,40 +61,17 @@ public class GarageManagementService {
         return garage;
     }
 
-    public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId, MultipartFile garageLogo, List<MultipartFile> vatCertificate, List<MultipartFile> tradeLicenseAttachment, List<MultipartFile> garageImages) throws IOException {
+    public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId) {
 
         Garage garage = mapToEntity ( garageRequest );
-
         Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
-
         garage.setGarageLocation ( location );
-        garage.setGarageOwner ( Integer.parseInt ( autoAddaId  ));
+        garage.setGarageOwner ( Integer.parseInt ( autoAddaId ) );
 //      =================================================================================================================
-
-        List<MediaFile> logo = mediaFileService.upload ( Collections.singletonList ( garageLogo ) );
-
-        MediaFile logoMediaFile = logo.get ( 0 );
-
-        garage.setGarageLogo ( logoMediaFile );
-
-        if ( vatCertificate != null ) {
-
-        List<MediaFile> vatCertificates = mediaFileService.upload ( vatCertificate );
-
-        garage.setVatCertificate ( vatCertificates );
-        }
-        if ( tradeLicenseAttachment != null ) {
-            List<MediaFile> tradeLicenseAttachments = mediaFileService.upload ( tradeLicenseAttachment );
-
-            garage.setTradeLicenseAttachment ( tradeLicenseAttachments );
-
-        }
-        if (garageImages != null) {
-            List<MediaFile> garageImagess = mediaFileService.upload ( garageImages );
-
-            garage.setGarageImages ( garageImagess);
-
-        }
+        garage.setGarageLogo ( mediaFileRepository.findById ( garageRequest.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "garage logo not found" ) ) );
+        garage.setVatCertificate ( mediaFileRepository.findAllById ( garageRequest.getVatCertificateIds ( ) ) );
+        garage.setTradeLicenseAttachment ( mediaFileRepository.findAllById ( garageRequest.getTradeLicenseAttachmentIds ( ) ) );
+        garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
 //=====================================================================================================================================================
         return garageRepository.save ( garage );
     }
@@ -95,12 +79,13 @@ public class GarageManagementService {
 
     // Get all garages
     public List<Garage> getAllGarages() {
-        return garageRepository.findAll ( ).stream ().filter ( Garage::isActive ).toList ();
+        return garageRepository.findAll ( ).stream ( ).filter ( Garage::isActive ).toList ( );
     }
 
     public List<Garage> getAllGaragesByOwnerId(String autoAddaId) {
-        return garageRepository.findByGarageOwner (Integer.parseInt ( autoAddaId ) ).stream ().filter ( Garage::isActive ).toList ();
+        return garageRepository.findByGarageOwner ( Integer.parseInt ( autoAddaId ) ).stream ( ).filter ( Garage::isActive ).toList ( );
     }
+
     // Get all garages with services
     public List<Garage> getAllGaragesWithServices() {
         return garageRepository.findAllWithServices ( );
@@ -125,94 +110,131 @@ public class GarageManagementService {
                 .orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
 
 
-            if(request.getGarageLocation() != null) {
-                Location existingGarageLocation = existing.getGarageLocation ( );
-                Location location = locationService.updateLocation ( existingGarageLocation.getId ( ),request.getGarageLocation ( ) );
-                existing.setGarageLocation ( location );
-            }
-            if(request.getGarageType ()!=null) {
-                existing.setGarageType ( request.getGarageType ( ) );
-            }
-            if(request.getBrands ()!=null) {
-                existing.setBrands ( request.getBrands ( ) );
-            }
-            if(request.getModels ()!=null) {
-                existing.setModels ( request.getModels ( ) );
-            }
-            if(request.getGarageArabicName ()!=null) {
-                existing.setGarageArabicName ( request.getGarageArabicName ( ) );
-            }
-            if (request.getChainId ()!=null) {
-                existing.setChainId ( request.getChainId ( ) );
-            }
-            if(request.getGarageBrandName ()!=null) {
-                existing.setGarageBrandName ( request.getGarageBrandName ( ) );
-            }
-            if(request.getTrnNumber ()!=null) {
-                existing.setTrnNumber ( request.getTrnNumber ( ) );
-            }
-            if(request.getPhoneNumber ()!=null) {
-                existing.setPhoneNumber ( request.getPhoneNumber ( ) );
-            }
-            if(request.getWebSite ()!=null) {
-                existing.setWebSite ( request.getWebSite ( ) );
-            }
-            if(request.getName ()!=null) {
-                existing.setName ( request.getName ( ) );
-            }
-           if(request.getMobileNumber ()!=null) {
-               existing.setMobileNumber ( request.getMobileNumber ( ) );
-           }
+        if ( request.getGarageLocation ( ) != null ) {
+            Location existingGarageLocation = existing.getGarageLocation ( );
+            Location location = locationService.updateLocation ( existingGarageLocation.getId ( ), request.getGarageLocation ( ) );
+            existing.setGarageLocation ( location );
+        }
+        if ( request.getGarageType ( ) != null ) {
+            existing.setGarageType ( request.getGarageType ( ) );
+        }
+        if ( request.getBrands ( ) != null ) {
+            existing.setBrands ( request.getBrands ( ) );
+        }
+        if ( request.getModels ( ) != null ) {
+            existing.setModels ( request.getModels ( ) );
+        }
+        if ( request.getGarageArabicName ( ) != null ) {
+            existing.setGarageArabicName ( request.getGarageArabicName ( ) );
+        }
+        if(request.getOpeningTime() != null) {
+            existing.setOpeningTime ( request.getOpeningTime ( ) );
+        }
+        if(request.getClosingTime() != null) {
+            existing.setClosingTime ( request.getClosingTime ( ) );
+        }
+        if ( request.getChainId ( ) != null ) {
+            existing.setChainId ( request.getChainId ( ) );
+        }
+        if ( request.getGarageBrandName ( ) != null ) {
+            existing.setGarageBrandName ( request.getGarageBrandName ( ) );
+        }
+        if ( request.getTrnNumber ( ) != null ) {
+            existing.setTrnNumber ( request.getTrnNumber ( ) );
+        }
+        if ( request.getPhoneNumber ( ) != null ) {
+            existing.setPhoneNumber ( request.getPhoneNumber ( ) );
+        }
+        if ( request.getWebSite ( ) != null ) {
+            existing.setWebSite ( request.getWebSite ( ) );
+        }
+        if ( request.getName ( ) != null ) {
+            existing.setName ( request.getName ( ) );
+        }
+        if ( request.getMobileNumber ( ) != null ) {
+            existing.setMobileNumber ( request.getMobileNumber ( ) );
+        }
 
-        List<Long> filesToCleanup = new ArrayList<> ();
+        List<Long> filesToCleanup = new ArrayList<> ( );
 
         // Handle garage logo update
-        if (request.getLogoId ()!=null) {
-            Long prevLogoId = existing.getGarageLogo() != null ? existing.getGarageLogo().getId() : null;
+        if ( request.getLogoId ( ) != null ) {
+            Long prevLogoId = existing.getGarageLogo ( ) != null ? existing.getGarageLogo ( ).getId ( ) : null;
             MediaFile mediaFile = mediaFileRepository.findById ( request.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
-            existing.setGarageLogo(mediaFile);
+            existing.setGarageLogo ( mediaFile );
             // Schedule old logo for cleanup if changed
-            if (prevLogoId != null && !prevLogoId.equals(mediaFile.getId())) {
-                filesToCleanup.add(prevLogoId);
+            if ( prevLogoId != null && ! prevLogoId.equals ( mediaFile.getId ( ) ) ) {
+                filesToCleanup.add ( prevLogoId );
             }
 
         }
 
 
-        if(request.getTradeLicenseAttachmentIds ()!=null && !request.getTradeLicenseAttachmentIds ().isEmpty ()) {
+        if ( request.getTradeLicenseAttachmentIds ( ) != null && ! request.getTradeLicenseAttachmentIds ( ).isEmpty ( ) ) {
 
-            filesToCleanup.addAll ( existing.getTradeLicenseAttachment ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
-            existing.getTradeLicenseAttachment ( ).clear ( );
-            request.getTradeLicenseAttachmentIds ().forEach ( mediaFileId -> {
-                MediaFile mediaFile = mediaFileRepository.findById ( mediaFileId ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
-                existing.getTradeLicenseAttachment ( ).add ( mediaFile );
-            } );
+            List<Long> oldTradeLicenseIds = existing.getTradeLicenseAttachment().stream()
+                    .map(MediaFile::getId)
+                    .toList();
+            if (!oldTradeLicenseIds.isEmpty()) {
+                filesToCleanup.addAll(oldTradeLicenseIds);
+            }
+
+            // Create new trade license collection
+            List<MediaFile> newTradeLicenseAttachments = new ArrayList<>();
+            request.getTradeLicenseAttachmentIds ().forEach(tid -> {
+                MediaFile mediaFile = mediaFileRepository.findById(tid)
+                        .orElseThrow(() -> new ResourceNotFoundException("File not found"));
+                newTradeLicenseAttachments.add(mediaFile);
+            });
+            existing.setTradeLicenseAttachment(newTradeLicenseAttachments);
         }
 
 
-        if(request.getGarageImagesIds ()!=null && !request.getGarageImagesIds ().isEmpty ()){
-            filesToCleanup.addAll ( existing.getGarageImages ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
-            existing.getGarageImages ( ).clear ( );
-            request.getGarageImagesIds ().forEach ( mediaFileId -> {
-                MediaFile mediaFile = mediaFileRepository.findById ( mediaFileId ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
-                existing.getGarageImages ( ).add ( mediaFile );
-            } );
+        if ( request.getGarageImagesIds ( ) != null && ! request.getGarageImagesIds ( ).isEmpty ( ) ) {
+            // Schedule old garage images for cleanup
+            List<Long> oldGarageImageIds = existing.getGarageImages().stream()
+                    .map(MediaFile::getId)
+                    .toList();
+            if (!oldGarageImageIds.isEmpty()) {
+                filesToCleanup.addAll(oldGarageImageIds);
+            }
+
+            // Create new garage images collection
+            List<MediaFile> newGarageImages = new ArrayList<>();
+            request.getGarageImagesIds().forEach(gid -> {
+                MediaFile mediaFile = mediaFileRepository.findById(gid)
+                        .orElseThrow(() -> new ResourceNotFoundException("File not found"));
+                newGarageImages.add(mediaFile);
+            });
+            existing.setGarageImages(newGarageImages);
         }
 
-        if(request.getVatCertificateIds ()!=null && !request.getVatCertificateIds ().isEmpty()) {
-            filesToCleanup.addAll ( existing.getVatCertificate ( ).stream ().map ( MediaFile::getId ).toList ( ) ) ;
-            existing.getVatCertificate ( ).clear ( );
-            request.getVatCertificateIds ().forEach ( mediaFileId -> {
-                MediaFile mediaFile = mediaFileRepository.findById ( mediaFileId ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
-                existing.getVatCertificate ( ).add ( mediaFile );
-            } );
-        }
-        if (!filesToCleanup.isEmpty()) {
-            scheduleMediaFileCleanup(filesToCleanup);
+        if ( request.getVatCertificateIds ( ) != null && ! request.getVatCertificateIds ( ).isEmpty ( ) ) {
+            // Schedule old VAT certificates for cleanup
+            List<Long> oldVatCertIds = existing.getVatCertificate().stream()
+                    .map(MediaFile::getId)
+                    .toList();
+            if (!oldVatCertIds.isEmpty()) {
+                filesToCleanup.addAll(oldVatCertIds);
+            }
+
+            // Create new VAT certificates collection
+            List<MediaFile> newVatCertificates = new ArrayList<>();
+            request.getVatCertificateIds().forEach(vid -> {
+                MediaFile mediaFile = mediaFileRepository.findById(vid)
+                        .orElseThrow(() -> new ResourceNotFoundException("File not found"));
+                newVatCertificates.add(mediaFile);
+            });
+            existing.setVatCertificate(newVatCertificates);
         }
 
+        Garage save = garageRepository.save ( existing );
 
-        return garageRepository.save ( existing );
+        if ( ! filesToCleanup.isEmpty ( ) ) {
+            scheduleMediaFileCleanup ( filesToCleanup );
+        }
+
+        return save;
     }
 
     @Async
@@ -220,32 +242,38 @@ public class GarageManagementService {
     public void scheduleMediaFileCleanup(List<Long> mediaFileIds) {
         // Small delay to ensure transaction is committed
         try {
-            Thread.sleep(3000);
+            Thread.sleep ( 3000 );
 
             for (Long fileId : mediaFileIds) {
                 try {
                     // Check if file is still referenced elsewhere before deleting
-                    if (!isMediaFileStillReferenced(fileId)) {
-                        mediaFileRepository.deleteById(fileId);
-                        log.info("Successfully cleaned up media file: {}", fileId);
+                    if ( ! isMediaFileStillReferenced ( fileId ) ) {
+                        mediaFileRepository.deleteById ( fileId );
+                        log.info ( "Successfully cleaned up media file: {}", fileId );
                     } else {
-                        log.info("Media file {} still referenced, skipping cleanup", fileId);
+                        log.info ( "Media file {} still referenced, skipping cleanup", fileId );
                     }
-                } catch (Exception e) {
-                    log.warn("Failed to cleanup media file {}: {}", fileId, e.getMessage());
+                }
+                catch ( Exception e ) {
+                    log.warn ( "Failed to cleanup media file {}: {}", fileId, e.getMessage ( ) );
                 }
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.warn("Media file cleanup interrupted");
+        }
+        catch ( InterruptedException e ) {
+            Thread.currentThread ( ).interrupt ( );
+            log.warn ( "Media file cleanup interrupted" );
         }
     }
 
     private boolean isMediaFileStillReferenced(Long mediaFileId) {
         // Check if this media file is still referenced by any garage
         // This is a safety check to prevent deleting files that might still be in use
-        long count = garageRepository.countByGarageLogoId(mediaFileId);
-        return count > 0;
+        long garageLogoCount = garageRepository.countByGarageLogoId(mediaFileId);
+        long garageImageCount = garageRepository.countByGarageImageId(mediaFileId);
+        long garageTradeLicenseCount = garageRepository.countByTradeLicenseId(mediaFileId);
+        long garageVatCertCount = garageRepository.countByVatCertificateId(mediaFileId);
+        long totalReferences = garageLogoCount + garageImageCount + garageTradeLicenseCount + garageVatCertCount ;
+        return totalReferences > 0;
     }
 
     // Delete garage

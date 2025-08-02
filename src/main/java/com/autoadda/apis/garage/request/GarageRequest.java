@@ -19,6 +19,10 @@ public class GarageRequest {
     private String webSite;
     private String email;
     private String phoneNumber;
+    private String openingTime;
+    private String closingTime;
+    private String tradeLicenceNumber;
+    private String workingDays;
     private String mobileNumber;
     private LocationRequest garageLocation;
     private String garageType;
