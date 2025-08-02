@@ -46,6 +46,7 @@ public class GarageManagementService {
         garage.setTradeLicenceNumber ( garageRequest.getTradeLicenceNumber ( ) );
         garage.setOpeningTime ( garageRequest.getOpeningTime ( ) );
         garage.setClosingTime ( garageRequest.getClosingTime ( ) );
+        garage.setWorkingDays ( garageRequest.getWorkingDays ( ) );
         garage.setWebSite ( garageRequest.getWebSite ( ) );
         garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
         garage.setMobileNumber ( garageRequest.getMobileNumber ( ) );
@@ -132,6 +133,9 @@ public class GarageManagementService {
         }
         if(request.getClosingTime() != null) {
             existing.setClosingTime ( request.getClosingTime ( ) );
+        }
+        if(request.getWorkingDays() != null) {
+            existing.setWorkingDays ( request.getWorkingDays ( ) );
         }
         if ( request.getChainId ( ) != null ) {
             existing.setChainId ( request.getChainId ( ) );
