@@ -58,5 +58,5 @@ public class Invoice {
 
 	private String notes;
 
-	private LocalDateTime createdDate;
+	private LocalDateTime createdAt;
 }

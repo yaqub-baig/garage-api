@@ -45,52 +45,52 @@ public class GarageAnalyticsService {
 	 * @param garageId ID of the garage
 	 * @return GarageAnalyticsDTO containing today's analytics
 	 */
-	@Transactional
-	public GarageAnalyticsDTO getTodayAnalytics(Integer garageId) {
-		LocalDate today = LocalDate.now();
-		LocalDateTime start = today.atStartOfDay();
-		LocalDateTime end = today.atTime(LocalTime.MAX);
-
-		long jobCount = jobCardRepo.countJobsByDay(start, end, garageId);
-		BigDecimal revenue = invoiceRepo.getRevenueByDay(start, end, garageId);
-		if (revenue == null)
-			revenue = BigDecimal.ZERO;
-
-		List<Object[]> completed = jobCardRepo.countCompletedJobsPerTechnician(garageId);
-		List<Object[]> available = availabilityRepo.getAvailableHoursPerTechnician(garageId);
-
-		Map<Long, Integer> completedMap = completed.stream()
-				.collect(Collectors.toMap(obj -> (Long) obj[0], obj -> ((Long) obj[1]).intValue()));
-
-		Map<Long, Integer> availableMap = available.stream()
-				.collect(Collectors.toMap(obj -> (Long) obj[0], obj -> ((Long) obj[1]).intValue()));
-
-		List<Technician> techs = technicianRepo.findByGarageId(garageId);
-		List<TechnicianUtilizationDTO> utilizations = new ArrayList<>();
-
-		for (Technician tech : techs) {
-			int done = completedMap.getOrDefault(tech.getId(), 0);
-			int availableHours = availableMap.getOrDefault(tech.getId(), 8); // default 8 hours
-			double percent = availableHours == 0 ? 0.0 : (done * 1.0 / availableHours) * 100.0;
-
-			TechnicianUtilizationDTO dto = new TechnicianUtilizationDTO();
-			dto.setTechnicianId(tech.getId());
-			dto.setTechnicianName(tech.getFirstName());
-			dto.setJobsCompleted(done);
-			dto.setAvailableHours(availableHours);
-			dto.setUtilizationPercent(percent);
-
-			utilizations.add(dto);
-		}
-
-		GarageAnalyticsDTO analytics = new GarageAnalyticsDTO();
-		analytics.setDate(today);
-		analytics.setJobsToday(jobCount);
-		analytics.setRevenueToday(revenue);
-		analytics.setTechnicianUtilizations(utilizations);
-
-		return analytics;
-	}
+//	@Transactional
+//	public GarageAnalyticsDTO getTodayAnalytics(Integer garageId) {
+//		LocalDate today = LocalDate.now();
+//		LocalDateTime start = today.atStartOfDay();
+//		LocalDateTime end = today.atTime(LocalTime.MAX);
+//
+//		long jobCount = jobCardRepo.countJobsByDay(start, end, garageId);
+//		BigDecimal revenue = invoiceRepo.getRevenueByDay(start, end, garageId);
+//		if (revenue == null)
+//			revenue = BigDecimal.ZERO;
+//
+//		List<Object[]> completed = jobCardRepo.countCompletedJobsPerTechnician(garageId);
+//		List<Object[]> available = availabilityRepo.getAvailableHoursPerTechnician(garageId);
+//
+//		Map<Long, Integer> completedMap = completed.stream()
+//				.collect(Collectors.toMap(obj -> (Long) obj[0], obj -> ((Long) obj[1]).intValue()));
+//
+//		Map<Long, Integer> availableMap = available.stream()
+//				.collect(Collectors.toMap(obj -> (Long) obj[0], obj -> ((Long) obj[1]).intValue()));
+//
+//		List<Technician> techs = technicianRepo.findByGarageId(garageId);
+//		List<TechnicianUtilizationDTO> utilizations = new ArrayList<>();
+//
+//		for (Technician tech : techs) {
+//			int done = completedMap.getOrDefault(tech.getId(), 0);
+//			int availableHours = availableMap.getOrDefault(tech.getId(), 8); // default 8 hours
+//			double percent = availableHours == 0 ? 0.0 : (done * 1.0 / availableHours) * 100.0;
+//
+//			TechnicianUtilizationDTO dto = new TechnicianUtilizationDTO();
+//			dto.setTechnicianId(tech.getId());
+//			dto.setTechnicianName(tech.getFirstName());
+//			dto.setJobsCompleted(done);
+//			dto.setAvailableHours(availableHours);
+//			dto.setUtilizationPercent(percent);
+//
+//			utilizations.add(dto);
+//		}
+//
+//		GarageAnalyticsDTO analytics = new GarageAnalyticsDTO();
+//		analytics.setDate(today);
+//		analytics.setJobsToday(jobCount);
+//		analytics.setRevenueToday(revenue);
+//		analytics.setTechnicianUtilizations(utilizations);
+//
+//		return analytics;
+//	}
 
 	/**
 	 * Retrieves the revenue summary for the last 7 days.
@@ -118,21 +118,21 @@ public class GarageAnalyticsService {
 	 * @return List of TechnicianSummaryDTO containing performance metrics
 	 */
 	@Transactional
-	public List<TechnicianSummaryDTO> getTechnicianBreakdown(LocalDateTime from, LocalDateTime to) {
-		List<Object[]> results = jobCardRepo.findTechnicianSummary(from, to);
-		List<TechnicianSummaryDTO> summaries = new ArrayList<>();
-
-		for (Object[] row : results) {
-			TechnicianSummaryDTO dto = new TechnicianSummaryDTO();
-			dto.setTechnicianName((String) row[0]);
-			dto.setTotalJobs((Long) row[1]);
-			dto.setTotalRevenue((Double) row[2]);
-			dto.setUtilizationPercentage(calculateUtilization((Long) row[1])); // Stub
-			summaries.add(dto);
-		}
-
-		return summaries;
-	}
+//	public List<TechnicianSummaryDTO> getTechnicianBreakdown(LocalDateTime from, LocalDateTime to) {
+//		List<Object[]> results = jobCardRepo.findTechnicianSummary(from, to);
+//		List<TechnicianSummaryDTO> summaries = new ArrayList<>();
+//
+//		for (Object[] row : results) {
+//			TechnicianSummaryDTO dto = new TechnicianSummaryDTO();
+//			dto.setTechnicianName((String) row[0]);
+//			dto.setTotalJobs((Long) row[1]);
+//			dto.setTotalRevenue((Double) row[2]);
+//			dto.setUtilizationPercentage(calculateUtilization((Long) row[1])); // Stub
+//			summaries.add(dto);
+//		}
+//
+//		return summaries;
+//	}
 
 	private double calculateUtilization(long jobsHandled) {
 		int expectedJobs = 50; // you can configure per technician per period
@@ -149,6 +149,7 @@ public class GarageAnalyticsService {
 	 * @param to            End of the period
 	 * @return Utilization percentage (0 to 100)
 	 */
+	@Transactional
 	public double calculateTrueUtilization(Integer technicianId, long jobsCompleted, LocalDateTime from,
 			LocalDateTime to) {
 		List<TechnicianShift> shifts = shiftRepository.findShiftsInPeriod(technicianId, from.toLocalDate(),
@@ -182,5 +183,4 @@ public class GarageAnalyticsService {
 
 		return (double) totalJobTime / totalWorkingMinutes * 100;
 	}
-
 }

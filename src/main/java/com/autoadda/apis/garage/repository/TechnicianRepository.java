@@ -11,11 +11,11 @@ import com.autoadda.apis.garage.entity.Technician;
 @Repository
 public interface TechnicianRepository extends JpaRepository<Technician, Integer> {
 
-	Optional<Technician> findByEmail(String email);
+	Optional<Technician> findByEmailId(String email);
 
-	Optional<Technician> findByPhone(String phone);
+	Optional<Technician> findByMobileNumber(String phone);
 
-	List<Technician> findByGarageId(Integer garageId);
+	List<Technician> findByGarage_Id(Integer garageId);
 
 	List<Technician> findBySkillSetContaining(String skill); // if skillSet is stored as a list
 

@@ -11,7 +11,7 @@ public interface VehicleSaleRepository extends JpaRepository<VehicleSale, Intege
 
 	// Custom query methods can be added here if needed
 	// For example, to find by vehicle listing ID or status
-	List<VehicleSale> findByVehicleListingId(Integer vehicleListingId);
+//	List<VehicleSale> findByVehicleListingId(Integer vehicleListingId);
 
 	List<VehicleSale> findByStatus(Status status);
 	// Example: Find by vehicle ID

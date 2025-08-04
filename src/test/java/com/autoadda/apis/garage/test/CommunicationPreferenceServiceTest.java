@@ -1,7 +1,10 @@
 package com.autoadda.apis.garage.test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalTime;
@@ -34,14 +37,17 @@ public class CommunicationPreferenceServiceTest {
 		pref.setEmailOnServiceUpdates(true);
 
 		when(repository.findByCustomerId(1)).thenReturn(Optional.empty());
-		when(repository.save(mapToEntity(pref))).thenReturn(mapToEntity(pref));
+		when(repository.save(any(CommunicationPreference.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		CommunicationPreference saved = service.saveOrUpdatePreference(pref);
+
+		assertNotNull(saved);
 		assertTrue(saved.getEmailOnServiceUpdates());
 	}
 
 	private CommunicationPreference mapToEntity(CommunicationPreferenceRequest preferenceRequest) {
-		return CommunicationPreference.builder().customerId(preferenceRequest.getCustomerId())
+		return CommunicationPreference.builder().id(preferenceRequest.getId())
+				.customerId(preferenceRequest.getCustomerId())
 				.emailOnServiceUpdates(preferenceRequest.getEmailOnServiceUpdates())
 				.smsOnServiceUpdates(preferenceRequest.getSmsOnServiceUpdates())
 				.emailOnAppointments(preferenceRequest.getEmailOnAppointments())
@@ -76,12 +82,11 @@ public class CommunicationPreferenceServiceTest {
 
 	@Test
 	public void testDeletePreference() {
-		CommunicationPreference pref = new CommunicationPreference();
-		pref.setId(1);
-		when(repository.findById(1)).thenReturn(Optional.of(pref));
-
+//		CommunicationPreference pref = new CommunicationPreference();
+//		pref.setId(1);
+//		when(repository.findById(1)).thenReturn(Optional.of(pref));
 		service.deletePreference(1);
-		assertTrue(repository.findById(1).isEmpty());
+		verify(repository).deleteById(1); // ✅ match actual behavior
 	}
 
 	@Test
@@ -97,9 +102,17 @@ public class CommunicationPreferenceServiceTest {
 		existingPref.setEmailOnServiceUpdates(false);
 
 		when(repository.findByIdAndCustomerId(1, 1)).thenReturn(Optional.of(existingPref));
-		when(repository.save(mapToEntity(prefRequest))).thenReturn(mapToEntity(prefRequest));
+		when(repository.save(any(CommunicationPreference.class))).thenAnswer(invocation -> invocation.getArgument(0)); // ✅
+																														// Match
+																														// any
+																														// and
+																														// return
+																														// what
+																														// was
+																														// passed
 
 		CommunicationPreference updated = service.updatePreference(mapToEntity(prefRequest));
+
 		assertTrue(updated.getEmailOnServiceUpdates());
 	}
 

@@ -38,12 +38,12 @@ public class AppointmentController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.success(appointment));
 	}
 
-	@GetMapping("/customer/{customerId}")
-	public ResponseEntity<GenericResponse> getCustomerAppointments(@PathVariable Integer customerId,
-			@RequestParam(required = false) Status status) throws CustomerNotFoundException {
-		List<AppointmentDetails> appointments = appointmentService.getAppointmentsByCustomer(customerId, status);
-		return ResponseEntity.ok(GenericResponse.success(appointments));
-	}
+//	@GetMapping("/customer/{customerId}")
+//	public ResponseEntity<GenericResponse> getCustomerAppointments(@PathVariable Integer customerId,
+//			@RequestParam(required = false) Status status) throws CustomerNotFoundException {
+//		List<AppointmentDetails> appointments = appointmentService.getAppointmentsByCustomer(customerId, status);
+//		return ResponseEntity.ok(GenericResponse.success(appointments));
+//	}
 
 	@GetMapping("/garage/{garageId}")
 	public ResponseEntity<GenericResponse> getGarageAppointments(@PathVariable Integer garageId,

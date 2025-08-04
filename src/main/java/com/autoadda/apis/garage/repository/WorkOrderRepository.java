@@ -10,5 +10,5 @@ import com.autoadda.apis.garage.util.Status;
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Integer> {
 	List<WorkOrder> findByStatus(Status status);
 
-	List<WorkOrder> findByJobCardGarageId(Integer garageId);
+//	List<WorkOrder> findByJobCardGarageId(Integer garageId);
 }

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.autoadda.apis.garage.test.AppointmentServiceTest
 -------------------------------------------------------------------------------
-Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.916 s -- in com.autoadda.apis.garage.test.AppointmentServiceTest
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.673 s -- in com.autoadda.apis.garage.test.AppointmentServiceTest

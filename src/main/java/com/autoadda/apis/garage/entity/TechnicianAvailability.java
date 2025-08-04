@@ -36,6 +36,8 @@ public class TechnicianAvailability {
 	private LocalTime startTime;
 	private LocalTime endTime;
 
+	private Double availableHours;
+
 	@Enumerated(EnumType.STRING)
 	private Status status;
 

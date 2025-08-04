@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.autoadda.apis.garage.entity.AppointmentDetails;
@@ -33,16 +34,33 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InvoiceService {
 
+	@Autowired
 	private final AppointmentInvoiceRepository invoiceRepo;
-	private final AppointmentInvoiceBreakDownRepository breakdownRepo;
-	private final AppointmentDetailsRepository appointmentRepo;
-	private final GarageRepository garageRepo;
-	private final WorkOrderRepository workOrderRepository;
-	private final InvoiceRepository invoiceRepository;
-	private final LoyaltyService loyaltyService;
 
+	@Autowired
+	private final AppointmentInvoiceBreakDownRepository breakdownRepo;
+
+	@Autowired
+	private final AppointmentDetailsRepository appointmentRepo;
+
+	@Autowired
+	private final GarageRepository garageRepo;
+
+	@Autowired
+	private final WorkOrderRepository workOrderRepository;
+
+	@Autowired
+	private final InvoiceRepository invoiceRepository;
+
+	@Autowired
 	private final InvoiceMapper invoiceMapper;
 
+	/**
+	 * Prepares an invoice for a given appointment and garage.
+	 *
+	 * @param request the request containing appointment and garage details
+	 * @return the created AppointmentInvoice
+	 */
 	@Transactional
 	public AppointmentInvoice prepareInvoice(AppointmentInvoiceRequest request) {
 		AppointmentDetails appointment = appointmentRepo.findById(request.getAppointmentId())
@@ -65,6 +83,13 @@ public class InvoiceService {
 		return invoice;
 	}
 
+	/**
+	 * Updates the payment status of an invoice based on the appointment payment
+	 * request.
+	 *
+	 * @param request the request containing appointment ID and payment status
+	 * @return the updated AppointmentInvoice
+	 */
 	@Transactional
 	public AppointmentInvoice updateInvoicePayment(AppointmentPayRequest request) {
 		AppointmentInvoice invoice = invoiceRepo.findByAppointmentId(request.getAppointmentId());
@@ -79,6 +104,12 @@ public class InvoiceService {
 		return invoiceRepo.save(invoice);
 	}
 
+	/**
+	 * Retrieves all invoices for a specific garage.
+	 *
+	 * @param garageId the ID of the garage
+	 * @return a list of AppointmentInvoices for the specified garage
+	 */
 	@Transactional
 	public Invoice generateInvoice(Integer workOrderId, List<InvoiceLineItem> lineItems) {
 		WorkOrder workOrder = workOrderRepository.findById(workOrderId)
@@ -93,7 +124,7 @@ public class InvoiceService {
 
 		Invoice invoice = new Invoice();
 		invoice.setWorkOrder(workOrder);
-		invoice.setCreatedDate(LocalDateTime.now());
+		invoice.setCreatedAt(LocalDateTime.now());
 
 		for (InvoiceLineItem item : lineItems) {
 			if (item.getPrice() < 0 || item.getQuantity() <= 0) {
@@ -124,18 +155,37 @@ public class InvoiceService {
 		return invoiceRepository.save(invoice);
 	}
 
+	/**
+	 * Retrieves all invoices for a specific garage.
+	 *
+	 * @param garageId the ID of the garage
+	 * @return a list of AppointmentInvoices for the specified garage
+	 */
 	@Transactional
 	public Invoice getInvoiceById(Integer id) {
 		return invoiceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Invoice not found"));
 	}
 
-	@Transactional
-	public List<Invoice> getInvoicesForGarage(Integer garageId) {
-		return invoiceRepository.findByWorkOrderJobCardGarageId(garageId);
-	}
+	/**
+	 * Retrieves all invoices for a specific garage.
+	 *
+	 * @param garageId the ID of the garage
+	 * @return a list of AppointmentInvoices for the specified garage
+	 */
+//	@Transactional
+//	public List<Invoice> getInvoicesForGarage(Integer garageId) {
+//		return invoiceRepository.findByWorkOrderJobCardGarageId(garageId);
+//	}
 
-	@Transactional
-	public List<Invoice> getInvoicesByDateRange(LocalDate startDate, LocalDate endDate) {
-		return invoiceRepository.findByCreatedDateBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
-	}
+	/**
+	 * Retrieves all invoices created within a specific date range.
+	 *
+	 * @param startDate the start date of the range
+	 * @param endDate   the end date of the range
+	 * @return a list of invoices created within the specified date range
+	 */
+//	@Transactional
+//	public List<Invoice> getInvoicesByDateRange(LocalDate startDate, LocalDate endDate) {
+//		return invoiceRepository.findByCreatedDateBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+//	}
 }

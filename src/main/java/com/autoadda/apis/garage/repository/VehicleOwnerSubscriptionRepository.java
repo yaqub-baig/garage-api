@@ -28,4 +28,5 @@ public interface VehicleOwnerSubscriptionRepository extends JpaRepository<Vehicl
 
 	List<VehicleOwnerSubscription> findByVehicleOwnerIdAndStartDateBetween(Integer ownerId, LocalDate startDate,
 			LocalDate endDate);
+
 }

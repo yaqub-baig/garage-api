@@ -50,6 +50,15 @@ public class AppointmentService {
 
 	private final BusinessValidator validator;
 
+	/**
+	 * Creates a new customer appointment.
+	 *
+	 * @param request the appointment request containing details like garage ID,
+	 *                customer ID, vehicle ID, schedule date, service IDs, etc.
+	 * @return the created AppointmentDetails object.
+	 * @throws CustomerNotFoundException if the customer does not exist.
+	 * @throws GarageNotFoundException   if the garage does not exist.
+	 */
 	@Transactional
 	public AppointmentDetails createCustomerAppointment(CustomerAppointmentRequest request)
 			throws CustomerNotFoundException, GarageNotFoundException {
@@ -63,7 +72,7 @@ public class AppointmentService {
 		VehicleDetails vehicle = vehicleRepo.findById(request.getVehicleId())
 				.orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
-		AppointmentDetails appointment = AppointmentDetails.builder().customer(customer).garage(garage).vehicle(vehicle)
+		AppointmentDetails appointment = AppointmentDetails.builder().garage(garage).vehicle(vehicle)
 				.scheduleDate(request.getScheduleDate()).status(Status.CONFIRMED).insert_tms(DateHelper.dbDate())
 				.build();
 
@@ -85,20 +94,35 @@ public class AppointmentService {
 		return appointment;
 	}
 
-	@Transactional(readOnly = true)
-	public List<AppointmentDetails> getCustomerServiceAppointments(Integer customerId, Status status) {
-//		validator.validateCustomer(customerId);
+	/**
+	 * Retrieves all appointments for a customer, optionally filtered by status.
+	 *
+	 * @param customerId the ID of the customer.
+	 * @param status     the status to filter appointments by, or null for all.
+	 * @return a list of AppointmentDetails for the customer.
+	 */
+//	@Transactional(readOnly = true)
+//	public List<AppointmentDetails> getCustomerServiceAppointments(Integer customerId, Status status) {
+////		validator.validateCustomer(customerId);
+//
+//		Customer customer = customerRepo.findById(customerId)
+//				.orElseThrow(() -> new RuntimeException("Customer not found"));
+//
+//		if (status == null || Status.ALL.equals(status)) {
+//			return appointmentRepo.findByCustomer_Id(customerId);
+//		} else {
+//			return appointmentRepo.findByCustomer_IdAndStatus(customerId, status);
+//		}
+//	}
 
-		Customer customer = customerRepo.findById(customerId)
-				.orElseThrow(() -> new RuntimeException("Customer not found"));
-
-		if (status == null || Status.ALL.equals(status)) {
-			return appointmentRepo.findByCustomer_Id(customerId);
-		} else {
-			return appointmentRepo.findByCustomer_IdAndStatus(customerId, status);
-		}
-	}
-
+	/**
+	 * Retrieves all appointments for a garage, optionally filtered by status.
+	 *
+	 * @param garageId the ID of the garage.
+	 * @param status   the status to filter appointments by, or null for all.
+	 * @return a list of AppointmentDetails for the garage.
+	 * @throws GarageNotFoundException if the garage does not exist.
+	 */
 	@Transactional(readOnly = true)
 	public List<AppointmentDetails> getGarageServiceAppointments(Integer garageId, Status status)
 			throws GarageNotFoundException {
@@ -112,6 +136,13 @@ public class AppointmentService {
 		}
 	}
 
+	/**
+	 * Retrieves the details of an appointment, including services and job cards.
+	 *
+	 * @param appointmentId the ID of the appointment.
+	 * @return an AppointmentResponse containing appointment details, services, and
+	 *         job cards.
+	 */
 	@Transactional(readOnly = true)
 	public AppointmentResponse getAppointmentsDetails(Integer appointmentId) {
 		AppointmentDetails appointment = appointmentRepo.findById(appointmentId)
@@ -123,6 +154,13 @@ public class AppointmentService {
 		return AppointmentResponse.builder().appointment(appointment).services(services).jobcards(jobCards).build();
 	}
 
+	/**
+	 * Updates the status of an appointment.
+	 *
+	 * @param request the request containing appointment ID, new status, comments,
+	 *                and member details.
+	 * @return the updated AppointmentDetails object.
+	 */
 	@Transactional
 	public AppointmentDetails updateAppointmentStatus(AppointmentStatusRequest request) {
 		AppointmentDetails appointment = appointmentRepo.findById(request.getAppointmentId())
@@ -150,17 +188,33 @@ public class AppointmentService {
 		return appointment;
 	}
 
-	@Transactional(readOnly = true)
-	public List<AppointmentDetails> getAppointmentsByCustomer(Integer customerId, Status status)
-			throws CustomerNotFoundException {
-		validator.validateAndGetCustomer(customerId);
+	/**
+	 * Retrieves all appointments for a customer, optionally filtered by status.
+	 *
+	 * @param customerId the ID of the customer.
+	 * @param status     the status to filter appointments by, or null for all.
+	 * @return a list of AppointmentDetails for the customer.
+	 * @throws CustomerNotFoundException if the customer does not exist.
+	 */
+//	@Transactional(readOnly = true)
+//	public List<AppointmentDetails> getAppointmentsByCustomer(Integer customerId, Status status)
+//			throws CustomerNotFoundException {
+//		validator.validateAndGetCustomer(customerId);
+//
+//		if (status == null) {
+//			return appointmentRepo.findByCustomer_Id(customerId);
+//		}
+//		return appointmentRepo.findByCustomer_IdAndStatus(customerId, status);
+//	}
 
-		if (status == null) {
-			return appointmentRepo.findByCustomer_Id(customerId);
-		}
-		return appointmentRepo.findByCustomer_IdAndStatus(customerId, status);
-	}
-
+	/**
+	 * Retrieves all appointments for a garage, optionally filtered by status.
+	 *
+	 * @param garageId  the ID of the garage.
+	 * @param statusStr the status to filter appointments by, or null for all.
+	 * @return a list of AppointmentDetails for the garage.
+	 * @throws GarageNotFoundException if the garage does not exist.
+	 */
 	@Transactional(readOnly = true)
 	public List<AppointmentDetails> getAppointmentsByGarage(Integer garageId, String statusStr)
 			throws GarageNotFoundException {

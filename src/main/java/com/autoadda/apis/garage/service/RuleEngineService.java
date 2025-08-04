@@ -12,30 +12,49 @@ import com.autoadda.apis.garage.entity.VehicleDetails;
 import com.autoadda.apis.garage.repository.MaintenanceScheduleRuleRepository;
 import com.autoadda.apis.garage.util.IntervalType;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class RuleEngineService {
 
-    @Autowired
-    private MaintenanceScheduleRuleRepository ruleRepo;
+	@Autowired
+	private MaintenanceScheduleRuleRepository ruleRepo;
 
-    public Optional<MaintenanceScheduleRule> findApplicableRule(VehicleDetails vehicle) {
-        return ruleRepo.findByMakeAndModelAndIsActiveTrue(vehicle.getMake(), vehicle.getModel());
-    }
+	/**
+	 * Finds the applicable maintenance schedule rule for a given vehicle.
+	 *
+	 * @param vehicle The vehicle details for which to find the rule.
+	 * @return An Optional containing the applicable rule if found, otherwise empty.
+	 */
+	@Transactional
+	public Optional<MaintenanceScheduleRule> findApplicableRule(VehicleDetails vehicle) {
+		return ruleRepo.findByMakeAndModelAndIsActiveTrue(vehicle.getMake(), vehicle.getModel());
+	}
 
-    public LocalDate calculateNextServiceDate(VehicleDetails vehicle, MaintenanceScheduleRule rule) {
-        if (rule.getIntervalType() == IntervalType.TIME) {
-            return vehicle.getLastServiceDate().plusMonths(rule.getIntervalValue());
-        } else {
-            int mileageGap = rule.getIntervalValue();
-            int avgKmPerDay = 40; // configurable
-            int daysToNextService = mileageGap / avgKmPerDay;
-            return vehicle.getLastServiceDate().plusDays(daysToNextService);
-        }
-    }
+	@Transactional
+	public LocalDate calculateNextServiceDate(VehicleDetails vehicle, MaintenanceScheduleRule rule) {
+		if (rule.getIntervalType() == IntervalType.TIME) {
+			return vehicle.getLastServiceDate().plusMonths(rule.getIntervalValue());
+		} else {
+			int mileageGap = rule.getIntervalValue();
+			int avgKmPerDay = 40; // configurable
+			int daysToNextService = mileageGap / avgKmPerDay;
+			return vehicle.getLastServiceDate().plusDays(daysToNextService);
+		}
+	}
 
-    public Integer estimateMileageAtDate(VehicleDetails vehicle, LocalDate date) {
-        int days = (int) ChronoUnit.DAYS.between(vehicle.getLastServiceDate(), date);
-        int avgKmPerDay = 40; // configurable
-        return vehicle.getLastServiceMileage() + (avgKmPerDay * days);
-    }
+	/**
+	 * Estimates the mileage of a vehicle at a given date based on its last service
+	 * date and mileage.
+	 *
+	 * @param vehicle The vehicle details containing last service date and mileage.
+	 * @param date    The date for which to estimate the mileage.
+	 * @return Estimated mileage at the given date.
+	 */
+	@Transactional
+	public Integer estimateMileageAtDate(VehicleDetails vehicle, LocalDate date) {
+		int days = (int) ChronoUnit.DAYS.between(vehicle.getLastServiceDate(), date);
+		int avgKmPerDay = 40; // configurable
+		return vehicle.getLastServiceMileage() + (avgKmPerDay * days);
+	}
 }

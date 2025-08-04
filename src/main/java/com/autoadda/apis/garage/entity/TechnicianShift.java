@@ -27,7 +27,7 @@ public class TechnicianShift {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     private Technician technician;

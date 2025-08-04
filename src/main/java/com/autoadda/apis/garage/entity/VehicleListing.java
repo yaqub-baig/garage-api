@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.autoadda.apis.garage.util.Status;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -44,6 +45,6 @@ public class VehicleListing {
 
 	private LocalDate listedDate;
 
-	@OneToOne
-	private VehicleSale sale; // nullable until sold
+	@OneToOne(mappedBy = "vehicleListing", cascade = CascadeType.ALL)
+	private VehicleSale sale;
 }

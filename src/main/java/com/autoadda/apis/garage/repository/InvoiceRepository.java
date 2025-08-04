@@ -13,7 +13,7 @@ import com.autoadda.apis.garage.entity.Invoice;
 import com.autoadda.apis.garage.util.Status;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
-	List<Invoice> findByWorkOrderJobCardGarageId(Integer garageId);
+//	List<Invoice> findByWorkOrderJobCardGarageId(Integer garageId);
 
 	// Find invoices by Work Order
 	Optional<Invoice> findByWorkOrderId(Integer workOrderId);
@@ -26,14 +26,14 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
 	List<Invoice> findByPaymentStatus(Status status);
 
 	// Filter by creation date range
-	List<Invoice> findByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+	List<Invoice> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
 	// Search by partial note content
 	List<Invoice> findByNotesContainingIgnoreCase(String keyword);
 
-	@Query("SELECT SUM(i.amountPaid) FROM Invoice i WHERE i.createdAt BETWEEN :start AND :end AND i.jobCard.garage.id = :garageId")
-	BigDecimal getRevenueByDay(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end,
-			@Param("garageId") Integer garageId);
+//	@Query("SELECT SUM(i.totalAmount) FROM Invoice i WHERE i.createdAt BETWEEN :start AND :end AND i.jobCard.garage.id = :garageId")
+//	BigDecimal getRevenueByDay(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end,
+//			@Param("garageId") Integer garageId);
 
 	@Query("SELECT SUM(i.totalAmount) FROM Invoice i WHERE i.createdAt BETWEEN :from AND :to")
 	Double calculateTotalRevenue(LocalDateTime from, LocalDateTime to);

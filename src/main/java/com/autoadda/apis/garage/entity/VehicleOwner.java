@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.autoadda.apis.garage.util.OwnerType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -15,6 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +40,7 @@ public class VehicleOwner {
 	@Column(nullable = false)
 	private String email;
 
-	private String phone;
+	private String mobileNumber;
 
 	private int loyaltyPoints = 0;
 
@@ -48,4 +51,14 @@ public class VehicleOwner {
 	@OneToMany(mappedBy = "vehicleOwner")
 	private List<VehicleOwnerSubscription> subscriptions;
 
+	@ManyToOne
+	@JoinColumn(name = "location_id", referencedColumnName = "id")
+	private Location location;
+
+	@OneToMany(mappedBy = "vehicleOwner", cascade = CascadeType.ALL)
+	private List<VehicleDetails> vehicleDetails;
+
+	@ManyToOne
+	@JoinColumn(name = "favorite_garage_id")
+	private Garage favoriteGarage;
 }

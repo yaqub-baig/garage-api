@@ -31,10 +31,10 @@ public class TechnicianController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(created);
 	}
 
-	@GetMapping("/garage/{garageId}")
-	public ResponseEntity<List<Technician>> getByGarage(@PathVariable Integer garageId) {
-		return ResponseEntity.ok(technicianService.getTechniciansByGarage(garageId));
-	}
+//	@GetMapping("/garage/{garageId}")
+//	public ResponseEntity<List<Technician>> getByGarage(@PathVariable Integer garageId) {
+//		return ResponseEntity.ok(technicianService.getTechniciansByGarage(garageId));
+//	}
 	
 	@GetMapping("/email/{email}")
 	public ResponseEntity<Technician> getByEmail(@PathVariable String email) {
