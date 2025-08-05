@@ -1,18 +1,9 @@
 package com.autoadda.apis.garage.request;
 
 import com.autoadda.apis.garage.util.Status;
-
-import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -21,27 +12,27 @@ import lombok.Setter;
 @Builder
 public class CommunicationPreferenceRequest {
 
-	private Integer id;
+    private Integer id;
 
-	private Integer customerId; // Reference to the customer (could be VehicleOwner or User)
+    private Integer customerId; // Reference to the customer (could be VehicleOwner or User)
 
-	private Boolean emailOnServiceUpdates;
-	private Boolean smsOnServiceUpdates;
+    private Boolean emailOnServiceUpdates;
+    private Boolean smsOnServiceUpdates;
 
-	private Boolean emailOnAppointments;
-	private Boolean smsOnAppointments;
+    private Boolean emailOnAppointments;
+    private Boolean smsOnAppointments;
 
-	private Boolean emailOnReminders;
-	private Boolean smsOnReminders;
+    private Boolean emailOnReminders;
+    private Boolean smsOnReminders;
 
-	private Boolean emailOnOffers;
-	private Boolean smsOnOffers;
-	
-	private Boolean emailOnQuotationRequests;
-	private Boolean smsOnQuotationRequests;
+    private Boolean emailOnOffers;
+    private Boolean smsOnOffers;
 
-	@Enumerated(EnumType.STRING)
-	private Status status;
+    private Boolean emailOnQuotationRequests;
+    private Boolean smsOnQuotationRequests;
 
-	// Getters and setters
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    // Getters and setters
 }
