@@ -16,6 +16,8 @@ import com.autoadda.apis.garage.repository.LoyaltyPointRepository;
 import com.autoadda.apis.garage.repository.LoyaltyTransactionRepository;
 import com.autoadda.apis.garage.repository.VehicleOwnerRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class LoyaltyService {
 
@@ -31,6 +33,15 @@ public class LoyaltyService {
 	@Autowired
 	private LoyaltyTransactionRepository txRepo;
 
+	/**
+	 * Adds points to a vehicle owner's loyalty account for a specific garage.
+	 *
+	 * @param ownerId      the ID of the vehicle owner
+	 * @param garageId     the ID of the garage
+	 * @param earnedPoints the number of points to be added
+	 * @param reason       the reason for adding points
+	 */
+	@Transactional
 	public void addPoints(Integer ownerId, Integer garageId, int earnedPoints, String reason) {
 		LoyaltyPoint lp = pointRepo.findByOwnerIdAndGarageId(ownerId, garageId).orElseGet(() -> {
 			LoyaltyPoint newLp = new LoyaltyPoint();
@@ -66,6 +77,14 @@ public class LoyaltyService {
 		txRepo.save(tx);
 	}
 
+	/**
+	 * Redeems points from a vehicle owner's loyalty account for a specific garage.
+	 *
+	 * @param ownerId      the ID of the vehicle owner
+	 * @param garageId     the ID of the garage
+	 * @param redeemPoints the number of points to be redeemed
+	 */
+	@Transactional
 	public void redeemPoints(Integer ownerId, Integer garageId, int redeemPoints) {
 		LoyaltyPoint lp = pointRepo.findByOwnerIdAndGarageId(ownerId, garageId)
 				.orElseThrow(() -> new RuntimeException("No points record found"));
@@ -93,19 +112,49 @@ public class LoyaltyService {
 		txRepo.save(tx);
 	}
 
+	/**
+	 * Retrieves the loyalty status of a vehicle owner for a specific garage.
+	 *
+	 * @param ownerId  the ID of the vehicle owner
+	 * @param garageId the ID of the garage
+	 * @return the LoyaltyPoint object containing loyalty status
+	 */
+	@Transactional
 	public LoyaltyPoint getLoyaltyStatus(Integer ownerId, Integer garageId) {
 		return pointRepo.findByOwnerIdAndGarageId(ownerId, garageId)
 				.orElseThrow(() -> new RuntimeException("Not enrolled in loyalty program"));
 	}
 
+	/**
+	 * Retrieves the transaction history of a vehicle owner.
+	 *
+	 * @param ownerId the ID of the vehicle owner
+	 * @return a list of LoyaltyTransaction objects
+	 */
+	@Transactional
 	public List<LoyaltyTransaction> getTransactionHistory(Integer ownerId) {
 		return txRepo.findByOwnerId(ownerId);
 	}
 
+	/**
+	 * Retrieves the transaction history of a vehicle owner for a specific garage.
+	 *
+	 * @param ownerId  the ID of the vehicle owner
+	 * @param garageId the ID of the garage
+	 * @return a list of LoyaltyTransaction objects
+	 */
+	@Transactional
 	public List<LoyaltyTransaction> getTransactionHistoryByGarage(Integer ownerId, Integer garageId) {
 		return txRepo.findByOwnerIdAndGarageId(ownerId, garageId);
 	}
 
+	/**
+	 * Retrieves all loyalty points for a specific garage.
+	 *
+	 * @param garageId the ID of the garage
+	 * @return an Optional containing LoyaltyPoint if found, otherwise empty
+	 */
+	@Transactional
 	public Optional<LoyaltyPoint> getAllLoyaltyPointsByGarage(Integer garageId) {
 		return pointRepo.findByGarageId(garageId);
 	}

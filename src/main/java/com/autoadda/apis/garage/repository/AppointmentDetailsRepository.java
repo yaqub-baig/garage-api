@@ -19,9 +19,7 @@ import jakarta.persistence.LockModeType;
 @Repository
 public interface AppointmentDetailsRepository extends JpaRepository<AppointmentDetails, Integer> {
 
-	List<AppointmentDetails> findByCustomer_Id(Integer customerId);
-
-	List<AppointmentDetails> findByCustomer_IdAndStatus(Integer customerId, Status status);
+	List<AppointmentDetails> findByStatus(Status status);
 
 	List<AppointmentDetails> findByGarage_Id(Integer garageId);
 
@@ -32,8 +30,8 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
 	Optional<AppointmentDetails> findByGarage_IdAndScheduleDateAndServiceStartTime(Integer garageId,
 			LocalDate scheduleDate, LocalTime serviceStartTime);
 
-	boolean existsByCustomer_IdAndGarage_IdAndScheduleDateAndServiceStartTimeAndStatus(Integer customerId,
-			Integer garageId, LocalDate scheduleDate, LocalTime serviceStartTime, Status status);
+	boolean existsByGarage_IdAndScheduleDateAndServiceStartTimeAndStatus(Integer garageId, LocalDate scheduleDate,
+			LocalTime serviceStartTime, Status status);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("SELECT b FROM AppointmentDetails b WHERE b.garage.id = :garageId AND b.scheduleDate = :date AND b.serviceStartTime = :time")

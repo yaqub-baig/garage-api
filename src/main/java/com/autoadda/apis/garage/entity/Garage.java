@@ -8,6 +8,22 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.autoadda.apis.garage.util.Status;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -60,7 +76,7 @@ public class Garage {
     @JoinColumn(name = "garage_logo")
     private MediaFile garageLogo;
 
-    @OneToOne
+    @ManyToOne
     private Location garageLocation;
 
     @Column(name = "account_status")
@@ -69,8 +85,7 @@ public class Garage {
     @Column(name = "garage_type")
     private String garageType;
 
-    @Column(name = "chain_id")
-    private Integer chainId;
+
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

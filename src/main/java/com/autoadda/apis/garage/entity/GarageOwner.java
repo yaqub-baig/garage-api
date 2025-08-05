@@ -1,7 +1,7 @@
 package com.autoadda.apis.garage.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.autoadda.apis.garage.util.Status;
@@ -54,9 +54,6 @@ public class GarageOwner {
 //	@OneToMany(mappedBy = "garageOwner", cascade = CascadeType.ALL, orphanRemoval = true)
 //	private List<Garage> ownedGarages = new ArrayList<>();
 
-	@Column(name = "ownership_per")
-	private Integer ownershipPer;
-
 	@Column(name = "insert_tms")
-	private Date insertTms;
+	private LocalDate insertTms;
 }

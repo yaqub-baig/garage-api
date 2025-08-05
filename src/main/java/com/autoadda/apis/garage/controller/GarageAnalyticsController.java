@@ -26,10 +26,10 @@ public class GarageAnalyticsController {
 		this.analyticsService = analyticsService;
 	}
 
-	@GetMapping("/{garageId}/today")
-	public ResponseEntity<GarageAnalyticsDTO> getTodayStats(@PathVariable Integer garageId) {
-		return ResponseEntity.ok(analyticsService.getTodayAnalytics(garageId));
-	}
+//	@GetMapping("/{garageId}/today")
+//	public ResponseEntity<GarageAnalyticsDTO> getTodayStats(@PathVariable Integer garageId) {
+//		return ResponseEntity.ok(analyticsService.getTodayAnalytics(garageId));
+//	}
 
 	@GetMapping("/summary/weekly")
 	public ResponseEntity<RevenueSummaryDTO> getWeeklySummary() {
@@ -43,10 +43,10 @@ public class GarageAnalyticsController {
 		return ResponseEntity.ok(analyticsService.getWeeklySummary());
 	}
 
-	@GetMapping("/technician")
-	public ResponseEntity<List<TechnicianSummaryDTO>> getTechnicianBreakdown(
-			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
-		return ResponseEntity.ok(analyticsService.getTechnicianBreakdown(from, to));
-	}
+//	@GetMapping("/technician")
+//	public ResponseEntity<List<TechnicianSummaryDTO>> getTechnicianBreakdown(
+//			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+//			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to) {
+//		return ResponseEntity.ok(analyticsService.getTechnicianBreakdown(from, to));
+//	}
 }

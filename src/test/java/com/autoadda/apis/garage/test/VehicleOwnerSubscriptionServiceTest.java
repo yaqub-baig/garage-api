@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,8 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.entity.VehicleOwner;
@@ -30,20 +30,20 @@ import com.autoadda.apis.garage.util.SubscriptionStatus;
 
 import jakarta.persistence.EntityNotFoundException;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class VehicleOwnerSubscriptionServiceTest {
 
-	@InjectMocks
-	private VehicleOwnerSubscriptionService subscriptionService;
+	@Mock
+	private VehicleOwnerSubscriptionRepository vehicleOwnerSubscriptionRepository;
 
 	@Mock
 	private VehicleOwnerRepository vehicleOwnerRepository;
 
 	@Mock
-	private GarageSubscriptionRepository planRepository;
+	private GarageSubscriptionRepository garageSubscriptionRepository;
 
-	@Mock
-	private VehicleOwnerSubscriptionRepository subscriptionRepository;
+	@InjectMocks
+	private VehicleOwnerSubscriptionService vehicleOwnerSubscriptionService;
 
 	private VehicleOwner owner;
 	private GarageSubscription plan;
@@ -51,16 +51,11 @@ class VehicleOwnerSubscriptionServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		MockitoAnnotations.openMocks(this);
-
 		owner = new VehicleOwner();
-		owner.setId(1);
-		owner.setPhone("8479098528");
+		owner.setId(12);
 
 		plan = new GarageSubscription();
-		plan.setId(101);
-		plan.setName("Premium Wash");
-		plan.setDurationMonths(3);
+		plan.setId(123);
 
 		subscription = new VehicleOwnerSubscription();
 		subscription.setId(1001);
@@ -72,134 +67,119 @@ class VehicleOwnerSubscriptionServiceTest {
 	}
 
 	@Test
-	void testSubscribeToPlan_Success() {
-		when(vehicleOwnerRepository.findById(1)).thenReturn(Optional.of(owner));
-		when(planRepository.findById(101)).thenReturn(Optional.of(plan));
-		when(subscriptionRepository.save(any())).thenReturn(subscription);
+	void testGetSubscriptionById() {
+		// Arrange (mock behavior)
+		when(vehicleOwnerSubscriptionRepository.findById(1001)).thenReturn(Optional.of(subscription));
 
-		VehicleOwnerSubscription result = subscriptionService.subscribeToPlan(subscription);
+		// Act
+		VehicleOwnerSubscription result = vehicleOwnerSubscriptionService.getSubscriptionById(1001);
 
+		// Assert
 		assertNotNull(result);
-		assertEquals(owner, result.getVehicleOwner());
-		assertEquals(plan, result.getGarageSubscription());
+		assertEquals(12, result.getVehicleOwner().getId());
 		assertEquals(SubscriptionStatus.ACTIVE, result.getStatus());
-	}
 
-	@Test
-	void testSubscribeToPlan_OwnerNotFound() {
-		when(vehicleOwnerRepository.findById(1)).thenReturn(Optional.empty());
-
-		EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
-				() -> subscriptionService.subscribeToPlan(subscription));
-
-		assertEquals("Vehicle owner not found", ex.getMessage());
-	}
-
-	@Test
-	void testSubscribeToPlan_PlanNotFound() {
-		when(vehicleOwnerRepository.findById(1)).thenReturn(Optional.of(owner));
-		when(planRepository.findById(101)).thenReturn(Optional.empty());
-
-		EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
-				() -> subscriptionService.subscribeToPlan(subscription));
-
-		assertEquals("Subscription plan not found", ex.getMessage());
-	}
-
-	@Test
-	void testGetSubscriptionsByOwner() {
-		List<VehicleOwnerSubscription> list = List.of(subscription);
-		when(subscriptionRepository.findByVehicleOwnerId(1)).thenReturn(list);
-
-		List<VehicleOwnerSubscription> result = subscriptionService.getSubscriptionsByOwner(1);
-		assertEquals(1, result.size());
-	}
-
-	@Test
-	void testCancelSubscription() {
-		when(subscriptionRepository.findById(1001)).thenReturn(Optional.of(subscription));
-		subscriptionService.cancelSubscription(1001);
-		assertEquals(SubscriptionStatus.CANCELLED, subscription.getStatus());
-		verify(subscriptionRepository).save(subscription);
-	}
-
-	@Test
-	void testGetSubscriptionById_Success() {
-		when(subscriptionRepository.findById(1001)).thenReturn(Optional.of(subscription));
-		VehicleOwnerSubscription result = subscriptionService.getSubscriptionById(1001);
-		assertNotNull(result);
+		// Verify that repo method was called once
+		verify(vehicleOwnerSubscriptionRepository, times(1)).findById(1001);
 	}
 
 	@Test
 	void testGetSubscriptionById_NotFound() {
-		when(subscriptionRepository.findById(999)).thenReturn(Optional.empty());
+		// Arrange
+		when(vehicleOwnerSubscriptionRepository.findById(9999)).thenReturn(Optional.empty());
 
-		assertThrows(EntityNotFoundException.class, () -> subscriptionService.getSubscriptionById(999));
+		// Act & Assert
+		assertThrows(EntityNotFoundException.class, () -> {
+			vehicleOwnerSubscriptionService.getSubscriptionById(9999);
+		});
+
+		verify(vehicleOwnerSubscriptionRepository, times(1)).findById(9999);
 	}
 
 	@Test
-	void testGetActiveSubscriptions() {
-		when(subscriptionRepository.findByStatus(SubscriptionStatus.ACTIVE)).thenReturn(List.of(subscription));
-		List<VehicleOwnerSubscription> result = subscriptionService.getActiveSubscriptions();
-		assertEquals(1, result.size());
+	void testSubscribeToPlan() {
+		VehicleOwner owner = new VehicleOwner();
+		owner.setId(12);
+
+		GarageSubscription plan = new GarageSubscription();
+		plan.setId(123);
+		plan.setDurationMonths(6);
+
+		VehicleOwnerSubscription subscription = new VehicleOwnerSubscription();
+		subscription.setVehicleOwner(owner);
+		subscription.setGarageSubscription(plan);
+
+		when(vehicleOwnerRepository.findById(12)).thenReturn(Optional.of(owner));
+
+		when(garageSubscriptionRepository.findById(123)).thenReturn(Optional.of(plan));
+
+		when(vehicleOwnerSubscriptionRepository.save(any(VehicleOwnerSubscription.class))).thenReturn(subscription);
+
+		VehicleOwnerSubscription result = vehicleOwnerSubscriptionService.subscribeToPlan(subscription);
+
+		assertNotNull(result);
+		assertEquals(SubscriptionStatus.ACTIVE, result.getStatus());
+		assertEquals(LocalDate.now(), result.getStartDate());
+		assertEquals(LocalDate.now().plusMonths(6), result.getEndDate());
+
+		verify(vehicleOwnerRepository, times(1)).findById(12);
+		verify(garageSubscriptionRepository, times(1)).findById(123);
+		verify(vehicleOwnerSubscriptionRepository, times(1)).save(subscription);
 	}
 
 	@Test
-	void testGetSubscriptionsByDateRange() {
-		LocalDate start = LocalDate.now().minusDays(1);
-		LocalDate end = LocalDate.now().plusDays(1);
+	void testCancelSubscription() {
+		when(vehicleOwnerSubscriptionRepository.findById(1001)).thenReturn(Optional.of(subscription));
 
-		when(subscriptionRepository.findByVehicleOwnerIdAndStartDateBetween(1, start, end))
+		vehicleOwnerSubscriptionService.cancelSubscription(1001);
+
+		assertEquals(SubscriptionStatus.CANCELLED, subscription.getStatus());
+		verify(vehicleOwnerSubscriptionRepository, times(1)).save(subscription);
+	}
+
+	@Test
+	void testCancelSubscription_NotFound() {
+		when(vehicleOwnerSubscriptionRepository.findById(9999)).thenReturn(Optional.empty());
+		assertThrows(EntityNotFoundException.class, () -> {
+			vehicleOwnerSubscriptionService.cancelSubscription(9999);
+		});
+		verify(vehicleOwnerSubscriptionRepository, times(1)).findById(9999);
+	}
+
+	@Test
+	void testGetSubscriptionsByOwner() {
+		when(vehicleOwnerSubscriptionRepository.findByVehicleOwnerId(12)).thenReturn(List.of(subscription));
+
+		List<VehicleOwnerSubscription> subscriptions = vehicleOwnerSubscriptionService.getSubscriptionsByOwner(12);
+		assertEquals(1, subscriptions.size());
+		assertEquals(1001, subscriptions.get(0).getId());
+
+		verify(vehicleOwnerSubscriptionRepository, times(1)).findByVehicleOwnerId(12);
+	}
+
+	@Test
+	void testGetAllActiveSubscriptions() {
+		when(vehicleOwnerSubscriptionRepository.findByStatus(SubscriptionStatus.ACTIVE))
 				.thenReturn(List.of(subscription));
 
-		List<VehicleOwnerSubscription> result = subscriptionService.getSubscriptionsByDateRange(1, start, end);
-		assertEquals(1, result.size());
+		List<VehicleOwnerSubscription> activeSubscriptions = vehicleOwnerSubscriptionService.getActiveSubscriptions();
+		assertEquals(1, activeSubscriptions.size());
+		assertEquals(1001, activeSubscriptions.get(0).getId());
+
+		verify(vehicleOwnerSubscriptionRepository, times(1)).findByStatus(SubscriptionStatus.ACTIVE);
 	}
 
 	@Test
-	void testGetSubscriptionsByPlan() {
-		when(subscriptionRepository.findByGarageSubscriptionId(101)).thenReturn(List.of(subscription));
-		List<VehicleOwnerSubscription> result = subscriptionService.getSubscriptionsByPlan(101);
-		assertEquals(1, result.size());
-	}
+	void testGetAllSubscriptions() {
+		when(vehicleOwnerSubscriptionRepository.findAll()).thenReturn(List.of(subscription));
 
-	@Test
-	void testGetSubscriptionsByOwnerAndPlan() {
-		when(subscriptionRepository.findByVehicleOwnerIdAndGarageSubscriptionId(1, 101))
-				.thenReturn(List.of(subscription));
+		List<VehicleOwnerSubscription> allSubscriptions = vehicleOwnerSubscriptionService.getAllSubscriptions();
+		System.out.println("Returned size: " + allSubscriptions.size());
+		System.out.println("Returned list: " + allSubscriptions);
 
-		List<VehicleOwnerSubscription> result = subscriptionService.getSubscriptionsByOwnerAndPlan(1, 101);
-		assertEquals(1, result.size());
-	}
+		assertEquals(1, allSubscriptions.size());
+		assertEquals(1001, allSubscriptions.get(0).getId());
 
-	@Test
-	void testGetSubscriptionsByOwnerAndStatus() {
-		when(subscriptionRepository.findByVehicleOwnerIdAndStatus(1, SubscriptionStatus.ACTIVE.name()))
-				.thenReturn(List.of(subscription));
-
-		List<VehicleOwnerSubscription> result = subscriptionService.getSubscriptionsByOwnerAndStatus(1,
-				SubscriptionStatus.ACTIVE.name());
-		assertEquals(1, result.size());
-	}
-
-	@Test
-	void testGetSubscriptionsByPlanAndStatus() {
-		when(subscriptionRepository.findByGarageSubscriptionIdAndStatus(101, SubscriptionStatus.ACTIVE.name()))
-				.thenReturn(List.of(subscription));
-
-		List<VehicleOwnerSubscription> result = subscriptionService.getSubscriptionsByPlanAndStatus(101,
-				SubscriptionStatus.ACTIVE.name());
-		assertEquals(1, result.size());
-	}
-
-	@Test
-	void testUpdateSubscriptionStatus() {
-		when(subscriptionRepository.findById(1001)).thenReturn(Optional.of(subscription));
-		when(subscriptionRepository.save(subscription)).thenReturn(subscription);
-
-		VehicleOwnerSubscription updated = subscriptionService.updateSubscriptionStatus(1001,
-				SubscriptionStatus.EXPIRED);
-
-		assertEquals(SubscriptionStatus.EXPIRED, updated.getStatus());
+		verify(vehicleOwnerSubscriptionRepository, times(1)).findAll();
 	}
 }

@@ -58,10 +58,6 @@ public class AppointmentDetails {
 	private Garage garage;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "customer_id", referencedColumnName = "id")
-	private Customer customer;
-
-	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "vehicle_id", referencedColumnName = "id")
 	private VehicleDetails vehicle;
 

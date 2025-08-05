@@ -9,35 +9,31 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.autoadda.apis.garage.entity.VehicleDetails;
+import com.autoadda.apis.garage.util.Status;
 
 @Repository
 public interface VehicleDetailsRepository extends JpaRepository<VehicleDetails, Integer> {
 
-//	List<VehicleDetails> findByCustomerId(Integer customerId);
+	List<VehicleDetails> findByVin(String vin);
 
-//	List<VehicleDetails> findByGarageId(Integer garageId);
+	List<VehicleDetails> findByYear(Integer year);
 
-//	List<VehicleDetails> findByVin(String vin);
+	List<VehicleDetails> findByName(String name);
 
-//	List<VehicleDetails> findByYear(String year);
+	List<VehicleDetails> findByOdometer(Integer odometer);
 
-//	List<VehicleDetails> findByName(String name);
+	List<VehicleDetails> findByColor(String color);
 
-//	List<VehicleDetails> findByOdometer(String odometer);
+	List<VehicleDetails> findByEngineSize(String engineSize);
 
-//	List<VehicleDetails> findByColor(String color);
+	List<VehicleDetails> findByNoOfDoors(Integer noOfDoors);
 
-//	List<VehicleDetails> findByEngineSize(String engineSize);
+	List<VehicleDetails> findByNoOfSeats(Integer noOfSeats);
 
-//	List<VehicleDetails> findByNoOfDoors(String noOfDoors);
+	List<VehicleDetails> findByNoOfCylinders(Integer noOfCylinders);
 
-//	List<VehicleDetails> findByNoOfSeats(String noOfSeats);
+	List<VehicleDetails> findByNoOfSpeeds(Integer noOfSpeeds);
 
-//	List<VehicleDetails> findByNoOfCylinders(String noOfCylinders);
+	List<VehicleDetails> findByStatus(Status status);
 
-//	List<VehicleDetails> findByNoOfSpeeds(String noOfSpeeds);
-
-//	List<VehicleDetails> findByStatus(String status);
-
-//	List<VehicleDetails> findByStatusAndGarageId(String status, Integer garageId);
 }

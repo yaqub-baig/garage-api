@@ -117,32 +117,32 @@ public class AppointmentServiceTest {
 		verify(serviceRepo, times(1)).saveAll(anyList());
 	}
 
-	@Test
-	void getCustomerServiceAppointments_withStatus() {
-		when(customerRepo.findById(1)).thenReturn(Optional.of(customer));
-		when(appointmentRepo.findByCustomer_IdAndStatus(1, Status.NEW)).thenReturn(List.of(new AppointmentDetails()));
+//	@Test
+//	void getCustomerServiceAppointments_withStatus() {
+//		when(customerRepo.findById(1)).thenReturn(Optional.of(customer));
+//		when(appointmentRepo.findByCustomer_IdAndStatus(1, Status.NEW)).thenReturn(List.of(new AppointmentDetails()));
+//
+//		List<AppointmentDetails> result = appointmentService.getCustomerServiceAppointments(1, Status.NEW);
+//		assertEquals(1, result.size());
+//	}
 
-		List<AppointmentDetails> result = appointmentService.getCustomerServiceAppointments(1, Status.NEW);
-		assertEquals(1, result.size());
-	}
+//	@Test
+//	void getCustomerServiceAppointments_allStatus() {
+//		when(customerRepo.findById(1)).thenReturn(Optional.of(customer));
+//		when(appointmentRepo.findByCustomer_Id(1)).thenReturn(List.of(new AppointmentDetails()));
+//
+//		List<AppointmentDetails> result = appointmentService.getCustomerServiceAppointments(1, Status.ALL);
+//		assertEquals(1, result.size());
+//	}
 
-	@Test
-	void getCustomerServiceAppointments_allStatus() {
-		when(customerRepo.findById(1)).thenReturn(Optional.of(customer));
-		when(appointmentRepo.findByCustomer_Id(1)).thenReturn(List.of(new AppointmentDetails()));
-
-		List<AppointmentDetails> result = appointmentService.getCustomerServiceAppointments(1, Status.ALL);
-		assertEquals(1, result.size());
-	}
-
-	@Test
-	void getCustomerServiceAppointments_customerNotFound() {
-		when(customerRepo.findById(1)).thenReturn(Optional.empty());
-
-		Exception ex = assertThrows(RuntimeException.class,
-				() -> appointmentService.getCustomerServiceAppointments(1, Status.NEW));
-		assertEquals("Customer not found", ex.getMessage());
-	}
+//	@Test
+//	void getCustomerServiceAppointments_customerNotFound() {
+//		when(customerRepo.findById(1)).thenReturn(Optional.empty());
+//
+//		Exception ex = assertThrows(RuntimeException.class,
+//				() -> appointmentService.getCustomerServiceAppointments(1, Status.NEW));
+//		assertEquals("Customer not found", ex.getMessage());
+//	}
 
 	@Test
 	void getGarageServiceAppointments_withStatus() throws GarageNotFoundException {
@@ -204,14 +204,14 @@ public class AppointmentServiceTest {
 		verify(appointmentActivityRepo, times(1)).save(any());
 	}
 
-	@Test
-	void getAppointmentsByCustomer_valid() throws CustomerNotFoundException {
-		when(validator.validateAndGetCustomer(1)).thenReturn(customer);
-		when(appointmentRepo.findByCustomer_IdAndStatus(1, Status.NEW)).thenReturn(List.of(new AppointmentDetails()));
-
-		List<AppointmentDetails> result = appointmentService.getAppointmentsByCustomer(1, Status.NEW);
-		assertEquals(1, result.size());
-	}
+//	@Test
+//	void getAppointmentsByCustomer_valid() throws CustomerNotFoundException {
+//		when(validator.validateAndGetCustomer(1)).thenReturn(customer);
+//		when(appointmentRepo.findByCustomer_IdAndStatus(1, Status.NEW)).thenReturn(List.of(new AppointmentDetails()));
+//
+//		List<AppointmentDetails> result = appointmentService.getAppointmentsByCustomer(1, Status.NEW);
+//		assertEquals(1, result.size());
+//	}
 
 	@Test
 	void getAppointmentsByGarage_valid() throws GarageNotFoundException {

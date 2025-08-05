@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
@@ -43,7 +44,8 @@ public class VehicleSale {
 	private LocalDate saleDate;
 
 	private Double salePrice;
-@OneToOne
+
+	@OneToOne
 	private Customer buyer;
 
 	private String paymentMode; // e.g., CASH, CREDIT, LOAN
@@ -58,5 +60,6 @@ public class VehicleSale {
 	private VehicleSaleInvoice invoice;
 
 	@OneToOne
-	private VehicleListing listing;
+	@JoinColumn(name = "vehicle_listing_id")
+	private VehicleListing vehicleListing;
 }

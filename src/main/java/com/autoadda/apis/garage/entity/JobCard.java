@@ -43,15 +43,19 @@ public class JobCard {
 	private LocalDateTime completedAt;
 
 	@ManyToOne
+	@JoinColumn(name = "garage_id", referencedColumnName = "id")
 	private Garage garage;
 
 	@ManyToOne
+	@JoinColumn(name = "technician_id", referencedColumnName = "id")
 	private Technician technician;
 
 	@ManyToOne
+	@JoinColumn(name = "appointment_id", referencedColumnName = "id")
 	private AppointmentDetails appointment;
 
 	@ManyToOne
+	@JoinColumn(name = "appointment_service_id", referencedColumnName = "id")
 	private AppointmentServices service;
 
 	@ManyToOne

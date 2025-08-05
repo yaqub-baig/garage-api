@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +74,12 @@ public class JobCardService {
 		return jobCard;
 	}
 
+	/**
+	 * Updates the status of a job card.
+	 *
+	 * @param request the request containing job card ID and new status
+	 * @return the updated JobCard
+	 */
 	@Transactional
 	public JobCard updateJobCardStatus(JobCardStatusRequest request) {
 		JobCard jobCard = jobCardRepo.findById(request.getJobcardId())
@@ -95,6 +102,12 @@ public class JobCardService {
 		return jobCardRepo.save(jobCard);
 	}
 
+	/**
+	 * Retrieves a job card by its ID.
+	 *
+	 * @param jobCardId the ID of the job card
+	 * @return the JobCard if found
+	 */
 	@Transactional(readOnly = true)
 	public List<JobCard> getTechnicianJobCards(Integer technicianId, Status status) throws MemberNotFoundException {
 		validator.validateTechnician(technicianId);
@@ -104,6 +117,13 @@ public class JobCardService {
 			return jobCardRepo.findByTechnicianIdAndStatus(technicianId, status);
 	}
 
+	/**
+	 * Retrieves job cards for a specific garage.
+	 *
+	 * @param garageId the ID of the garage
+	 * @param status   the status of the job cards to filter by (optional)
+	 * @return a list of JobCards for the specified garage
+	 */
 	@Transactional(readOnly = true)
 	public List<JobCard> getGarageJobCards(Integer garageId, Status status) {
 		if (status == null || StringUtils.isBlank(status.toString()))
@@ -112,11 +132,24 @@ public class JobCardService {
 			return jobCardRepo.findByGarage_IdAndStatus(garageId, status);
 	}
 
+	/**
+	 * Retrieves job cards for a specific appointment.
+	 *
+	 * @param appointmentId the ID of the appointment
+	 * @return a list of JobCards for the specified appointment
+	 */
 	@Transactional(readOnly = true)
 	public List<JobCard> getJobCardsByAppointmentId(Integer appointmentId) {
 		return jobCardRepo.findByAppointmentId(appointmentId);
 	}
 
+	/**
+	 * Marks a job card as completed.
+	 *
+	 * @param jobCardId the ID of the job card to mark as completed
+	 * @return the updated JobCard
+	 */
+	@Transactional
 	public JobCard markJobCardComplete(Integer jobCardId) {
 		JobCard jobCard = jobCardRepo.findById(jobCardId)
 				.orElseThrow(() -> new RuntimeException("JobCard not found with ID: " + jobCardId));

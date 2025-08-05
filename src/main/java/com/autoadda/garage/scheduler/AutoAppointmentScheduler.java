@@ -44,7 +44,6 @@ public class AutoAppointmentScheduler {
 					FutureAppointment appointment = new FutureAppointment();
 					// appointment.setId(UUID.randomUUID().toString());
 					appointment.setVehicleId(vehicle.getId());
-					appointment.setGarageId(vehicle.getPreferredGarageId());
 					appointment.setServiceType(rule.getServiceType());
 					appointment.setScheduledDate(nextDate);
 					appointment.setEstimatedMileage(ruleEngine.estimateMileageAtDate(vehicle, nextDate));

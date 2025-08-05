@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
 
 import com.autoadda.apis.garage.response.GenericResponse;
 
@@ -154,6 +155,12 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<GenericResponse> handleGenericException(Exception ex) {
 		log.error("Unhandled exception", ex);
 		return buildResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessage.ERROR_INTERNAL_SERVER);
+	}
+
+	@ExceptionHandler(MultipartException.class)
+	public ResponseEntity<?> handleMultipartException(MultipartException ex) {
+		ex.printStackTrace(); // Log full error
+		return ResponseEntity.badRequest().body("Multipart request failed: " + ex.getMessage());
 	}
 
 	private ResponseEntity<GenericResponse> buildResponse(Exception ex, HttpStatus status, String message) {

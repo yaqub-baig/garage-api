@@ -2,6 +2,8 @@ package com.autoadda.apis.garage.entity;
 
 import java.time.LocalDate;
 
+import com.autoadda.apis.garage.util.Status;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -77,11 +80,8 @@ public class VehicleDetails {
 	@Column(name = "model")
 	private String model;
 
-	@Column(name = "preferred_garage_id")
-	private String preferredGarageId;
-
-	@Column(name = "customer_id")
-	private Integer customerId;
+	@Column(name = "status")
+	private Status status;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "insurance_id", referencedColumnName = "id")
@@ -90,5 +90,9 @@ public class VehicleDetails {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "registration_id", referencedColumnName = "id")
 	private VehicleRegistration registration;
+
+	@ManyToOne
+	@JoinColumn(name = "vehicle_owner_id", referencedColumnName = "id")
+	private VehicleOwner vehicleOwner;
 
 }
