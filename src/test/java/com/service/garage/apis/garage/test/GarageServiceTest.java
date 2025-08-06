@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,7 +47,6 @@ class GarageServiceTest {
         sampleGarageRequest.setEmail ( "info@quickfix.com" );
         sampleGarageRequest.setPhoneNumber ( "1234567890" );
         sampleGarageRequest.setWebSite ( "http://quickfix.com" );
-        sampleGarageRequest.setGarageType ( "Multi-Brand" );
         sampleGarageRequest.setChainId ( 101 );
 
         sampleGarageEntity = new Garage ( );
@@ -59,8 +57,7 @@ class GarageServiceTest {
         sampleGarageEntity.setPhoneNumber ( "1234567890" );
         sampleGarageEntity.setWebSite ( "http://quickfix.com" );
         sampleGarageEntity.setAccountStatus ( Status.ACTIVE );
-        sampleGarageEntity.setGarageType ( "Multi-Brand" );
-        sampleGarageEntity.setChainId ( 101 );
+
     }
 
     @Test
@@ -69,11 +66,7 @@ class GarageServiceTest {
         String userId = "105";
         String userRole = "ADMIN";
         String autoAddaId = "101";
-        MultipartFile garageLogo = null;
-        List<MultipartFile> vatCertificate = null;
-        List<MultipartFile> tradeLicenseAttachment = null;
-        List<MultipartFile> garageImages = null;
-        Garage result = garageService.createGarage ( sampleGarageRequest, userId, userRole, autoAddaId, garageLogo, vatCertificate, tradeLicenseAttachment, garageImages ) ;
+        Garage result = garageService.createGarage ( sampleGarageRequest, userId, userRole, autoAddaId ) ;
         assertNotNull ( result );
         assertEquals ( "QuickFix", result.getName ( ) );
         assertEquals ( "QuickFix LLC", result.getGarageBrandName ( ) );
