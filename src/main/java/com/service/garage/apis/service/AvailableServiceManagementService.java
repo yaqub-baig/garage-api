@@ -3,7 +3,8 @@ package com.service.garage.apis.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.service.garage.apis.entity.AvailableService;
@@ -13,15 +14,22 @@ import com.service.garage.apis.request.AvailableServiceRequest;
 import jakarta.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class AvailableServiceManagementService {
 
-	@Autowired
-	private AvailableServiceRepository availableServiceRepository;
+
+	private final AvailableServiceRepository availableServiceRepository;
 
 	private AvailableService mapToEntity(AvailableServiceRequest serviceRequest) {
-
-		return AvailableService.builder().name(serviceRequest.getName()).description(serviceRequest.getDescription())
-				.price(serviceRequest.getPrice()).laborPrice(serviceRequest.getLaborPrice()).build();
+	log.info("serviceRequest: {}", serviceRequest.getDescription ());
+		return AvailableService
+				.builder()
+				.name(serviceRequest.getName())
+				.description(serviceRequest.getDescription())
+				.price(serviceRequest.getPrice())
+				.laborPrice(serviceRequest.getLaborPrice())
+				.build();
 	}
 
 	/**
@@ -32,7 +40,12 @@ public class AvailableServiceManagementService {
 	 */
 	@Transactional
 	public AvailableService createService(AvailableServiceRequest service) {
-		return availableServiceRepository.save(mapToEntity(service));
+
+		AvailableService save = availableServiceRepository.save ( mapToEntity ( service ) );
+		log.info("Service saved with ID: {}", save.getId());
+		log.info("Service saved with name: {}", save.getName());
+		log.info("Service saved with description: {}", save.getDescription());
+		return save;
 	}
 
 	/**

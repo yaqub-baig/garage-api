@@ -3,20 +3,14 @@ package com.service.garage.apis.controller;
 import java.util.List;
 import java.util.Optional;
 
+import com.service.garage.apis.request.GarageServiceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.service.garage.apis.entity.GarageService;
 import com.service.garage.apis.service.GarageServiceManagementService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("/garage-services")
@@ -26,7 +20,7 @@ public class GarageServiceController {
 	private GarageServiceManagementService garageServiceService;
 
 	@PostMapping
-	public ResponseEntity<GarageService> create(@RequestBody GarageService garageService) {
+	public ResponseEntity<GarageService> create(@RequestBody GarageServiceRequest garageService) {
 		return ResponseEntity.ok(garageServiceService.createGarageService(garageService));
 	}
 

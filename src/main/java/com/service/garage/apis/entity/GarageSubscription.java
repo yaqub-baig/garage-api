@@ -1,15 +1,13 @@
 package com.service.garage.apis.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -18,7 +16,7 @@ import lombok.Setter;
 @Getter
 public class GarageSubscription {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	@ManyToOne
@@ -26,12 +24,29 @@ public class GarageSubscription {
 	private Garage garage;
 
 	private String name;
+
 	private String description;
+
 	private Double price;
+
 	private int durationMonths;
 
-	@Column(columnDefinition = "TEXT")
-	private String servicesIncluded; // JSON string or convert to @ElementCollection
+	private String brands;
+
+	private String benefits;
+
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "garage_subscription_services",
+			joinColumns = @JoinColumn(name = "subscription_id"),
+			inverseJoinColumns = @JoinColumn(name = "service_id")
+	)
+	private List<AvailableService> servicesIncluded = new ArrayList<>();
 
 	private Boolean isActive;
+
+	@PrePersist
+	public void prePersist() {
+		isActive = true;
+	}
 }

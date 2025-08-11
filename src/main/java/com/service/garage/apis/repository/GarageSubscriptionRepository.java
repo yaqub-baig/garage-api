@@ -3,6 +3,8 @@ package com.service.garage.apis.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.service.garage.apis.entity.GarageSubscription;
@@ -15,8 +17,14 @@ public interface GarageSubscriptionRepository extends JpaRepository<GarageSubscr
 	// For example, to find active subscriptions:
 	List<GarageSubscription> findByGarageIdAndIsActive(Integer garageId, Boolean isActive);
 
-	// Or to find subscriptions by name:
-	List<GarageSubscription> findByNameContainingIgnoreCase(String name);
+	@Query("""
+        SELECT gs FROM GarageSubscription gs 
+        WHERE gs.isActive = true
+        AND (:searchTerm IS NULL OR :searchTerm = '' OR 
+             LOWER(gs.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR
+             LOWER(gs.brands) LIKE LOWER(CONCAT('%', :searchTerm, '%')) )
+        """)
+	List<GarageSubscription> findByNameContainingIgnoreCase(@Param("searchTerm") String name);
 
 	// Or to find subscriptions by price range:
 	List<GarageSubscription> findByPriceBetween(Double minPrice, Double maxPrice);
@@ -28,5 +36,7 @@ public interface GarageSubscriptionRepository extends JpaRepository<GarageSubscr
 	List<GarageSubscription> findByDescriptionContainingIgnoreCase(String description);
 
 	// Or to find subscriptions by services included:
-	List<GarageSubscription> findByServicesIncludedContainingIgnoreCase(String service);
+	List<GarageSubscription> findByServicesIncludedId(Integer garageServiceId);
+
+
 }

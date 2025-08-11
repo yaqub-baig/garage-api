@@ -179,7 +179,7 @@ class GarageSubscriptionServiceTest {
 
 	@Test
 	void testFilterByServiceIncluded() {
-		when(subscriptionRepository.findByServicesIncludedContainingIgnoreCase("wash")).thenReturn(List.of(plan));
+		when(subscriptionRepository.findByServicesIncludedId ("wash")).thenReturn(List.of(plan));
 
 		List<GarageSubscription> result = subscriptionService.filterPlansByServicesIncluded("wash");
 

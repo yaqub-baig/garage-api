@@ -1,7 +1,11 @@
 package com.service.garage.apis.service;
 
 import com.service.garage.apis.entity.GarageService;
+import com.service.garage.apis.exception.ResourceNotFoundException;
+import com.service.garage.apis.repository.AvailableServiceRepository;
+import com.service.garage.apis.repository.GarageRepository;
 import com.service.garage.apis.repository.GarageServiceRepository;
+import com.service.garage.apis.request.GarageServiceRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,19 +16,28 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class GarageServiceManagementService {
-
-
+    private final GarageRepository garageRepository;
+    private final AvailableServiceRepository availableServiceRepository;
     private final GarageServiceRepository garageServiceRepository;
+
+    private GarageService mapToEntity(GarageServiceRequest service) {
+        GarageService garageService = new GarageService ( );
+        garageService.setIsActive ( service.isActive ( ) );
+        garageService.setGarage ( garageRepository.findById ( service.getGarageId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
+        garageService.setAvailableService ( availableServiceRepository.findById ( service.getServiceId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) ) );
+        return garageService;
+    }
 
     /**
      * Creates a new GarageService entry in the database.
      *
      * @param service The GarageService object to be created.
      * @return The created GarageService object.
+     * `
      */
     @Transactional
-    public GarageService createGarageService(GarageService service) {
-        return garageServiceRepository.save ( service );
+    public GarageService createGarageService(GarageServiceRequest service) {
+        return garageServiceRepository.save ( mapToEntity ( service ) );
     }
 
     /**

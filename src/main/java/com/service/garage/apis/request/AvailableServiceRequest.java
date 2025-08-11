@@ -1,13 +1,6 @@
 package com.service.garage.apis.request;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -16,16 +9,15 @@ import lombok.Setter;
 @Builder
 public class AvailableServiceRequest {
 
-	private Integer id;
+    private Integer id;
 
-	private String name;
+    private String name;
 
-	private String description;
+    private String description;
 
-	private Double price;
+    private Double price;
 
-	private Double laborPrice;
+    private Double laborPrice;
 
-    private List<GarageServiceRequest> garageLinks = new ArrayList<>();
 
 }

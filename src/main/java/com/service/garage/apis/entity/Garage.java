@@ -1,5 +1,7 @@
 package com.service.garage.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.service.garage.apis.util.Status;
 import jakarta.persistence.*;
 
@@ -101,6 +103,7 @@ public class Garage {
     @OneToMany
     @JoinColumn(name = "garage_vat_certificate")
     private List<MediaFile> vatCertificate = new ArrayList<> ( );
+
 
     @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GarageService> services = new ArrayList<> ( );

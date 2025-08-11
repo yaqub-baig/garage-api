@@ -1,5 +1,6 @@
 package com.service.garage.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,10 +32,11 @@ public class GarageService {
 
 	@ManyToOne
     @JoinColumn(name = "garage_id")
+	@JsonIgnore
     private Garage garage;
 
     @ManyToOne
     @JoinColumn(name = "service_id")
+	@JsonIgnore
     private AvailableService availableService;
-
 }

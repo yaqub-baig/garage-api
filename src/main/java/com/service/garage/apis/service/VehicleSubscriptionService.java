@@ -25,14 +25,12 @@ public class VehicleSubscriptionService {
 	private final VehicleOwnerSubscriptionRepository subscriptionRepository;
 
 	public VehicleOwnerSubscription subscribeToPlan(Integer ownerId, Integer planId) {
-		VehicleOwner owner = vehicleOwnerRepository.findById(ownerId)
-				.orElseThrow(() -> new EntityNotFoundException("Vehicle owner not found"));
 
 		GarageSubscription plan = planRepository.findById(planId)
 				.orElseThrow(() -> new EntityNotFoundException("Subscription plan not found"));
 
 		VehicleOwnerSubscription subscription = new VehicleOwnerSubscription();
-		subscription.setVehicleOwner(owner);
+		subscription.setVehicleOwnerId (ownerId);
 		subscription.setGarageSubscription(plan);
 		subscription.setPurchaseDate(LocalDate.now());
 		subscription.setStartDate(LocalDate.now());
