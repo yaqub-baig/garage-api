@@ -38,7 +38,7 @@ public class OpenAPIConfig {
 
 		License mitLicense = new License().name("License").url("https://carservices.com/licenses/");
 
-		Info info = new Info().title("Garage Service").version("1.0").contact(contact)
+		Info info = new Info().title("Garage API").version("1.0").contact(contact)
 				.description("This API exposes endpoints to manage Garages.")
 				.termsOfService("https://www.carservices.com/terms").license(mitLicense);
 

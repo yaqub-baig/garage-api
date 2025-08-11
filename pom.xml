@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.service.garage.apis.</groupId>
-    <artifactId>GarageServiceApplication</artifactId>
+    <artifactId>GarageApi</artifactId>
     <version>0.1</version>
-    <name>GarageServiceApplication</name>
+    <name>GarageApi</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
