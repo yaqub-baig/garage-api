@@ -1,4 +1,4 @@
-# Garage Management Service - API Documentation
+# Garage - API Documentation
 
 ## Table of Contents
 - [Appointment Management](#appointment-management)
