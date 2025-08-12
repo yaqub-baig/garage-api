@@ -22,7 +22,8 @@ public interface GarageSubscriptionRepository extends JpaRepository<GarageSubscr
         WHERE gs.isActive = true
         AND (:searchTerm IS NULL OR :searchTerm = '' OR 
              LOWER(gs.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR
-             LOWER(gs.brands) LIKE LOWER(CONCAT('%', :searchTerm, '%')) )
+             LOWER(gs.brands) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR
+             LOWER(gs.garage.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))
         """)
 	List<GarageSubscription> findByNameContainingIgnoreCase(@Param("searchTerm") String name);
 

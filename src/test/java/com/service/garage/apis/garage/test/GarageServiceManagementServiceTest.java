@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
+import com.service.garage.apis.request.GarageServiceRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +37,7 @@ class GarageServiceManagementServiceTest {
 	private Garage garage;
 	private AvailableService availableService;
 	private GarageService garageService;
-
+	private GarageServiceRequest garageServiceRequest;
 	@BeforeEach
 	void setUp() {
 		garage = Garage.builder().id(1).name ("My Garage").build();
@@ -48,7 +49,7 @@ class GarageServiceManagementServiceTest {
 	@Test
 	void testCreateGarageService() {
 		when(garageServiceRepository.save(garageService)).thenReturn(garageService);
-		GarageService saved = garageServiceManagementService.createGarageService(garageService);
+		GarageService saved = garageServiceManagementService.createGarageService(garageServiceRequest);
 		assertEquals(garageService, saved);
 		verify(garageServiceRepository).save(garageService);
 	}

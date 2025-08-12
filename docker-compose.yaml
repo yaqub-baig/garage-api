@@ -6,7 +6,7 @@ services:
     container_name: mysql-docker
     environment:
       MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: auto_adda_parts
+      MYSQL_DATABASE: auto_adda_garage
     ports:
       - "3308:3306"
 #    volumes:
@@ -19,20 +19,20 @@ services:
     networks:
       - auto-adda-network
 
-  part-service:
+  garage-service:
     build:
       context: .
-    container_name: part-service
+    container_name: garage-service
     depends_on:
       mysql-docker:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_parts
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_garage
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
       FILE_UPLOAD-DIR: /app/documents  # 👈 Add document path environment variable
     ports:
-      - "8060:8061"
+      - "8020:8021"
     volumes:
       - documents-volume:/app/documents       # 👈 Mount volume for document storage
       - ./src:/app/src          # 👈 Mount source code

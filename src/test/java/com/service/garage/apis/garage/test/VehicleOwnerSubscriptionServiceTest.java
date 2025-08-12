@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.service.garage.apis.request.SubscriptionRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,9 +49,11 @@ class VehicleOwnerSubscriptionServiceTest {
 	private VehicleOwner owner;
 	private GarageSubscription plan;
 	private VehicleOwnerSubscription subscription;
-
+	private SubscriptionRequest subscriptionRequest;
 	@BeforeEach
 	void setUp() {
+
+		subscriptionRequest=new SubscriptionRequest();
 		owner = new VehicleOwner();
 		owner.setId(12);
 
@@ -59,7 +62,7 @@ class VehicleOwnerSubscriptionServiceTest {
 
 		subscription = new VehicleOwnerSubscription();
 		subscription.setId(1001);
-		subscription.setVehicleOwnerId (owner);
+		subscription.setVehicleOwnerId (owner.getId ());
 		subscription.setGarageSubscription(plan);
 		subscription.setStartDate(LocalDate.now());
 		subscription.setEndDate(LocalDate.now().plusMonths(3));
@@ -76,7 +79,7 @@ class VehicleOwnerSubscriptionServiceTest {
 
 		// Assert
 		assertNotNull(result);
-		assertEquals(12, result.getVehicleOwnerId ().getId());
+		assertEquals(12, result.getVehicleOwnerId ());
 		assertEquals(SubscriptionStatus.ACTIVE, result.getStatus());
 
 		// Verify that repo method was called once
@@ -106,7 +109,7 @@ class VehicleOwnerSubscriptionServiceTest {
 		plan.setDurationMonths(6);
 
 		VehicleOwnerSubscription subscription = new VehicleOwnerSubscription();
-		subscription.setVehicleOwnerId (owner);
+		subscription.setVehicleOwnerId (owner.getId ());
 		subscription.setGarageSubscription(plan);
 
 		when(vehicleOwnerRepository.findById(12)).thenReturn(Optional.of(owner));
@@ -115,7 +118,7 @@ class VehicleOwnerSubscriptionServiceTest {
 
 		when(vehicleOwnerSubscriptionRepository.save(any(VehicleOwnerSubscription.class))).thenReturn(subscription);
 
-		VehicleOwnerSubscription result = vehicleOwnerSubscriptionService.subscribeToPlan(subscription);
+		VehicleOwnerSubscription result = vehicleOwnerSubscriptionService.subscribeToPlan(subscriptionRequest);
 
 		assertNotNull(result);
 		assertEquals(SubscriptionStatus.ACTIVE, result.getStatus());
