@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +15,10 @@ import com.autoadda.apis.garage.service.GarageServiceManagementService;
 
 @RestController
 @RequestMapping("/garage-services")
+@RequiredArgsConstructor
 public class GarageServiceController {
 
-	@Autowired
-	private GarageServiceManagementService garageServiceService;
+	private final  GarageServiceManagementService garageServiceService;
 
 	@PostMapping
 	public ResponseEntity<GarageService> create(@RequestBody GarageServiceRequest garageService) {
