@@ -1,0 +1,67 @@
+
+
+services:
+  mysql-docker:
+    image: mysql:8
+    container_name: mysql-docker
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: auto_adda_parts
+    ports:
+      - "3308:3306"
+#    volumes:
+#      - ./mysql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - auto-adda-network
+
+  part-service:
+    build:
+      context: .
+    container_name: part-service
+    depends_on:
+      mysql-docker:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_parts
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+      FILE_UPLOAD-DIR: /app/documents  # 👈 Add document path environment variable
+    ports:
+      - "8060:8061"
+    volumes:
+      - documents-volume:/app/documents       # 👈 Mount volume for document storage
+      - ./src:/app/src          # 👈 Mount source code
+      - ./pom.xml:/app/pom.xml  # 👈 Mount pom.xml
+    networks:
+      - auto-adda-network
+#  identity-service:
+#    build:
+#      context: ../IdentityService
+#    container_name: identity-service
+#    depends_on:
+#      mysql-docker:
+#        condition: service_healthy
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_identity
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root123
+#      FILE_UPLOAD-DIR: /app/documents  # 👈 Add document path environment variable
+#    ports:
+#      - "8010:8011"
+#    volumes:
+#      - documents-volume:/app/documents       # 👈 Mount volume for document storage
+#      - ./src:/app/src          # 👈 Mount source code
+#      - ./pom.xml:/app/pom.xml  # 👈 Mount pom.xml
+#    networks:
+#      - auto-adda-network
+volumes:
+  documents-volume:                            # 👈 Named volume for document storage
+
+networks:
+  auto-adda-network:
+    driver: bridge
