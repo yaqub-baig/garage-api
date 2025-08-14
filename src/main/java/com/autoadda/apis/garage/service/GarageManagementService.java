@@ -67,33 +67,23 @@ public class GarageManagementService {
         Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
         garage.setGarageLocation ( location );
         garage.setGarageOwner ( Integer.parseInt ( autoAddaId ) );
-        List<GarageService> garageServices = new ArrayList<> ( );
-        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
-            garageRequest.getGarageServiceIds ( ).forEach ( garageServiceId -> {
-                garageServiceManagementService
-                        .getGarageServiceById ( garageServiceId )
-                        .map ( garageServices::add )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "garage service not found" ) );
-            } );
-        }
-        garage.setServices ( garageServices );
         garage.setGarageLogo ( mediaFileRepository.findById ( garageRequest.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "garage logo not found" ) ) );
         garage.setVatCertificate ( mediaFileRepository.findAllById ( garageRequest.getVatCertificateIds ( ) ) );
         garage.setTradeLicenseAttachment ( mediaFileRepository.findAllById ( garageRequest.getTradeLicenseAttachmentIds ( ) ) );
         garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
         Garage save = garageRepository.save(garage);
 
-        List<GarageService> garageServices1 = new ArrayList<> ( );
+        List<GarageService> garageServices = new ArrayList<> ( );
         if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
             garageRequest.getGarageServiceIds ( ).forEach ( sId -> {
                 availableServiceRepository.findById ( sId )
                         .map ( availableService -> garageServiceManagementService.createGarageService (
-                                new GarageServiceRequest( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices1::add )
+                                new GarageServiceRequest( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
                         .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
             } );
 
         }
-        save.setServices ( garageServices1 );
+        save.setServices ( garageServices );
         return garageRepository.save(save);
     }
 
