@@ -1,12 +1,16 @@
 package com.autoadda.apis.garage.service;
 
+
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.OtherService;
+import com.autoadda.apis.garage.entity.OtherServiceBridge;
 import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
+import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.repository.MediaFileRepository;
 import com.autoadda.apis.garage.repository.OtherServiceRepository;
+import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.request.OtherServiceRequest;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,15 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static java.lang.Boolean.TRUE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OtherServiceManagementServiceImpl implements OtherServiceManagementService {
 
     private final OtherServiceRepository otherServiceRepository;
+    private final AvailableServiceRepository availableServiceRepository;
     private final LocationService locationService;
     private final MediaFileService mediaFileService;
     private final MediaFileRepository mediaFileRepository;
+    private final OtherServiceBridgeManagementService otherServiceBridgeManagementService;
 
     private OtherService mapToEntity(OtherServiceRequest request) {
         OtherService otherService = new OtherService ( );
@@ -44,7 +52,6 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         otherService.setWorkingDays ( request.getWorkingDays ( ) );
         otherService.setWebSite ( request.getWebSite ( ) );
         otherService.setAccountStatus ( Status.PENDING ); // Default status
-        otherService.setServiceType ( request.getServiceType ( ) );
         otherService.setCompanyArabicName ( request.getCompanyArabicName ( ) );
         otherService.setCreatedAt ( LocalDateTime.now ( ) );
         return otherService;
@@ -96,7 +103,19 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
             } );
         }
 
-        return otherServiceRepository.save ( otherService );
+        OtherService save = otherServiceRepository.save ( otherService );
+        List<OtherServiceBridge> garageServices = new ArrayList<> ( );
+        if ( otherServiceRequest.getGarageServiceIds ( ) != null && ! otherServiceRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
+            otherServiceRequest.getGarageServiceIds ( ).forEach ( sId -> {
+                availableServiceRepository.findById ( sId )
+                        .map ( availableService -> otherServiceBridgeManagementService.createOtherServiceBridge (
+                                new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
+            } );
+
+        }
+        save.setServices ( garageServices );
+        return save;
     }
 
     @Override
@@ -133,9 +152,6 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
 
 
         // Update other fields if provided
-        if ( request.getServiceType ( ) != null ) {
-            existing.setServiceType ( request.getServiceType ( ) );
-        }
         if ( request.getCompanyArabicName ( ) != null ) {
             existing.setCompanyArabicName ( request.getCompanyArabicName ( ) );
         }
@@ -154,7 +170,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         if ( request.getWorkingDays ( ) != null ) {
             existing.setWorkingDays ( request.getWorkingDays ( ) );
         }
-        if(request.getTradeLicenceNumber() != null) {
+        if ( request.getTradeLicenceNumber ( ) != null ) {
             validateTradeLicenceNumber ( request.getTradeLicenceNumber ( ) );
             existing.setTradeLicenceNumber ( request.getTradeLicenceNumber ( ) );
         }
@@ -242,14 +258,28 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
                 existing.getCompanyImages ( ).add ( mediaFile );
             } );
         }
+        handleGarageServices ( request, existing );
 
         return otherServiceRepository.save ( existing );
     }
 
+
     private void validateTradeLicenceNumber(String tradeLicenceNumber) {
-        otherServiceRepository.findByTradeLicenceNumber(tradeLicenceNumber).ifPresent(otherService -> {
-          throw new AlreadyExistsException ("Other service with trade licence number " + tradeLicenceNumber + " already exists");
-        });
+        otherServiceRepository.findByTradeLicenceNumber ( tradeLicenceNumber ).ifPresent ( otherService -> {
+            throw new AlreadyExistsException ( "Other service with trade licence number " + tradeLicenceNumber + " already exists" );
+        } );
+    }
+
+    private void handleGarageServices(OtherServiceRequest request, OtherService existing) {
+        if ( request.getGarageServiceIds ( ) != null && ! request.getGarageServiceIds ( ).isEmpty ( ) ) {
+            existing.getServices ( ).clear ( );
+            request.getGarageServiceIds ( ).forEach ( id -> {
+                otherServiceBridgeManagementService.getOtherServiceBridgeById ( id )
+                        .map ( (OtherServiceBridge gs) -> existing.getServices ( ).add ( gs ) )
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) );
+            } );
+
+        }
     }
 
     @Override

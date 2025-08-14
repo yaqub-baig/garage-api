@@ -18,9 +18,9 @@ public interface GarageSubscriptionRepository extends JpaRepository<GarageSubscr
 	List<GarageSubscription> findByGarageIdAndIsActive(Integer garageId, Boolean isActive);
 
 	@Query("""
-        SELECT gs FROM GarageSubscription gs 
+        SELECT gs FROM GarageSubscription gs
         WHERE gs.isActive = true
-        AND (:searchTerm IS NULL OR :searchTerm = '' OR 
+        AND (:searchTerm IS NULL OR :searchTerm = '' OR
              LOWER(gs.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR
              LOWER(gs.brands) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR
              LOWER(gs.garage.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))

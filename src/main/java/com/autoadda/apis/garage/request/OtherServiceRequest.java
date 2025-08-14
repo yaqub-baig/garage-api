@@ -21,7 +21,7 @@ public class OtherServiceRequest {
     private String phoneNumber;
     private String mobileNumber;
     private LocationRequest companyLocation;
-    private String serviceType;
+    private List<Integer> garageServiceIds;
     private String tradeLicenceNumber;
     private String openingTime;
     private String closingTime;

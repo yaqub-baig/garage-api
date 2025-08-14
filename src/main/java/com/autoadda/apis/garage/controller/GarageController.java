@@ -81,4 +81,6 @@ public class GarageController {
     public ResponseEntity<List<Garage>> getGaragesByService(@PathVariable Integer serviceId) {
         return ResponseEntity.ok ( garageService.findGaragesOfferingAvailableService ( serviceId ) );
     }
+
+    //search garage based on
 }
