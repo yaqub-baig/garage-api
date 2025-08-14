@@ -1,0 +1,82 @@
+package com.autoadda.apis.garage.controller;
+
+
+import com.autoadda.apis.garage.entity.OtherService;
+import com.autoadda.apis.garage.request.OtherServiceRequest;
+import com.autoadda.apis.garage.service.OtherServiceManagementService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/other-services")
+@RequiredArgsConstructor
+public class OtherServiceController {
+
+    private final OtherServiceManagementService otherService;
+
+    @PostMapping
+    public ResponseEntity<?> createOtherService(
+            @RequestHeader(value = "X-User-Id") String userId,
+            @RequestHeader(value = "X-User-Role") String userRole,
+            @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
+            @RequestBody OtherServiceRequest otherServiceRequest) {
+        return ResponseEntity.status ( HttpStatus.CREATED )
+                .body ( otherService.createOtherService (
+                        otherServiceRequest,
+                        userId,
+                        userRole,
+                        autoAddaId
+                ) );
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<OtherService>> getAllOtherServices() {
+        return ResponseEntity.ok ( otherService.getAllOtherServices ( ) );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OtherService>> getAllOtherServicesByOwnerId(
+            @RequestHeader(value = "X-User-Id") String userId,
+            @RequestHeader(value = "X-User-Role") String userRole,
+            @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+        return ResponseEntity.ok ( otherService.getAllOtherServicesByOwnerId ( autoAddaId ) );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OtherService> getOtherServiceById(@PathVariable Integer id) {
+        return otherService.getOtherServiceById ( id )
+                .map ( ResponseEntity::ok )
+                .orElse ( ResponseEntity.notFound ( ).build ( ) );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OtherService> updateOtherService(
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-User-Id") String userId,
+            @RequestHeader(value = "X-User-Role") String userRole,
+            @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
+            @RequestBody OtherServiceRequest otherServiceRequest
+    ) {
+        return ResponseEntity.ok ( otherService.updateOtherService ( id, otherServiceRequest ) );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOtherService(@PathVariable Integer id) {
+        otherService.deleteOtherService ( id );
+        return ResponseEntity.noContent ( ).build ( );
+    }
+
+    @GetMapping("/brandname/{name}")
+    public ResponseEntity<List<OtherService>> searchByBrandName(@PathVariable String name) {
+        return ResponseEntity.ok ( otherService.findOtherServicesByBrandName ( name ) );
+    }
+
+    @GetMapping("/service/{serviceType}")
+    public ResponseEntity<List<OtherService>> getOtherServicesByServiceType(@PathVariable String serviceType) {
+        return ResponseEntity.ok ( otherService.findOtherServicesByServiceType ( serviceType ) );
+    }
+}
