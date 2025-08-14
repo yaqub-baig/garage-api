@@ -115,7 +115,8 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
 
         }
         save.setServices ( garageServices );
-        return save;
+        return otherServiceRepository.save ( save );
+
     }
 
     @Override
