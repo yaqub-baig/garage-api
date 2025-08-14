@@ -60,7 +60,7 @@ public class GarageManagementService {
         garage.setCreatedAt ( LocalDateTime.now ( ) );
         return garage;
     }
-
+    @Transactional
     public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId) {
         validateTradingLicenseNumber ( garageRequest.getTradeLicenceNumber ( ) );
         Garage garage = mapToEntity ( garageRequest );
