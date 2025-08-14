@@ -49,8 +49,8 @@ class GarageSubscriptionServiceTest {
         garage.setId ( 1 );
         garage.setName ( "Test Garage" );
         services = List.of (
-                new AvailableService ( 1, "Oil Change", "skdjfsdf", 20.0, 100.0, null ),
-                new AvailableService ( 2, "Oil Change", "skdjfsdf", 20.0, 100.0, null ) );
+                new AvailableService ( 1, "Oil Change", "skdjfsdf", 20.0, 100.0, null,null ),
+                new AvailableService ( 2, "Oil Change", "skdjfsdf", 20.0, 100.0, null ,null) );
         plan = new GarageSubscription ( );
         plan.setId ( 1 );
         plan.setName ( "Basic Plan" );
