@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.service.garage.apis.</groupId>
+    <groupId>com.autotadda.apis.garage</groupId>
     <artifactId>GarageApi</artifactId>
     <version>0.1</version>
     <name>GarageApi</name>
@@ -18,7 +18,7 @@
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <start-class>com.service.garage.apis.GarageServiceApplication</start-class>
+        <start-class>com.autoadda.apis.garage.GarageServiceApplication</start-class>
         <docker.image.prefix>${user.name}</docker.image.prefix>
         <spring-cloud.version>2023.0.6</spring-cloud.version>
     </properties>
