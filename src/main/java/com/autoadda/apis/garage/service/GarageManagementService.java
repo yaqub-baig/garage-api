@@ -4,11 +4,9 @@ import com.autoadda.apis.garage.config.AuthClient;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
-import com.autoadda.apis.garage.repository.GarageRepository;
-import com.autoadda.apis.garage.repository.MediaFileRepository;
-import com.autoadda.apis.garage.repository.PickupDropRequestRepository;
-import com.autoadda.apis.garage.repository.TechnicianRepository;
+import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.GarageRequest;
+import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +23,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static java.lang.Boolean.TRUE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,6 +37,7 @@ public class GarageManagementService {
     private final AuthClient authClient;
     private final PickupDropRequestRepository pickupDropRequestRepository;
     private final GarageServiceManagementService garageServiceManagementService;
+    private final AvailableServiceRepository availableServiceRepository;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage ( );
@@ -59,28 +60,31 @@ public class GarageManagementService {
         garage.setCreatedAt ( LocalDateTime.now ( ) );
         return garage;
     }
-
+    @Transactional
     public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId) {
         validateTradingLicenseNumber ( garageRequest.getTradeLicenceNumber ( ) );
         Garage garage = mapToEntity ( garageRequest );
         Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
         garage.setGarageLocation ( location );
         garage.setGarageOwner ( Integer.parseInt ( autoAddaId ) );
-        List<GarageService> garageServices = new ArrayList<> ( );
-        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
-            garageRequest.getGarageServiceIds ( ).forEach ( garageServiceId -> {
-                garageServiceManagementService
-                        .getGarageServiceById ( garageServiceId )
-                        .map ( garageServices::add )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "garage service not found" ) );
-            } );
-        }
-        garage.setServices ( garageServices );
         garage.setGarageLogo ( mediaFileRepository.findById ( garageRequest.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "garage logo not found" ) ) );
         garage.setVatCertificate ( mediaFileRepository.findAllById ( garageRequest.getVatCertificateIds ( ) ) );
         garage.setTradeLicenseAttachment ( mediaFileRepository.findAllById ( garageRequest.getTradeLicenseAttachmentIds ( ) ) );
         garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
-        return garageRepository.save ( garage );
+        Garage save = garageRepository.save(garage);
+
+        List<GarageService> garageServices = new ArrayList<> ( );
+        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
+            garageRequest.getGarageServiceIds ( ).forEach ( sId -> {
+                availableServiceRepository.findById ( sId )
+                        .map ( availableService -> garageServiceManagementService.createGarageService (
+                                new GarageServiceRequest( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
+            } );
+
+        }
+        save.setServices ( garageServices );
+        return garageRepository.save(save);
     }
 
     private void validateTradingLicenseNumber(String tradeLicenceNumber) {
