@@ -113,7 +113,7 @@ public class AppointmentSlotService {
 //		}
 
 		Garage garage = garageRepo.findById(garageId).orElseThrow(() -> new RuntimeException("Garage not found"));
-		Customer customer = customerRepo.findById(userId).orElseThrow(() -> new RuntimeException("Customer not found"));
+//		Customer customer = customerRepo.findById(userId).orElseThrow(() -> new RuntimeException("Customer not found"));
 
 		AppointmentDetails appointment = AppointmentDetails.builder().garage(garage).scheduleDate(date)
 				.serviceStartTime(time).status(Status.CONFIRMED).comments("Booked via platform")

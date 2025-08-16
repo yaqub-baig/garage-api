@@ -37,4 +37,6 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
 	@Query("SELECT b FROM AppointmentDetails b WHERE b.garage.id = :garageId AND b.scheduleDate = :date AND b.serviceStartTime = :time")
 	Optional<AppointmentDetails> findLockedSlot(@Param("garageId") Integer garageId, @Param("date") LocalDate date,
 			@Param("time") LocalTime time);
+
+
 }

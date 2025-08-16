@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.request;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -18,9 +19,18 @@ public class CustomerAppointmentRequest {
 	private Integer customerId;
 	private Integer garageId;
 	private Integer vehicleId;
-	List<Integer> serviceIds;
+	private List<Integer> serviceIds;
 	private LocalDate scheduleDate;
-	private Integer memberId;
-	private String memberType;
-	
+	private LocalTime serviceStartTime;
+	private LocalTime serviceEndTime;
+	private LocalTime deliveryTime;
+	private String comments;
+
+	private  Integer memberId;
+
+			private  String memberType;
+
+
+
+
 }

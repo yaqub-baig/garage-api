@@ -39,7 +39,6 @@ import com.autoadda.apis.garage.repository.VehicleDetailsRepository;
 import com.autoadda.apis.garage.request.AppointmentStatusRequest;
 import com.autoadda.apis.garage.request.CustomerAppointmentRequest;
 import com.autoadda.apis.garage.response.AppointmentResponse;
-import com.autoadda.apis.garage.service.AppointmentService;
 import com.autoadda.apis.garage.service.JobCardService;
 import com.autoadda.apis.garage.util.BusinessValidator;
 import com.autoadda.apis.garage.util.Status;
