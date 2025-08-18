@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -117,5 +118,17 @@ public class Garage {
     public void prePersist() {
         isActive = true;
         createdAt = LocalDateTime.now ( );
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Garage)) return false;
+        Garage garage = (Garage) o;
+        return Objects.equals(id, garage.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

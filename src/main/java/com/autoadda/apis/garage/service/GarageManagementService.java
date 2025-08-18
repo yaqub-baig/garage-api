@@ -11,6 +11,7 @@ import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
 
@@ -60,6 +59,7 @@ public class GarageManagementService {
         garage.setCreatedAt ( LocalDateTime.now ( ) );
         return garage;
     }
+
     @Transactional
     public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId) {
         validateTradingLicenseNumber ( garageRequest.getTradeLicenceNumber ( ) );
@@ -71,20 +71,20 @@ public class GarageManagementService {
         garage.setVatCertificate ( mediaFileRepository.findAllById ( garageRequest.getVatCertificateIds ( ) ) );
         garage.setTradeLicenseAttachment ( mediaFileRepository.findAllById ( garageRequest.getTradeLicenseAttachmentIds ( ) ) );
         garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
-        Garage save = garageRepository.save(garage);
+        Garage save = garageRepository.save ( garage );
 
         List<GarageService> garageServices = new ArrayList<> ( );
         if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
             garageRequest.getGarageServiceIds ( ).forEach ( sId -> {
                 availableServiceRepository.findById ( sId )
                         .map ( availableService -> garageServiceManagementService.createGarageService (
-                                new GarageServiceRequest( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
+                                new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
                         .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
             } );
 
         }
         save.setServices ( garageServices );
-        return garageRepository.save(save);
+        return garageRepository.save ( save );
     }
 
     private void validateTradingLicenseNumber(String tradeLicenceNumber) {
@@ -474,6 +474,131 @@ public class GarageManagementService {
                 .orElseThrow ( () -> new RuntimeException ( "Request not found" ) );
         request.setStatus ( status );
         return pickupDropRequestRepository.save ( request );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Garage> searchGarages(String brand, String city, String zip, String garageName, List<Integer> availableServiceIds) {
+
+        Set<Garage> garages = garageRepository.findAllWithLocationAndServices ( );
+        List<Garage> searchResults = new ArrayList<> (  List.of());
+        for (Garage garage : garages) {
+            boolean cityCheck = true;
+            boolean nameCheck = true;
+            boolean zipCheck = true;
+            boolean brandCheck = true;
+            boolean serviceCheck = true;
+            log.info ( " 2  enabledGarages -> " + garages.size ( ) );
+            log.info ( "   currentGarage -> " + garage.getName ( ) );
+
+            Location address = garage.getGarageLocation ( );
+            log.info ( " 4 enabledGarages -> " );
+            if ( StringUtils.isNotEmpty ( city ) ) {
+                log.info ( " 5 enabledGarages -> " );
+                if ( ! address.getCity ( ).toLowerCase ().equalsIgnoreCase ( city.toLowerCase (  ) ) ) {
+                    cityCheck = false;
+                }
+            }
+
+            if ( StringUtils.isNotEmpty ( zip ) ) {
+                log.info ( " 6 enabledGarages -> " );
+                if ( ! address.getPostalCode ( ).toLowerCase ().equalsIgnoreCase ( zip.toLowerCase (  ) ) ) {
+                    zipCheck = false;
+                }
+            }
+
+            if ( StringUtils.isNotEmpty ( garageName ) ) {
+                if ( ! garage.getName ( ).toLowerCase ( ).contains ( garageName .toLowerCase (  )) ) {
+                    nameCheck = false;
+                }
+            }
+
+            if ( StringUtils.isNotEmpty ( brand ) ) {
+                if ( ! garage.getBrands ( ).toLowerCase ().contains ( brand.toLowerCase () ) ) {
+                    brandCheck = false;
+                }
+            }
+            if ( availableServiceIds != null && ! availableServiceIds.isEmpty ( ) ) {
+
+                List<Integer> garageServiceIds = garage.getServices ().stream ( )
+                        .map ( GarageService::getAvailableService ).map ( AvailableService::getId )
+                        .toList ( );
+
+                serviceCheck = availableServiceIds.stream ( )
+                        .anyMatch ( garageServiceIds::contains );
+            }
+
+            if ( cityCheck && nameCheck && zipCheck && brandCheck && serviceCheck ) {
+                searchResults.add ( garage );
+            }
+        }
+        return searchResults ;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Garage> searchGarages2(String brand, String city, String zip, String garageName, List<Integer> availableServiceIds) {
+
+
+//         Handle null service IDs
+        availableServiceIds = availableServiceIds != null ? availableServiceIds : Collections.emptyList ( );
+
+        // Convert search terms to lowercase once
+        final String brandTerm = brand != null ? brand.toLowerCase ( ) : "";
+        final String cityTerm = city != null ? city.toLowerCase ( ) : "";
+        final String zipTerm = zip != null ? zip.toLowerCase ( ) : "";
+        final String garageNameTerm = garageName != null ? garageName.toLowerCase ( ) : "";
+        final List<Integer> serviceIds = new ArrayList<> ( availableServiceIds );
+
+        // Fetch all necessary data in a single query with joins
+        Set<Garage> garages = garageRepository.findAllWithLocationAndServices ( );
+
+
+        return garages.stream ( )
+                .filter ( Objects::nonNull )
+                .filter ( garage -> matchesBrand ( garage, brandTerm ) )
+                .filter ( garage -> matchesCity ( garage, cityTerm ) )
+                .filter ( garage -> matchesZip ( garage, zipTerm ) )
+                .filter ( garage -> matchesName ( garage, garageNameTerm ) )
+                .filter ( garage -> matchesServices ( garage, serviceIds ) )
+                .toList ( );
+    }
+
+    private boolean matchesBrand(Garage garage, String brandTerm) {
+        return brandTerm.isEmpty ( ) ||
+                (garage.getGarageBrandName ( ) != null &&
+                        garage.getGarageBrandName ( ).toLowerCase ( ).contains ( brandTerm ));
+    }
+
+    private boolean matchesCity(Garage garage, String cityTerm) {
+        return cityTerm.isEmpty ( ) ||
+                (garage.getGarageLocation ( ) != null &&
+                        garage.getGarageLocation ( ).getCity ( ) != null &&
+                        garage.getGarageLocation ( ).getCity ( ).toLowerCase ( ).contains ( cityTerm ));
+    }
+
+    private boolean matchesZip(Garage garage, String zipTerm) {
+        return zipTerm.isEmpty ( ) ||
+                (garage.getGarageLocation ( ) != null &&
+                        garage.getGarageLocation ( ).getArea ( ) != null &&
+                        garage.getGarageLocation ( ).getArea ( ).toLowerCase ( ).contains ( zipTerm ));
+    }
+
+    private boolean matchesName(Garage garage, String nameTerm) {
+        return nameTerm.isEmpty ( ) ||
+                (garage.getName ( ) != null &&
+                        garage.getName ( ).toLowerCase ( ).contains ( nameTerm ));
+    }
+
+    private boolean matchesServices(Garage garage, List<Integer> serviceIds) {
+        if ( serviceIds.isEmpty ( ) ) {
+            return true;
+        }
+        if ( garage.getServices ( ) == null || garage.getServices ( ).isEmpty ( ) ) {
+            return false;
+        }
+        return garage.getServices().stream()
+                .map(GarageService::getAvailableService)
+                .map(AvailableService::getId)
+                .anyMatch(serviceIds::contains);
     }
 
 }

@@ -91,7 +91,6 @@ public class GarageSubscriptionService {
     public List<GarageSubscription> getPlansByGarage(Integer garageId) {
 //		return subscriptionRepository.findAll().stream().filter(p -> p.getGarage().getId().equals(garageId))
 //				.collect(Collectors.toList());
-
         return subscriptionRepository.findByGarageId ( garageId );
     }
 

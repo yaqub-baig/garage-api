@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.repository;
 
 import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.util.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface GarageRepository extends JpaRepository<Garage, Integer> {
@@ -93,4 +95,10 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
     long countByVatCertificateId(@Param("mediaFileId") Long mediaFileId);
 
     Optional<Garage> findByTradeLicenceNumber(String tradeLicenceNumber);
+
+    @Query("SELECT DISTINCT g FROM Garage g " +
+            "LEFT JOIN FETCH g.garageLocation " +
+            "LEFT JOIN FETCH g.services s " +
+            "LEFT JOIN FETCH s.availableService")
+    Set<Garage> findAllWithLocationAndServices();
 }

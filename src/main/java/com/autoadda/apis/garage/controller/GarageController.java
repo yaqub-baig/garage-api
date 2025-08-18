@@ -82,5 +82,12 @@ public class GarageController {
         return ResponseEntity.ok ( garageService.findGaragesOfferingAvailableService ( serviceId ) );
     }
 
-    //search garage based on
+    //search garage based on  city,postal code,available services ,brand, garage name
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Garage>> searchGarages(@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String zip, @RequestParam(required = false) String garageName, @RequestParam(required = false) List<Integer> availableServiceIds) {
+        return ResponseEntity.ok ( garageService.searchGarages ( brand, city, zip, garageName, availableServiceIds ) );
+    }
+
+
 }
