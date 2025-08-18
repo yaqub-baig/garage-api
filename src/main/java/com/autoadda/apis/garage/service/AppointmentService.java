@@ -3,6 +3,7 @@ package com.autoadda.apis.garage.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,8 @@ import com.autoadda.apis.garage.util.DateHelper;
 import com.autoadda.apis.garage.util.Status;
 
 import lombok.RequiredArgsConstructor;
-
+import java.util.Objects;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
@@ -60,36 +62,52 @@ public class AppointmentService {
 	 * @throws GarageNotFoundException   if the garage does not exist.
 	 */
 	@Transactional
+
 	public AppointmentDetails createCustomerAppointment(CustomerAppointmentRequest request)
 			throws CustomerNotFoundException, GarageNotFoundException {
-//		validator.validateGarage(request.getGarageId());
-//		validator.validateCustomer(request.getCustomerId());
 
+		// Garage is mandatory
 		Garage garage = garageRepo.findById(request.getGarageId())
 				.orElseThrow(() -> new GarageNotFoundException("Garage not found"));
-		Customer customer = customerRepo.findById(request.getCustomerId())
-				.orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-		VehicleDetails vehicle = vehicleRepo.findById(request.getVehicleId())
-				.orElseThrow(() -> new RuntimeException("Vehicle not found"));
 
-		AppointmentDetails appointment = AppointmentDetails.builder().garage(garage).vehicle(vehicle)
-				.scheduleDate(request.getScheduleDate()).status(Status.CONFIRMED).insert_tms(DateHelper.dbDate())
+		// Create appointment
+		AppointmentDetails appointment = AppointmentDetails.builder()
+				.garage(garage)
+				.vehicleId(request.getVehicleId()) // null bhi ho sakta hai
+				.customerId(request.getCustomerId()) // null bhi ho sakta hai
+				.scheduleDate(request.getScheduleDate())
+				.status(Status.CONFIRMED)
+				.insert_tms(DateHelper.dbDate())
 				.build();
 
 		appointmentRepo.save(appointment);
 
-		appointmentActivityRepo.save(AppointmentStatusActivity.builder().appointmentId(appointment.getId())
-				.status(appointment.getStatus()).memberId(request.getMemberId()).memberType(request.getMemberType())
-				.insert_tms(DateHelper.dbDate()).build());
+		// Save activity (memberId, memberType optional ho sakte hain)
+		appointmentActivityRepo.save(AppointmentStatusActivity.builder()
+				.appointmentId(appointment.getId())
+				.status(appointment.getStatus())
+				.memberId(request.getMemberId())
+				.memberType(request.getMemberType())
+				.insert_tms(DateHelper.dbDate())
+				.build());
 
-		List<AppointmentServices> services = request.getServiceIds().stream().map(serviceId -> {
-			GarageService service = garageServiceRepo.findById(serviceId)
-					.orElseThrow(() -> new RuntimeException("Service not found"));
-			return AppointmentServices.builder().appointmentId(appointment.getId()).service(service).status(Status.NEW)
-					.build();
-		}).collect(Collectors.toList());
+		// Services optional
+		if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
+			List<AppointmentServices> services = request.getServiceIds().stream()
+					.filter(Objects::nonNull) // null serviceId ignore karega
+					.map(serviceId -> {
+						GarageService service = garageServiceRepo.findById(serviceId)
+								.orElseThrow(() -> new RuntimeException("Service not found"));
+						return AppointmentServices.builder()
+								.appointmentId(appointment.getId())
+								.service(service)
+								.status(Status.NEW)
+								.build();
+					})
+					.collect(Collectors.toList());
 
-		serviceRepo.saveAll(services);
+			serviceRepo.saveAll(services);
+		}
 
 		return appointment;
 	}
@@ -227,4 +245,9 @@ public class AppointmentService {
 		Status status = Status.valueOf(statusStr.toUpperCase());
 		return appointmentRepo.findByGarage_IdAndStatus(garageId, status);
 	}
+
+
+
+
+
 }

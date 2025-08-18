@@ -25,7 +25,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class VehicleDetails {
+public class  VehicleDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

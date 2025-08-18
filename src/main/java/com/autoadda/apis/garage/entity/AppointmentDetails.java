@@ -5,14 +5,7 @@ import java.time.LocalTime;
 
 import com.autoadda.apis.garage.util.Status;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,12 +46,18 @@ public class AppointmentDetails {
 	@Column(name = "insert_tms")
 	private LocalDate insert_tms;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "garage_id", referencedColumnName = "id")
+//	@OneToOne(cascade = CascadeType.ALL)
+//	@JoinColumn(name = "garage_id", referencedColumnName = "id")
+//	private Garage garage;
+
+	@ManyToOne
+	@JoinColumn(name = "garage_id", nullable = false)
 	private Garage garage;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "vehicle_id", referencedColumnName = "id")
-	private VehicleDetails vehicle;
+	@Column(name = "customer_id", nullable = false)
+	private Integer customerId;
+
+	@Column(name = "vehicle_id", nullable = true)
+	private Integer vehicleId;
 
 }

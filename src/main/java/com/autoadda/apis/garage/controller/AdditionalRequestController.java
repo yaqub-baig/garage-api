@@ -27,6 +27,7 @@ public class AdditionalRequestController {
         return ResponseEntity.ok(GenericResponse.success("Additional request created", result));
     }
 
+
     @PutMapping
     public ResponseEntity<GenericResponse> updateRequest(@RequestBody JobCardAdditionalAPIRequest request) {
         JobCardAdditionalRequest result = additionalRequestService.updateAdditionalRequest(request);
