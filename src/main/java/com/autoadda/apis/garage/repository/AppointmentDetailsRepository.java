@@ -21,6 +21,8 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
 
 	List<AppointmentDetails> findByStatus(Status status);
 
+	List<AppointmentDetails> findByCustomerId(Integer customerId);
+
 	List<AppointmentDetails> findByGarage_Id(Integer garageId);
 
 	List<AppointmentDetails> findByGarage_IdAndStatus(Integer garageId, Status status);

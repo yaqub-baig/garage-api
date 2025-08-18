@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,7 @@ import static java.lang.Boolean.TRUE;
 @Service
 @RequiredArgsConstructor
 public class GarageManagementService {
+    private final GarageWorkingHoursRepository workingHoursRepository;
     private final GarageRepository garageRepository;
     private final TechnicianRepository technicianRepository;
     private final LocationService locationService;
@@ -46,7 +49,7 @@ public class GarageManagementService {
         garage.setTradeLicenceNumber ( garageRequest.getTradeLicenceNumber ( ) );
         garage.setOpeningTime ( garageRequest.getOpeningTime ( ) );
         garage.setClosingTime ( garageRequest.getClosingTime ( ) );
-        garage.setWorkingDays ( garageRequest.getWorkingDays ( ) );
+        garage.setWorkingDays ( garageRequest.getWorkingDays ( ).toString () );
         garage.setWebSite ( garageRequest.getWebSite ( ) );
         garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
         garage.setMobileNumber ( garageRequest.getMobileNumber ( ) );
@@ -72,7 +75,6 @@ public class GarageManagementService {
         garage.setTradeLicenseAttachment ( mediaFileRepository.findAllById ( garageRequest.getTradeLicenseAttachmentIds ( ) ) );
         garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
         Garage save = garageRepository.save ( garage );
-
         List<GarageService> garageServices = new ArrayList<> ( );
         if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
             garageRequest.getGarageServiceIds ( ).forEach ( sId -> {
@@ -83,8 +85,22 @@ public class GarageManagementService {
             } );
 
         }
+
+        handleGarageWorkingHours(save,garageRequest.getWorkingDays (),garageRequest.getClosingTime (),garageRequest.getOpeningTime ());
         save.setServices ( garageServices );
         return garageRepository.save ( save );
+    }
+
+    private void handleGarageWorkingHours(Garage save,List<String> workingDays, String closingTime, String openingTime) {
+        workingDays.forEach ( day -> {
+            day=day.toUpperCase ();
+            GarageWorkingHours garageWorkingHours = new GarageWorkingHours ( );
+            garageWorkingHours.setGarage ( save );
+            garageWorkingHours.setDayOfWeek ( DayOfWeek.valueOf ( day ) );
+            garageWorkingHours.setOpenTime ( LocalTime.parse ( openingTime ) );
+            garageWorkingHours.setCloseTime ( LocalTime.parse ( closingTime ) );
+            workingHoursRepository.save ( garageWorkingHours );
+        } );
     }
 
     private void validateTradingLicenseNumber(String tradeLicenceNumber) {
@@ -156,7 +172,7 @@ public class GarageManagementService {
             existing.setClosingTime ( request.getClosingTime ( ) );
         }
         if ( request.getWorkingDays ( ) != null ) {
-            existing.setWorkingDays ( request.getWorkingDays ( ) );
+            existing.setWorkingDays ( request.getWorkingDays ( ).toString () );
         }
 
         if ( request.getGarageBrandName ( ) != null ) {

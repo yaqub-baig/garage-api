@@ -2,25 +2,31 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.request.GarageRequest;
+import com.autoadda.apis.garage.service.AppointmentSlotService;
 import com.autoadda.apis.garage.service.GarageManagementService;
 import com.autoadda.apis.garage.service.MediaFileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/garages")
 @RequiredArgsConstructor
 public class GarageController {
-
+    private final AppointmentSlotService bookingService;
     private final GarageManagementService garageService;
     private final MediaFileService mediaFileService;
 
@@ -34,7 +40,7 @@ public class GarageController {
         log.info ( "Content-Length: {}", request.getHeader ( "Content-Length" ) );
         log.info ( "Content-Type: {}", request.getContentType ( ) );
 
-        return ResponseEntity.status ( HttpStatus.CREATED ).body ( garageService.createGarage ( garage,  autoAddaId ) );
+        return ResponseEntity.status ( HttpStatus.CREATED ).body ( garageService.createGarage ( garage, autoAddaId ) );
     }
 
     @GetMapping("all")
@@ -48,7 +54,7 @@ public class GarageController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Garage>  getGarageById(@PathVariable Integer id) {
+    public ResponseEntity<Garage> getGarageById(@PathVariable Integer id) {
         return garageService.getGarageById ( id ).map ( ResponseEntity::ok ).orElse ( ResponseEntity.notFound ( ).build ( ) );
     }
 

@@ -22,7 +22,7 @@ public class GarageRequest {
     private String openingTime;
     private String closingTime;
     private String tradeLicenceNumber;
-    private String workingDays;
+    private List<String> workingDays;
     private String mobileNumber;
     private LocationRequest garageLocation;
     private List<Integer> garageServiceIds;
