@@ -60,8 +60,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
     @Override
     @Transactional
     public OtherService createOtherService(OtherServiceRequest otherServiceRequest,
-                                           String userId,
-                                           String userRole,
+
                                            String autoAddaId) {
 
         OtherService otherService = mapToEntity ( otherServiceRequest );

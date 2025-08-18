@@ -15,8 +15,6 @@ public interface OtherServiceManagementService {
      * Create a new other service
      */
     OtherService createOtherService(OtherServiceRequest otherServiceRequest,
-                                    String userId,
-                                    String userRole,
                                     String autoAddaId
                                     );
     

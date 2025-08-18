@@ -20,15 +20,11 @@ public class OtherServiceController {
 
     @PostMapping
     public ResponseEntity<?> createOtherService(
-            @RequestHeader(value = "X-User-Id") String userId,
-            @RequestHeader(value = "X-User-Role") String userRole,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
             @RequestBody OtherServiceRequest otherServiceRequest) {
         return ResponseEntity.status ( HttpStatus.CREATED )
                 .body ( otherService.createOtherService (
                         otherServiceRequest,
-                        userId,
-                        userRole,
                         autoAddaId
                 ) );
     }
@@ -40,8 +36,6 @@ public class OtherServiceController {
 
     @GetMapping
     public ResponseEntity<List<OtherService>> getAllOtherServicesByOwnerId(
-            @RequestHeader(value = "X-User-Id") String userId,
-            @RequestHeader(value = "X-User-Role") String userRole,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
         return ResponseEntity.ok ( otherService.getAllOtherServicesByOwnerId ( autoAddaId ) );
     }
@@ -56,8 +50,6 @@ public class OtherServiceController {
     @PutMapping("/{id}")
     public ResponseEntity<OtherService> updateOtherService(
             @PathVariable Integer id,
-            @RequestHeader(value = "X-User-Id") String userId,
-            @RequestHeader(value = "X-User-Role") String userRole,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
             @RequestBody OtherServiceRequest otherServiceRequest
     ) {
