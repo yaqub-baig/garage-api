@@ -1,4 +1,4 @@
-
+version: "3.8"
 
 services:
   mysql-docker:
@@ -6,11 +6,11 @@ services:
     container_name: mysql-docker
     environment:
       MYSQL_ROOT_PASSWORD: root123
-#      MYSQL_DATABASE: auto_adda_garage
     ports:
       - "3308:3306"
     volumes:
       - ./mysql-init:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -19,30 +19,11 @@ services:
     networks:
       - auto-adda-network
 
-  garage-service:
+
+  identity-api:
     build:
-      context: .
-    container_name: garage-service
-    depends_on:
-      mysql-docker:
-        condition: service_healthy
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_garage
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root123
-      FILE_UPLOAD-DIR: /app/documents  # 👈 Add document path environment variable
-    ports:
-      - "8020:8021"
-    volumes:
-      - documents-volume:/app/documents       # 👈 Mount volume for document storage
-      - ./src:/app/src          # 👈 Mount source code
-      - ./pom.xml:/app/pom.xml  # 👈 Mount pom.xml
-    networks:
-      - auto-adda-network
-  identity-service:
-    build:
-      context: ../IdentityService
-    container_name: identity-service
+      context: ./identity-api
+    container_name: identity-api
     depends_on:
       mysql-docker:
         condition: service_healthy
@@ -50,18 +31,172 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_identity
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root123
-      FILE_UPLOAD-DIR: /app/documents  # 👈 Add document path environment variable
     ports:
-      - "8010:8011"
-    volumes:
-      - documents-volume:/app/documents       # 👈 Mount volume for document storage
-      - ./src:/app/src          # 👈 Mount source code
-      - ./pom.xml:/app/pom.xml  # 👈 Mount pom.xml
+      - "8010:8010"
     networks:
       - auto-adda-network
+
+  garage-api:
+    build:
+      context: ./garage-api
+    container_name: garage-api
+    depends_on:
+      mysql-docker:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_garage
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+    ports:
+      - "8020:8020"
+    networks:
+      - auto-adda-network
+
+  vehicle-api:
+    build:
+      context: ./vehicle-api
+    container_name: vehicle-api
+    depends_on:
+      mysql-docker:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_vehicle
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+    ports:
+      - "8030:8030"
+    networks:
+      - auto-adda-network
+
+
+  part-api:
+    build:
+      context: ./part-api
+    container_name: part-api
+    depends_on:
+      mysql-docker:
+        condition: service_healthy
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_parts
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+    ports:
+      - "8060:8060"
+    networks:
+      - auto-adda-network
+
+
+
+#  quote-service:
+#    build:
+#      context: ./quote-api
+#    container_name: quote-service
+#    depends_on:
+#      mysql-docker:
+#        condition: service_healthy
+#
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_quotes_management
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root123
+#    ports:
+#      - "8050:8050"
+#    networks:
+#      - auto-adda-network
+
+#  review-service:
+#    build:
+#      context: ./review-api
+#    container_name: review-service
+#    depends_on:
+#      mysql-docker:
+#        condition: service_healthy
+#
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_review
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root123
+#    ports:
+#      - "8070:8070"
+#    networks:
+#      - auto-adda-network
+
 volumes:
-  documents-volume:                            # 👈 Named volume for document storage
+  mysql_data:
 
 networks:
   auto-adda-network:
     driver: bridge
+
+
+
+
+
+
+
+#services:
+#  mysql-docker:
+#    image: mysql:8
+#    container_name: mysql-docker
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root123
+##      MYSQL_DATABASE: auto_adda_garage
+#    ports:
+#      - "3308:3306"
+#    volumes:
+#      - ./mysql-init:/docker-entrypoint-initdb.d
+#    healthcheck:
+#      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#    networks:
+#      - auto-adda-network
+#
+#  garage-api:
+#    build:
+#      context: .
+#    container_name: garage-api
+#    depends_on:
+#      mysql-docker:
+#        condition: service_healthy
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_garage
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root123
+#      FILE_UPLOAD-DIR: /app/documents  # 👈 Add document path environment variable
+#    ports:
+#      - "8020:8021"
+#    volumes:
+#      - documents-volume:/app/documents       # 👈 Mount volume for document storage
+#      - ./src:/app/src          # 👈 Mount source code
+#      - ./pom.xml:/app/pom.xml  # 👈 Mount pom.xml
+#    networks:
+#      - auto-adda-network
+#  identity-service:
+#    build:
+#      context: ../IdentityService
+#    container_name: identity-service
+#    depends_on:
+#      mysql-docker:
+#        condition: service_healthy
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-docker:3306/auto_adda_identity
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: root123
+#      FILE_UPLOAD-DIR: /app/documents  # 👈 Add document path environment variable
+#    ports:
+#      - "8010:8011"
+#    volumes:
+#      - documents-volume:/app/documents       # 👈 Mount volume for document storage
+#      - ./src:/app/src          # 👈 Mount source code
+#      - ./pom.xml:/app/pom.xml  # 👈 Mount pom.xml
+#    networks:
+#      - auto-adda-network
+#volumes:
+#  documents-volume:                            # 👈 Named volume for document storage
+#
+#networks:
+#  auto-adda-network:
+#    driver: bridge

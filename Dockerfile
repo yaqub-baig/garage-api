@@ -1,5 +1,5 @@
 # Use Java 17 to match your pom.xml (not 21)
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:21-jdk-alpine
 
 # Set working directory inside container
 WORKDIR /app

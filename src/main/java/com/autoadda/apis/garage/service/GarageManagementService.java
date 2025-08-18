@@ -61,7 +61,7 @@ public class GarageManagementService {
     }
 
     @Transactional
-    public Garage createGarage(GarageRequest garageRequest, String userId, String userRole, String autoAddaId) {
+    public Garage createGarage(GarageRequest garageRequest,String autoAddaId) {
         validateTradingLicenseNumber ( garageRequest.getTradeLicenceNumber ( ) );
         Garage garage = mapToEntity ( garageRequest );
         Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );

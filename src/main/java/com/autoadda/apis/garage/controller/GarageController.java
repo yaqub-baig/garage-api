@@ -27,8 +27,6 @@ public class GarageController {
     @PostMapping
     public ResponseEntity<?> createGarage(
             HttpServletRequest request,
-            @RequestHeader(value = "X-User-Id") String userId,
-            @RequestHeader(value = "X-User-Role") String userRole,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
             @RequestBody @Valid GarageRequest garage
     ) {
@@ -36,7 +34,7 @@ public class GarageController {
         log.info ( "Content-Length: {}", request.getHeader ( "Content-Length" ) );
         log.info ( "Content-Type: {}", request.getContentType ( ) );
 
-        return ResponseEntity.status ( HttpStatus.CREATED ).body ( garageService.createGarage ( garage, userId, userRole, autoAddaId ) );
+        return ResponseEntity.status ( HttpStatus.CREATED ).body ( garageService.createGarage ( garage,  autoAddaId ) );
     }
 
     @GetMapping("all")
@@ -45,9 +43,7 @@ public class GarageController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Garage>> getAllGaragesByOwnerId(@RequestHeader(value = "X-User-Id") String userId,
-                                                               @RequestHeader(value = "X-User-Role") String userRole,
-                                                               @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+    public ResponseEntity<List<Garage>> getAllGaragesByOwnerId(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
         return ResponseEntity.ok ( garageService.getAllGaragesByOwnerId ( autoAddaId ) );
     }
 
@@ -58,8 +54,6 @@ public class GarageController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Garage> updateGarage(@PathVariable Integer id,
-                                               @RequestHeader(value = "X-User-Id") String userId,
-                                               @RequestHeader(value = "X-User-Role") String userRole,
                                                @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
                                                @RequestBody GarageRequest garage) throws IOException {
 

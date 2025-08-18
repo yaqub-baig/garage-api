@@ -63,10 +63,8 @@ class GarageServiceTest {
     @Test
     void testCreateGarage() throws IOException {
         when ( garageRepository.save ( any ( Garage.class ) ) ).thenReturn ( sampleGarageEntity );
-        String userId = "105";
-        String userRole = "ADMIN";
         String autoAddaId = "101";
-        Garage result = garageService.createGarage ( sampleGarageRequest, userId, userRole, autoAddaId ) ;
+        Garage result = garageService.createGarage ( sampleGarageRequest, autoAddaId ) ;
         assertNotNull ( result );
         assertEquals ( "QuickFix", result.getName ( ) );
         assertEquals ( "QuickFix LLC", result.getGarageBrandName ( ) );

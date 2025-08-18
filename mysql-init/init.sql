@@ -1,0 +1,5 @@
+CREATE DATABASE IF NOT EXISTS auto_adda_garage;
+CREATE DATABASE IF NOT EXISTS auto_adda_vehicle;
+CREATE DATABASE IF NOT EXISTS auto_adda_identity;
+CREATE DATABASE IF NOT EXISTS auto_adda_parts;
+
