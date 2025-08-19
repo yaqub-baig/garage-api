@@ -150,7 +150,7 @@ class GarageSubscriptionServiceTest {
     void testSearchPlans() {
         when ( subscriptionRepository.findByNameContainingIgnoreCase ( "basic" ) ).thenReturn ( List.of ( plan ) );
 
-        List<GarageSubscription> result = subscriptionService.searchPlans ( "basic" );
+        List<GarageSubscription> result = subscriptionService.searchPlans ( "basic", "city",  "garageName" );
 
         assertEquals ( 1, result.size ( ) );
         assertEquals ( "Basic Plan", result.get ( 0 ).getName ( ) );

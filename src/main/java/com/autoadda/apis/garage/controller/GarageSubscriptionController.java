@@ -26,7 +26,6 @@ public class GarageSubscriptionController {
 		if (plan.getGarageIds() == null || plan.getGarageIds().isEmpty()) {
 			return ResponseEntity.badRequest().body ( null );
 		}
-
 		return ResponseEntity.ok(garageSubscriptionService.createPlan(plan));
 	}
 
@@ -65,8 +64,8 @@ public class GarageSubscriptionController {
 	}
 
 	@GetMapping("/search")
-	public List<GarageSubscription> searchPlans(@RequestParam String query) {
-		return garageSubscriptionService.searchPlans(query);
+	public List<GarageSubscription> searchPlans(@RequestParam(required = false) String brand, @RequestParam(required = false) String city,  @RequestParam(required = false) String garageName) {
+		return garageSubscriptionService.searchPlans(brand, city, garageName);
 	}
 
 	@GetMapping("/all")

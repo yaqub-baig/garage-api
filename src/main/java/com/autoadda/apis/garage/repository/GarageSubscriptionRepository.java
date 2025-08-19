@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,5 +40,8 @@ public interface GarageSubscriptionRepository extends JpaRepository<GarageSubscr
 	// Or to find subscriptions by services included:
 	List<GarageSubscription> findByServicesIncludedId(Integer garageServiceId);
 
-
+	@Query("SELECT DISTINCT gs FROM GarageSubscription gs " +
+			"LEFT JOIN FETCH gs.garage g " +
+			"LEFT JOIN FETCH g.garageLocation")
+	Set<GarageSubscription> findAllWithLocationAndServices();
 }

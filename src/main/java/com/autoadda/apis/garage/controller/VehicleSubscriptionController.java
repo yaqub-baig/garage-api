@@ -58,8 +58,8 @@ public class VehicleSubscriptionController {
     }
 
     @GetMapping("/search")
-    public List<GarageSubscription> searchPlans(String query) {
-        return garageSubscriptionService.searchPlans ( query );
+    public List<GarageSubscription> searchPlans(@RequestParam(required = false) String brand, @RequestParam(required = false) String city,  @RequestParam(required = false) String garageName) {
+        return garageSubscriptionService.searchPlans ( brand, city,  garageName);
     }
 
     @GetMapping("/active")

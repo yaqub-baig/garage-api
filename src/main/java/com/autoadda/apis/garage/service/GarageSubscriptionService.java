@@ -1,8 +1,6 @@
 package com.autoadda.apis.garage.service;
 
-import com.autoadda.apis.garage.entity.AvailableService;
-import com.autoadda.apis.garage.entity.Garage;
-import com.autoadda.apis.garage.entity.GarageSubscription;
+import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.GarageSubscriptionRepository;
@@ -10,14 +8,15 @@ import com.autoadda.apis.garage.request.GarageSubscriptionRequest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GarageSubscriptionService {
 
 
@@ -140,12 +139,53 @@ public class GarageSubscriptionService {
     /**
      * Searches for subscription plans by name.
      *
-     * @param query the search query
+     * @param query               the search query
+     * @param city
+     * @param zip
+     * @param garageName
+     * @param availableServiceIds
      * @return a list of subscription plans matching the search query
      */
     @Transactional
-    public List<GarageSubscription> searchPlans(String query) {
-        return subscriptionRepository.findByNameContainingIgnoreCase ( query );
+    public List<GarageSubscription> searchPlans(String brand, String city, String garageName) {
+        Set<GarageSubscription> subscriptionPlans = subscriptionRepository.findAllWithLocationAndServices ( );
+        List<GarageSubscription> searchResults = new ArrayList<> ( List.of ( ) );
+        for (GarageSubscription plan : subscriptionPlans) {
+            boolean cityCheck = true;
+            boolean nameCheck = true;
+            boolean brandCheck = true;
+
+            log.info ( " 2  enabledGarages -> " + subscriptionPlans.size ( ) );
+            log.info ( "   currentGarage -> " + plan.getName ( ) );
+
+            Location address = plan.getGarage ().getGarageLocation ( );
+            log.info ( " 4 enabledGarages -> " );
+            if ( StringUtils.isNotEmpty ( city ) ) {
+                log.info ( " 5 enabledGarages -> " );
+                if ( ! address.getCity ( ).toLowerCase ( ).equalsIgnoreCase ( city.toLowerCase ( ) ) ) {
+                    cityCheck = false;
+                }
+            }
+
+
+            if ( StringUtils.isNotEmpty ( garageName ) ) {
+                if ( ! plan.getGarage ( ).getName ().toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
+                    nameCheck = false;
+                }
+            }
+
+            if ( StringUtils.isNotEmpty ( brand ) ) {
+                if ( ! plan.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
+                    brandCheck = false;
+                }
+            }
+
+
+            if ( cityCheck && nameCheck  && brandCheck ) {
+                searchResults.add ( plan );
+            }
+        }
+        return searchResults;
     }
 
     /**
