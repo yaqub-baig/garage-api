@@ -46,10 +46,6 @@ public class AppointmentDetails {
 	@Column(name = "insert_tms")
 	private LocalDate insert_tms;
 
-//	@OneToOne(cascade = CascadeType.ALL)
-//	@JoinColumn(name = "garage_id", referencedColumnName = "id")
-//	private Garage garage;
-
 	@ManyToOne
 	@JoinColumn(name = "garage_id", nullable = false)
 	private Garage garage;

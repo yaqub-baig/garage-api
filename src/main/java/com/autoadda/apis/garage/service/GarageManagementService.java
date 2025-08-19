@@ -22,7 +22,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
 
@@ -49,7 +48,7 @@ public class GarageManagementService {
         garage.setTradeLicenceNumber ( garageRequest.getTradeLicenceNumber ( ) );
         garage.setOpeningTime ( garageRequest.getOpeningTime ( ) );
         garage.setClosingTime ( garageRequest.getClosingTime ( ) );
-        garage.setWorkingDays ( garageRequest.getWorkingDays ( ).toString () );
+        garage.setWorkingDays ( garageRequest.getWorkingDays ( ).toString ( ) );
         garage.setWebSite ( garageRequest.getWebSite ( ) );
         garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
         garage.setMobileNumber ( garageRequest.getMobileNumber ( ) );
@@ -64,7 +63,7 @@ public class GarageManagementService {
     }
 
     @Transactional
-    public Garage createGarage(GarageRequest garageRequest,String autoAddaId) {
+    public Garage createGarage(GarageRequest garageRequest, String autoAddaId) {
         validateTradingLicenseNumber ( garageRequest.getTradeLicenceNumber ( ) );
         Garage garage = mapToEntity ( garageRequest );
         Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
@@ -86,14 +85,14 @@ public class GarageManagementService {
 
         }
 
-        handleGarageWorkingHours(save,garageRequest.getWorkingDays (),garageRequest.getClosingTime (),garageRequest.getOpeningTime ());
+        handleGarageWorkingHours ( save, garageRequest.getWorkingDays ( ), garageRequest.getClosingTime ( ), garageRequest.getOpeningTime ( ) );
         save.setServices ( garageServices );
         return garageRepository.save ( save );
     }
 
-    private void handleGarageWorkingHours(Garage save,List<String> workingDays, String closingTime, String openingTime) {
+    private void handleGarageWorkingHours(Garage save, List<String> workingDays, String closingTime, String openingTime) {
         workingDays.forEach ( day -> {
-            day=day.toUpperCase ();
+            day = day.toUpperCase ( );
             GarageWorkingHours garageWorkingHours = new GarageWorkingHours ( );
             garageWorkingHours.setGarage ( save );
             garageWorkingHours.setDayOfWeek ( DayOfWeek.valueOf ( day ) );
@@ -172,7 +171,7 @@ public class GarageManagementService {
             existing.setClosingTime ( request.getClosingTime ( ) );
         }
         if ( request.getWorkingDays ( ) != null ) {
-            existing.setWorkingDays ( request.getWorkingDays ( ).toString () );
+            existing.setWorkingDays ( request.getWorkingDays ( ).toString ( ) );
         }
 
         if ( request.getGarageBrandName ( ) != null ) {
@@ -496,7 +495,7 @@ public class GarageManagementService {
     public List<Garage> searchGarages(String brand, String city, String zip, String garageName, List<Integer> availableServiceIds) {
 
         Set<Garage> garages = garageRepository.findAllWithLocationAndServices ( );
-        List<Garage> searchResults = new ArrayList<> (  List.of());
+        List<Garage> searchResults = new ArrayList<> ( List.of ( ) );
         for (Garage garage : garages) {
             boolean cityCheck = true;
             boolean nameCheck = true;
@@ -510,32 +509,32 @@ public class GarageManagementService {
             log.info ( " 4 enabledGarages -> " );
             if ( StringUtils.isNotEmpty ( city ) ) {
                 log.info ( " 5 enabledGarages -> " );
-                if ( ! address.getCity ( ).toLowerCase ().equalsIgnoreCase ( city.toLowerCase (  ) ) ) {
+                if ( ! address.getCity ( ).toLowerCase ( ).equalsIgnoreCase ( city.toLowerCase ( ) ) ) {
                     cityCheck = false;
                 }
             }
 
             if ( StringUtils.isNotEmpty ( zip ) ) {
                 log.info ( " 6 enabledGarages -> " );
-                if ( ! address.getPostalCode ( ).toLowerCase ().equalsIgnoreCase ( zip.toLowerCase (  ) ) ) {
+                if ( ! address.getPostalCode ( ).toLowerCase ( ).equalsIgnoreCase ( zip.toLowerCase ( ) ) ) {
                     zipCheck = false;
                 }
             }
 
             if ( StringUtils.isNotEmpty ( garageName ) ) {
-                if ( ! garage.getName ( ).toLowerCase ( ).contains ( garageName .toLowerCase (  )) ) {
+                if ( ! garage.getName ( ).toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
                     nameCheck = false;
                 }
             }
 
             if ( StringUtils.isNotEmpty ( brand ) ) {
-                if ( ! garage.getBrands ( ).toLowerCase ().contains ( brand.toLowerCase () ) ) {
+                if ( ! garage.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
                     brandCheck = false;
                 }
             }
             if ( availableServiceIds != null && ! availableServiceIds.isEmpty ( ) ) {
 
-                List<Integer> garageServiceIds = garage.getServices ().stream ( )
+                List<Integer> garageServiceIds = garage.getServices ( ).stream ( )
                         .map ( GarageService::getAvailableService ).map ( AvailableService::getId )
                         .toList ( );
 
@@ -547,7 +546,7 @@ public class GarageManagementService {
                 searchResults.add ( garage );
             }
         }
-        return searchResults ;
+        return searchResults;
     }
 
     @Transactional(readOnly = true)
@@ -611,10 +610,10 @@ public class GarageManagementService {
         if ( garage.getServices ( ) == null || garage.getServices ( ).isEmpty ( ) ) {
             return false;
         }
-        return garage.getServices().stream()
-                .map(GarageService::getAvailableService)
-                .map(AvailableService::getId)
-                .anyMatch(serviceIds::contains);
+        return garage.getServices ( ).stream ( )
+                .map ( GarageService::getAvailableService )
+                .map ( AvailableService::getId )
+                .anyMatch ( serviceIds::contains );
     }
 
 }

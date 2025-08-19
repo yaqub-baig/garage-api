@@ -36,12 +36,6 @@ public class AppointmentController {
         AppointmentDetails appointment = appointmentService.createCustomerAppointment ( request );
         return ResponseEntity.status ( HttpStatus.CREATED ).body ( GenericResponse.success ( appointment ) );
     }
-//
-//	@PostMapping
-//	public ResponseEntity<AppointmentDetails> createAppointment(@RequestBody AppointmentDetails appointmentDetails) {
-//		AppointmentDetails saved = appointmentDetailsRepository.save(appointmentDetails);
-//		return ResponseEntity.ok(saved);
-//	}
 
     @PostMapping("/{garageId}/book")
     public ResponseEntity<?> bookAppointment(@PathVariable Integer garageId, @RequestParam Integer vehicleId,
@@ -50,7 +44,7 @@ public class AppointmentController {
         try {
             LocalDate date = time.toLocalDate ( );
             LocalTime timestamp = time.toLocalTime ( );
-            AppointmentDetails booking = appointmentSlotService.bookSlot ( garageId, vehicleId, date, timestamp );
+            AppointmentDetails booking = appointmentSlotService.bookSlot ( garageId, vehicleId, date, timestamp,autoAddaId );
             return ResponseEntity.ok ( booking );
         }
         catch ( IllegalStateException e ) {
@@ -90,8 +84,23 @@ public class AppointmentController {
     }
 
     @GetMapping("/user/bookings")
-    public ResponseEntity<List<AppointmentDetails>> getUserBookings(@RequestHeader(value = "X-User-Id") String userId) {
+    public ResponseEntity<List<AppointmentDetails>> getUserBookings(@RequestHeader(value = "X-Auto-Adda-Id") String userId) {
         return ResponseEntity.ok ( appointmentSlotService.getBookingsByUser ( userId ) );
+    }
+
+    @DeleteMapping("/{appointmentId}/cancel")
+    public ResponseEntity<?> cancelAppointment(@PathVariable Integer appointmentId, @RequestHeader(value = "X-Auto-Adda-Id") String userId) {
+            appointmentSlotService.cancelBooking ( appointmentId );
+            return ResponseEntity.ok ( "Booking cancelled successfully." );
+    }
+
+    @PutMapping("/edit/appointment")
+    public ResponseEntity<?> editAppointment(@RequestParam(required = false) Integer garageId,
+                                             @RequestParam(required = false) Integer vehicleId,
+                                             @RequestParam Integer appointmentId,
+                                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
+                                             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+        return appointmentSlotService.editBooking ( garageId, vehicleId, appointmentId, time, autoAddaId );
     }
 
 }

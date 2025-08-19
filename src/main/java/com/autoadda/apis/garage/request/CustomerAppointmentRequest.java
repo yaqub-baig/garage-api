@@ -21,9 +21,7 @@ public class CustomerAppointmentRequest {
     private LocalTime serviceEndTime;
     private LocalTime deliveryTime;
     private String comments;
-
     private Integer memberId;
-
     private String memberType;
 
 
