@@ -100,7 +100,7 @@ class GarageWorkflowIntegrationTest {
 		vehicle.setYear(2020);
 		vehicle.setName("Toyota Camry");
 
-		appointment.setVehicle(vehicle);
+		appointment.setVehicleId(vehicle.getId());
 		appointment.setScheduleDate(LocalDate.now());
 		appointment.setGarage(garage);
 		appointment = appointmentRepo.save(appointment);
