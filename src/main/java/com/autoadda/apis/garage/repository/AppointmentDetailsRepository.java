@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -27,7 +28,7 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
 
 	List<AppointmentDetails> findByGarage_IdAndStatus(Integer garageId, Status status);
 
-	Optional<AppointmentDetails> findByGarageIdAndScheduleDate(Integer garageId, LocalDate date);
+	Set<AppointmentDetails> findByGarageIdAndScheduleDate(Integer garageId, LocalDate date);
 
 	Optional<AppointmentDetails> findByGarage_IdAndScheduleDateAndServiceStartTime(Integer garageId,
 			LocalDate scheduleDate, LocalTime serviceStartTime);

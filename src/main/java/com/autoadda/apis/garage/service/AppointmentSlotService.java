@@ -3,6 +3,7 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.request.AppointmentSlotRequest;
 import com.autoadda.apis.garage.util.AppointmentStatus;
 import com.autoadda.apis.garage.util.DateHelper;
 import com.autoadda.apis.garage.util.Status;
@@ -163,5 +164,6 @@ public class AppointmentSlotService {
         return new ResponseEntity<> ( save, HttpStatus.OK );
 
     }
+
 
 }

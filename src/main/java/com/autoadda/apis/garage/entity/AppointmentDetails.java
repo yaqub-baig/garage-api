@@ -59,4 +59,10 @@ public class AppointmentDetails {
 	@Column(name = "vehicle_id", nullable = true)
 	private Integer vehicleId;
 
+	@ManyToOne
+	@JoinColumn(name = "appointment_slot_id", nullable = false)
+	private AppointmentSlot slot;
+
+	@Column(name = "technician_id", nullable = true)
+	private Integer technicianId;
 }
