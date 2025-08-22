@@ -31,6 +31,7 @@ public class AppointmentSlotService {
     private final AppointmentDetailsRepository bookingRepo;
     private final GarageRepository garageRepo;
     private final CustomerRepository customerRepo;
+    private final AppointmentService appointmentService;
 
     /**
      * Retrieves available time slots for a garage on a specific date.
@@ -109,6 +110,7 @@ public class AppointmentSlotService {
                 .serviceStartTime ( time ).status ( Status.CONFIRMED ).comments ( "Booked via platform" )
                 .vehicleId ( vehicleId )
                 .customerId ( userId )
+                .appointmentReferenceId ( appointmentService.generateAppointmentCode () )
                 .insert_tms ( DateHelper.dbDate ( ) ).build ( );
 
         return bookingRepo.save ( appointment );

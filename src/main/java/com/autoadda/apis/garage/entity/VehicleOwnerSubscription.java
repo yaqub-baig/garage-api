@@ -28,20 +28,15 @@ public class VehicleOwnerSubscription {
 	@Id
 	@GeneratedValue
 	private Integer id;
-
-	private Integer vehicleOwnerId;
-
+	private Integer customerId;
 	@ManyToOne
 	@JoinColumn(name = "garage_subscription_id")
 	private GarageSubscription garageSubscription;
-
 	private LocalDate purchaseDate;
 	private LocalDate startDate;
 	private LocalDate endDate;
-
 	@Enumerated(EnumType.STRING)
 	private SubscriptionStatus status;
-
 	@Column(columnDefinition = "TEXT")
 	private String usageCounts; // JSON for tracking service usage
 }

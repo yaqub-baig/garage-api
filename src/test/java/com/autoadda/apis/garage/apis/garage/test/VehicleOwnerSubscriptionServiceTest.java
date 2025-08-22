@@ -62,7 +62,7 @@ class VehicleOwnerSubscriptionServiceTest {
 
 		subscription = new VehicleOwnerSubscription();
 		subscription.setId(1001);
-		subscription.setVehicleOwnerId (owner.getId ());
+		subscription.setCustomerId (owner.getId ());
 		subscription.setGarageSubscription(plan);
 		subscription.setStartDate(LocalDate.now());
 		subscription.setEndDate(LocalDate.now().plusMonths(3));
@@ -79,7 +79,7 @@ class VehicleOwnerSubscriptionServiceTest {
 
 		// Assert
 		assertNotNull(result);
-		assertEquals(12, result.getVehicleOwnerId ());
+		assertEquals(12, result.getCustomerId ());
 		assertEquals(SubscriptionStatus.ACTIVE, result.getStatus());
 
 		// Verify that repo method was called once
@@ -109,7 +109,7 @@ class VehicleOwnerSubscriptionServiceTest {
 		plan.setDurationMonths(6);
 
 		VehicleOwnerSubscription subscription = new VehicleOwnerSubscription();
-		subscription.setVehicleOwnerId (owner.getId ());
+		subscription.setCustomerId (owner.getId ());
 		subscription.setGarageSubscription(plan);
 
 		when(vehicleOwnerRepository.findById(12)).thenReturn(Optional.of(owner));
@@ -151,13 +151,13 @@ class VehicleOwnerSubscriptionServiceTest {
 
 	@Test
 	void testGetSubscriptionsByOwner() {
-		when(vehicleOwnerSubscriptionRepository.findByVehicleOwnerId(12)).thenReturn(List.of(subscription));
+		when(vehicleOwnerSubscriptionRepository.findByCustomerId (12)).thenReturn(List.of(subscription));
 
 		List<VehicleOwnerSubscription> subscriptions = vehicleOwnerSubscriptionService.getSubscriptionsByOwner(12);
 		assertEquals(1, subscriptions.size());
 		assertEquals(1001, subscriptions.get(0).getId());
 
-		verify(vehicleOwnerSubscriptionRepository, times(1)).findByVehicleOwnerId(12);
+		verify(vehicleOwnerSubscriptionRepository, times(1)).findByCustomerId (12);
 	}
 
 	@Test

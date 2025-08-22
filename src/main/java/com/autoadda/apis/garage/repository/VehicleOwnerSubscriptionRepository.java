@@ -11,22 +11,22 @@ import com.autoadda.apis.garage.util.SubscriptionStatus;
 
 @Repository
 public interface VehicleOwnerSubscriptionRepository extends JpaRepository<VehicleOwnerSubscription, Integer> {
-	List<VehicleOwnerSubscription> findByVehicleOwnerId(Integer ownerId);
+	List<VehicleOwnerSubscription> findByCustomerId(Integer ownerId);
 
 	List<VehicleOwnerSubscription> findByGarageSubscriptionId(Integer subscriptionId);
 
-	List<VehicleOwnerSubscription> findByVehicleOwnerIdAndGarageSubscriptionId(Integer ownerId, Integer subscriptionId);
+	List<VehicleOwnerSubscription> findByCustomerIdAndGarageSubscriptionId(Integer ownerId, Integer subscriptionId);
 
-	List<VehicleOwnerSubscription> findByVehicleOwnerIdAndStatus(Integer ownerId, String status);
+	List<VehicleOwnerSubscription> findByCustomerIdAndStatus(Integer ownerId, String status);
 
 	List<VehicleOwnerSubscription> findByGarageSubscriptionIdAndStatus(Integer subscriptionId, String status);
 
-	List<VehicleOwnerSubscription> findByVehicleOwnerIdAndStatusAndGarageSubscriptionId(Integer ownerId, String status,
+	List<VehicleOwnerSubscription> findByCustomerIdAndStatusAndGarageSubscriptionId(Integer ownerId, String status,
 			Integer subscriptionId);
 
 	List<VehicleOwnerSubscription> findByStatus(SubscriptionStatus status);
 
-	List<VehicleOwnerSubscription> findByVehicleOwnerIdAndStartDateBetween(Integer ownerId, LocalDate startDate,
+	List<VehicleOwnerSubscription> findByCustomerIdAndStartDateBetween(Integer ownerId, LocalDate startDate,
 			LocalDate endDate);
 
 }

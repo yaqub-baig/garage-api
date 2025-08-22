@@ -25,6 +25,9 @@ public class AppointmentDetails {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
+	@Column(name = "appointment_reference_id")
+	private String appointmentReferenceId;
+
 	@Column(name = "schedule_date")
 	private LocalDate scheduleDate;
 

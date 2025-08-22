@@ -44,7 +44,7 @@ public class VehicleOwnerSubscriptionService {
         vehicleOwnerSubscription.setStartDate ( LocalDate.now ( ) );
         vehicleOwnerSubscription.setEndDate ( LocalDate.now ( ).plusMonths ( plan.getDurationMonths ( ) ) );
         vehicleOwnerSubscription.setStatus ( SubscriptionStatus.ACTIVE );
-        vehicleOwnerSubscription.setVehicleOwnerId ( subscription.getOwnerId ( ) );
+        vehicleOwnerSubscription.setCustomerId ( subscription.getOwnerId ( ) );
         return vehicleOwnerSubscriptionRepository.save ( vehicleOwnerSubscription );
     }
 
@@ -56,7 +56,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscription> getSubscriptionsByOwner(Integer ownerId) {
-        return vehicleOwnerSubscriptionRepository.findByVehicleOwnerId ( ownerId );
+        return vehicleOwnerSubscriptionRepository.findByCustomerId ( ownerId );
     }
 
     /**
@@ -103,7 +103,7 @@ public class VehicleOwnerSubscriptionService {
     @Transactional
     public List<VehicleOwnerSubscription> getSubscriptionsByDateRange(Integer ownerId, LocalDate startDate,
                                                                       LocalDate endDate) {
-        return vehicleOwnerSubscriptionRepository.findByVehicleOwnerIdAndStartDateBetween ( ownerId, startDate, endDate );
+        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndStartDateBetween ( ownerId, startDate, endDate );
     }
 
     /**
@@ -127,7 +127,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscription> getSubscriptionsByOwnerAndPlan(Integer ownerId, Integer subscriptionId) {
-        return vehicleOwnerSubscriptionRepository.findByVehicleOwnerIdAndGarageSubscriptionId ( ownerId, subscriptionId );
+        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndGarageSubscriptionId ( ownerId, subscriptionId );
     }
 
     /**
@@ -139,7 +139,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscription> getSubscriptionsByOwnerAndStatus(Integer ownerId, String status) {
-        return vehicleOwnerSubscriptionRepository.findByVehicleOwnerIdAndStatus ( ownerId, status );
+        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndStatus ( ownerId, status );
     }
 
     /**

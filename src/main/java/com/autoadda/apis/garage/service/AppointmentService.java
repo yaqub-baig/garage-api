@@ -1,5 +1,7 @@
 package com.autoadda.apis.garage.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,13 +75,12 @@ public class AppointmentService {
 		// Create appointment
 		AppointmentDetails appointment = AppointmentDetails.builder()
 				.garage(garage)
-				.vehicleId(request.getVehicleId()) // null bhi ho sakta hai
-				.customerId(request.getCustomerId()) // null bhi ho sakta hai
+				.vehicleId(request.getVehicleId())
+				.customerId(request.getCustomerId())
 				.scheduleDate(request.getScheduleDate())
 				.status(Status.CONFIRMED)
 				.insert_tms(DateHelper.dbDate())
 				.build();
-
 		appointmentRepo.save(appointment);
 
 		// Save activity (memberId, memberType optional ho sakte hain)
@@ -246,7 +247,34 @@ public class AppointmentService {
 		return appointmentRepo.findByGarage_IdAndStatus(garageId, status);
 	}
 
+	public String generateAppointmentCode() {
+		// Get current year and month
+		LocalDateTime now = LocalDateTime.now ( );
+		String yearMonth = now.format ( DateTimeFormatter.ofPattern ( "yyMM" ) );
 
+		// Format: RQ-YYMM-XXXX
+		String codePrefix = "APP-" + yearMonth + "-";
+
+		// Find the latest code for this prefix
+		List<String> latestCodes = appointmentRepo.findLatestCodesByPrefix (
+				codePrefix );
+
+		int nextSequence = 1;
+		if ( ! latestCodes.isEmpty ( ) ) {
+			String latestCode = latestCodes.get ( 0 );
+			try {
+				// Extract the sequence number from the latest code
+				String sequencePart = latestCode.substring ( codePrefix.length ( ) );
+				nextSequence = Integer.parseInt ( sequencePart ) + 1;
+			}
+			catch ( NumberFormatException | IndexOutOfBoundsException e ) {
+				log.warn ( "Failed to parse sequence number, starting from 1", e );
+			}
+		}
+
+		// Format the final code with the sequence padded to 4 digits
+		return String.format ( "%s%06d", codePrefix, nextSequence );
+	}
 
 
 

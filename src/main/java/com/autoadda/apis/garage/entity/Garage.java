@@ -95,6 +95,8 @@ public class Garage {
 
     private boolean isActive;
 
+    private Integer concurrentAppointmentCapacity;
+
     @OneToMany
     @JoinColumn(name = "garage_trade_license")
     private List<MediaFile> tradeLicenseAttachment = new ArrayList<> ( );
