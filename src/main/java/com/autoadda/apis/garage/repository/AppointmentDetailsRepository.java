@@ -37,9 +37,10 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
 			LocalTime serviceStartTime, Status status);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("SELECT b FROM AppointmentDetails b WHERE b.garage.id = :garageId AND b.scheduleDate = :date AND b.serviceStartTime = :time")
+	@Query("SELECT b FROM AppointmentDetails b WHERE b.garage.id = :garageId AND b.scheduleDate = :date AND b.serviceStartTime = :time AND b.slot.currentBookings < b.slot.maxBookings")
 	Optional<AppointmentDetails> findLockedSlot(@Param("garageId") Integer garageId, @Param("date") LocalDate date,
 			@Param("time") LocalTime time);
+
 
 	@Query("SELECT a.appointmentReferenceId FROM AppointmentDetails a WHERE a.appointmentReferenceId LIKE :prefix% ORDER BY a.appointmentReferenceId DESC")
     List<String> findLatestCodesByPrefix(@Param("prefix")String codePrefix);

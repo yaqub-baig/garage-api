@@ -20,5 +20,4 @@ public class AvailableServiceResponse {
 	private Boolean isActive;
 	private Double price;
 	private Double laborPrice;
-	private Integer garageId;
 }

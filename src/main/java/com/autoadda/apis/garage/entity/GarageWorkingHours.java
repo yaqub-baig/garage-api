@@ -25,16 +25,13 @@ public class GarageWorkingHours {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
 	@ManyToOne
 	@JoinColumn(name = "garage_id", referencedColumnName = "id")
 	private Garage garage;
-
 	@Enumerated(EnumType.STRING)
 	private DayOfWeek dayOfWeek;
-
 	private LocalTime openTime;
 	private LocalTime closeTime;
 	private boolean isClosed;
-	final private int slotDurationMinutes = 30;
+	final private int slotDurationMinutes = 20;
 }

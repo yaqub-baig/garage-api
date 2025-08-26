@@ -20,4 +20,6 @@ public interface TechnicianRepository extends JpaRepository<Technician, Integer>
 	List<Technician> findBySkillSetContaining(String skill); // if skillSet is stored as a list
 
 	List<Technician> findByStatus(String status);
+
+	int countByGarageId(Integer id);
 }

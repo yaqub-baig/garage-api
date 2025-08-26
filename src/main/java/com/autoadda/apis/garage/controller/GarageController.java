@@ -1,7 +1,7 @@
 package com.autoadda.apis.garage.controller;
 
-import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.request.GarageRequest;
+import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.service.AppointmentSlotService;
 import com.autoadda.apis.garage.service.GarageManagementService;
 import com.autoadda.apis.garage.service.MediaFileService;
@@ -26,7 +26,7 @@ public class GarageController {
     private final MediaFileService mediaFileService;
 
     @PostMapping
-    public ResponseEntity<?> createGarage(
+    public ResponseEntity<GarageResponse> createGarage(
             HttpServletRequest request,
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
             @RequestBody @Valid GarageRequest garage
@@ -39,24 +39,24 @@ public class GarageController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<List<Garage>> getAllGarages() {
+    public ResponseEntity<List<GarageResponse>> getAllGarages() {
         return ResponseEntity.ok ( garageService.getAllGarages ( ) );
     }
 
     @GetMapping
-    public ResponseEntity<List<Garage>> getAllGaragesByOwnerId(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+    public ResponseEntity<List<GarageResponse>> getAllGaragesByOwnerId(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
         return ResponseEntity.ok ( garageService.getAllGaragesByOwnerId ( autoAddaId ) );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Garage> getGarageById(@PathVariable Integer id) {
+    public ResponseEntity<GarageResponse> getGarageById(@PathVariable Integer id) {
         return garageService.getGarageById ( id ).map ( ResponseEntity::ok ).orElse ( ResponseEntity.notFound ( ).build ( ) );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Garage> updateGarage(@PathVariable Integer id,
-                                               @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
-                                               @RequestBody GarageRequest garage) throws IOException {
+    public ResponseEntity<GarageResponse> updateGarage(@PathVariable Integer id,
+                                                       @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
+                                                       @RequestBody GarageRequest garage) throws IOException {
 
         return ResponseEntity.ok ( garageService.updateGarage ( id, garage ) );
     }
@@ -68,20 +68,20 @@ public class GarageController {
     }
 
     @GetMapping("/brandname/{name}")
-    public ResponseEntity<List<Garage>> searchByLegalName(@RequestParam String name) {
+    public ResponseEntity<List<GarageResponse>> searchByLegalName(@RequestParam String name) {
         return ResponseEntity.ok ( garageService.findGaragesByLegalName ( name ) );
     }
 
     @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<Garage>> getGaragesByService(@PathVariable Integer serviceId) {
+    public ResponseEntity<List<GarageResponse>> getGaragesByService(@PathVariable Integer serviceId) {
         return ResponseEntity.ok ( garageService.findGaragesOfferingAvailableService ( serviceId ) );
     }
 
     //search garage based on  city,postal code,available services ,brand, garage name
 
     @GetMapping("/search")
-    public ResponseEntity<List<Garage>> searchGarages(@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String zip, @RequestParam(required = false) String garageName, @RequestParam(required = false) List<Integer> availableServiceIds) {
-        return ResponseEntity.ok ( garageService.searchGarages ( brand, city, zip, garageName, availableServiceIds ) );
+    public ResponseEntity<List<GarageResponse>> searchGarages(@RequestParam(required = false) String model,@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String zip, @RequestParam(required = false) String garageName, @RequestParam(required = false) List<Integer> availableServiceIds) {
+        return ResponseEntity.ok ( garageService.searchGarages ( brand, city, zip, garageName, availableServiceIds, model ) );
     }
 
 

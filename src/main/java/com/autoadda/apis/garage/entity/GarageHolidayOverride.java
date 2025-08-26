@@ -23,11 +23,9 @@ public class GarageHolidayOverride {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
 	@ManyToOne
 	@JoinColumn(name = "garage_id", referencedColumnName = "id")
 	private Garage garage;
-
 	private LocalDate date;
 	private boolean isClosed;
 	private LocalTime openTime;

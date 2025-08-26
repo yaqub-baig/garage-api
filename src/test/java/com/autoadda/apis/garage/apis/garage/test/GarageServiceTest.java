@@ -5,6 +5,7 @@ package com.autoadda.apis.garage.apis.garage.test;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.request.GarageRequest;
+import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.service.GarageManagementService;
 import com.autoadda.apis.garage.util.Status;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class GarageServiceTest {
         sampleGarageRequest.setEmail ( "info@quickfix.com" );
         sampleGarageRequest.setPhoneNumber ( "1234567890" );
         sampleGarageRequest.setWebSite ( "http://quickfix.com" );
-        sampleGarageRequest.setChainId ( 101 );
+
 
         sampleGarageEntity = new Garage ( );
         sampleGarageEntity.setId ( 1 );
@@ -64,7 +65,7 @@ class GarageServiceTest {
     void testCreateGarage() throws IOException {
         when ( garageRepository.save ( any ( Garage.class ) ) ).thenReturn ( sampleGarageEntity );
         String autoAddaId = "101";
-        Garage result = garageService.createGarage ( sampleGarageRequest, autoAddaId ) ;
+        GarageResponse result = garageService.createGarage ( sampleGarageRequest, autoAddaId ) ;
         assertNotNull ( result );
         assertEquals ( "QuickFix", result.getName ( ) );
         assertEquals ( "QuickFix LLC", result.getGarageBrandName ( ) );
@@ -73,7 +74,7 @@ class GarageServiceTest {
     @Test
     void testGetAllGarages() {
         when ( garageRepository.findAll ( ) ).thenReturn ( List.of ( sampleGarageEntity ) );
-        List<Garage> garages = garageService.getAllGarages (  );
+        List<GarageResponse> garages = garageService.getAllGarages (  );
         assertEquals ( 1, garages.size ( ) );
         assertEquals ( "QuickFix", garages.get ( 0 ).getName ( ) );
     }
@@ -81,7 +82,7 @@ class GarageServiceTest {
     @Test
     void testGetGarageByIdSuccess() {
         when ( garageRepository.findById ( 1 ) ).thenReturn ( Optional.of ( sampleGarageEntity ) );
-        Optional<Garage> result = garageService.getGarageById ( 1 );
+        Optional<GarageResponse> result = garageService.getGarageById ( 1 );
         assertTrue ( result.isPresent ( ) );
         assertEquals ( "QuickFix", result.get ( ).getName ( ) );
     }

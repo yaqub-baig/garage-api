@@ -3,8 +3,6 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.*;
-import com.autoadda.apis.garage.request.AppointmentSlotRequest;
-import com.autoadda.apis.garage.util.AppointmentStatus;
 import com.autoadda.apis.garage.util.DateHelper;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.transaction.Transactional;
@@ -33,6 +31,8 @@ public class AppointmentSlotService {
     private final GarageRepository garageRepo;
     private final CustomerRepository customerRepo;
     private final AppointmentService appointmentService;
+    private final SlotService slotService;
+    private final SlotRepository slotRepository;
 
     /**
      * Retrieves available time slots for a garage on a specific date.
@@ -42,51 +42,63 @@ public class AppointmentSlotService {
      * @return A list of available LocalTime slots.
      */
     @Transactional
-    public List<LocalTime> getAvailableSlots(Integer garageId, LocalDate date) {
+    public List<AppointmentSlot> getAvailableSlots(Integer garageId, LocalDate date) {
         DayOfWeek day = date.getDayOfWeek ( );
 
+        // Check if garage is closed (holiday or working hours)
         Optional<GarageHolidayOverride> overrideOpt = holidayRepo.findByGarageIdAndDate ( garageId, date );
-        log.info ( "overrideOpt: {}", overrideOpt.toString ( ) );
-        LocalTime openTime, closeTime;
-        int slotDuration;
 
-        if ( overrideOpt.isPresent ( ) ) {
-            GarageHolidayOverride override = overrideOpt.get ( );
-            if ( override.isClosed ( ) )
-                return Collections.emptyList ( );
-            openTime = override.getOpenTime ( );
-            closeTime = override.getCloseTime ( );
-            slotDuration = 30;
-        } else {
-            GarageWorkingHours workingHours = workingHoursRepo.findByGarageIdAndDayOfWeek ( garageId, day )
-                    .orElseThrow ( () -> {
-                        log.error ( "No working hours defined" );
-                        return new ResourceNotFoundException ( "No working hours defined" );
-                    } );
-
-            if ( workingHours.isClosed ( ) )
-                return Collections.emptyList ( );
-
-            openTime = workingHours.getOpenTime ( );
-            closeTime = workingHours.getCloseTime ( );
-            slotDuration = workingHours.getSlotDurationMinutes ( );
+        if ( overrideOpt.isPresent ( ) && overrideOpt.get ( ).isClosed ( ) ) {
+            return Collections.emptyList ( );
         }
 
+        GarageWorkingHours workingHours = workingHoursRepo.findByGarageIdAndDayOfWeek ( garageId, day )
+                .orElseThrow ( () -> new ResourceNotFoundException ( "No working hours defined" ) );
+
+        if ( workingHours.isClosed ( ) ) {
+            return Collections.emptyList ( );
+        }
+
+        LocalTime openTime = workingHours.getOpenTime ( );
+        LocalTime closeTime = workingHours.getCloseTime ( );
+
+        // Get slots for this specific date
+        List<AppointmentSlot> slotsForDate = slotRepository.findByGarageIdAndSlotDate ( garageId, date );
+
+        // Filter out slots in break times
         List<GarageBreakTime> breaks = breakRepo.findByGarageIdAndDayOfWeek ( garageId, day );
-        Set<LocalTime> booked = bookingRepo.findByGarageIdAndScheduleDate ( garageId, date ).stream ( )
-                .filter ( b -> b.getStatus ( ) == Status.CONFIRMED ).map ( AppointmentDetails::getServiceStartTime )
-                .collect ( Collectors.toSet ( ) );
 
-        List<LocalTime> slots = new ArrayList<> ( );
-        for (LocalTime t = openTime; t.plusMinutes ( slotDuration ).compareTo ( closeTime ) <= 0; t = t.plusMinutes ( slotDuration )) {
-            LocalTime finalT = t;
-            boolean inBreak = breaks.stream ( )
-                    .anyMatch ( b -> ! finalT.isBefore ( b.getBreakStart ( ) ) && finalT.isBefore ( b.getBreakEnd ( ) ) );
-            if ( ! booked.contains ( t ) && ! inBreak ) {
-                slots.add ( t );
-            }
-        }
-        return slots;
+        return slotsForDate.stream ( )
+                .filter ( slot -> slot.getStartTime ( ).compareTo ( openTime ) >= 0 )
+                .filter ( slot -> slot.getEndTime ( ).compareTo ( closeTime ) <= 0 )
+                .filter ( slot -> ! isSlotInBreak ( slot, breaks ) )
+                .filter ( AppointmentSlot::isAvailable )
+                .toList ( );
+    }
+
+    private boolean isSlotInBreak(AppointmentSlot slot, List<GarageBreakTime> breaks) {
+        return breaks.stream ( ).anyMatch ( breakTime ->
+                ! slot.getStartTime ( ).isBefore ( breakTime.getBreakStart ( ) ) &&
+                        slot.getStartTime ( ).isBefore ( breakTime.getBreakEnd ( ) ) );
+    }
+
+    @Transactional
+    public List<Map<String, Object>> getAvailableSlotsWithDetails(Integer garageId, LocalDate date) {
+        List<AppointmentSlot> availableSlots = getAvailableSlots ( garageId, date );
+
+        return availableSlots.stream ( )
+                .map ( slot -> {
+                    Map<String, Object> slotInfo = new HashMap<> ( );
+                    slotInfo.put ( "slotId", slot.getId ( ) );
+                    slotInfo.put ( "startTime", slot.getStartTime ( ) );
+                    slotInfo.put ( "endTime", slot.getEndTime ( ) );
+                    slotInfo.put ( "maxBookings", slot.getMaxBookings ( ) );
+                    slotInfo.put ( "currentBookings", slot.getCurrentBookings ( ) );
+                    slotInfo.put ( "availableBookings", slot.getAvailableBookings ( ) );
+                    slotInfo.put ( "isAvailable", slot.isAvailable ( ) );
+                    return slotInfo;
+                } )
+                .toList ( );
     }
 
     /**
@@ -97,12 +109,15 @@ public class AppointmentSlotService {
      * @return A list of LocalTime slots.
      */
     @Transactional
-    public AppointmentDetails bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time,String autoAddaId) {
+    public AppointmentDetails bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId) {
+
         Integer userId = Integer.parseInt ( autoAddaId );
-        Optional<AppointmentDetails> existing = bookingRepo.findLockedSlot ( garageId, date, time );
-        log.info ( "existing: {}", existing.toString ( ) );
-        if ( existing.isPresent ( ) && existing.get ( ).getStatus ( ) == Status.CONFIRMED ) {
-            throw new IllegalStateException ( "Slot already booked." );
+//        Optional<AppointmentDetails> existing = bookingRepo.findLockedSlot ( garageId, date, time );
+//        log.info ( "existing: {}", existing.toString ( ) );
+        AppointmentSlot slot = slotService.findAvailableSlotByGarageIdAndTime ( garageId, date, time );
+
+        if ( ! slot.isAvailable ( ) ) {
+            throw new IllegalStateException ( "Slot is Fully booked." );
         }
 
         Garage garage = garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) );
@@ -111,9 +126,10 @@ public class AppointmentSlotService {
                 .serviceStartTime ( time ).status ( Status.CONFIRMED ).comments ( "Booked via platform" )
                 .vehicleId ( vehicleId )
                 .customerId ( userId )
-                .appointmentReferenceId ( appointmentService.generateAppointmentCode () )
+                .appointmentReferenceId ( appointmentService.generateAppointmentCode ( ) )
+                .slot ( slot )
                 .insert_tms ( DateHelper.dbDate ( ) ).build ( );
-
+        slotService.incrementSlotBookings ( slot.getId ( ) );
         return bookingRepo.save ( appointment );
     }
 
@@ -136,7 +152,8 @@ public class AppointmentSlotService {
         Integer user = Integer.parseInt ( userId );
         return bookingRepo.findByCustomerId ( user ).stream ( ).sorted ( Comparator.comparing ( AppointmentDetails::getServiceStartTime ) ).collect ( Collectors.toList ( ) );
     }
-@Transactional
+
+    @Transactional
     public ResponseEntity<AppointmentDetails> editBooking(Integer garageId, Integer vehicleId, Integer appointmentId, LocalDateTime time, String autoAddaId) {
         AppointmentDetails appointmentDetails = bookingRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException ( "No such booking found to edit." ) );
         if ( garageId != null && time != null ) {
@@ -157,7 +174,7 @@ public class AppointmentSlotService {
             appointmentDetails.setVehicleId ( vehicleId );
         }
         if ( time != null ) {
-            appointmentDetails.setServiceStartTime ( time.toLocalTime () );
+            appointmentDetails.setServiceStartTime ( time.toLocalTime ( ) );
             appointmentDetails.setScheduleDate ( time.toLocalDate ( ) );
         }
         AppointmentDetails save = bookingRepo.save ( appointmentDetails );

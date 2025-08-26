@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -19,14 +22,20 @@ public class GarageRequest {
     private String webSite;
     private String email;
     private String phoneNumber;
-    private String openingTime;
-    private String closingTime;
+    @DateTimeFormat(pattern = "HH:mm:ss")
+    private LocalTime openingTime;
+    @DateTimeFormat(pattern = "HH:mm:ss")
+    private LocalTime closingTime;
+    @DateTimeFormat(pattern = "HH:mm:ss")
+    private LocalTime breakStartTime;
+    @DateTimeFormat(pattern = "HH:mm:ss")
+    private LocalTime breakEndTime;
+    private Integer concurrentAppointmentCapacity;
     private String tradeLicenceNumber;
-    private List<String> workingDays;
+    private List<DayOfWeek> workingDays;
     private String mobileNumber;
     private LocationRequest garageLocation;
     private List<Integer> garageServiceIds;
-    private Integer chainId;
     private String brands;
     private String models;
     private Long logoId;

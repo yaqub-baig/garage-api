@@ -62,7 +62,7 @@ public class AppointmentController {
     @PutMapping("/status")
     public ResponseEntity<GenericResponse> updateAppointmentStatus(@RequestBody AppointmentStatusRequest request) {
         AppointmentDetails updated = appointmentService.updateAppointmentStatus ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( "Appointment status updated" ) );
+        return ResponseEntity.ok ( GenericResponse.success ( updated ));
     }
 
     @GetMapping("/{appointmentId}")
@@ -73,14 +73,16 @@ public class AppointmentController {
 
     @GetMapping("/{garageId}/available-slots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@PathVariable Integer garageId,
-                                                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+                                                                 @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date) {
 
-        List<LocalTime> slots = appointmentSlotService.getAvailableSlots ( garageId, date );
-        Map<String, Object> res = new HashMap<> ( );
-        res.put ( "garageId", garageId );
-        res.put ( "date", date );
-        res.put ( "availableSlots", slots );
-        return ResponseEntity.ok ( res );
+        // Use the new method that returns detailed slot information
+        List<Map<String, Object>> slots = appointmentSlotService.getAvailableSlotsWithDetails(garageId, date);
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("garageId", garageId);
+        res.put("date", date);
+        res.put("availableSlots", slots);
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping("/user/bookings")
