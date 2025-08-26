@@ -150,7 +150,7 @@ public class AppointmentSlotService {
     @Transactional
     public List<AppointmentDetails> getBookingsByUser(String userId) {
         Integer user = Integer.parseInt ( userId );
-        return bookingRepo.findByCustomerId ( user ).stream ( ).sorted ( Comparator.comparing ( AppointmentDetails::getServiceStartTime ) ).collect ( Collectors.toList ( ) );
+        return bookingRepo.findByCustomerId(user).stream().sorted(Comparator.comparing(AppointmentDetails::getServiceStartTime).reversed()).toList();
     }
 
     @Transactional
