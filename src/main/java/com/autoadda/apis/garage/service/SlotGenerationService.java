@@ -32,16 +32,19 @@ public class SlotGenerationService {
 
     @Scheduled(cron = "0 0 0 * * ?") // Run daily at midnight
     public void generateSlotsForNextDays() {
-        List<Garage> garages = garageRepository.findAll ( );
-        LocalDate today = LocalDate.now ( );
+        List<Garage> garages = garageRepository.findAll ( ).stream ( ).toList ( );
+        LocalDate newDay = LocalDate.now().plusDays(59);
+        garages.forEach(g -> generateSlotsForGarageAndDate(g, newDay));
 
-        // Generate slots for next 7 days
-        for (int i = 0; i < 7; i++) {
+    }
+
+
+    public void generateSlotsForDays(Garage garage,int days) {
+        LocalDate today = LocalDate.now ( );
+        for (int i = 0; i < days; i++) {
             LocalDate targetDate = today.plusDays ( i );
-            for (Garage garage : garages) {
                 if ( garage.getConcurrentAppointmentCapacity ( ) != null )
                     generateSlotsForGarageAndDate ( garage, targetDate );
-            }
         }
     }
 
@@ -70,7 +73,8 @@ public class SlotGenerationService {
             );
             // Check if slot already exists
             if ( ! inBreak ) {
-                Optional<AppointmentSlot> existingSlot = slotRepository.findBySlotDateAndStartTime ( date, currentTime );
+                Optional<AppointmentSlot> existingSlot = slotRepository.findByGarageIdAndSlotDateAndStartTime(
+                        garage.getId(), date, currentTime);
                 if ( existingSlot.isEmpty ( ) ) {
                     AppointmentSlot slot = new AppointmentSlot ( );
                     slot.setSlotDate ( date );
@@ -91,7 +95,6 @@ public class SlotGenerationService {
         if (garage.getConcurrentAppointmentCapacity() == null) {
             return; // no capacity set, nothing to update
         }
-
         int newCapacity = garage.getConcurrentAppointmentCapacity();
         LocalDate today = LocalDate.now();
 
@@ -109,7 +112,6 @@ public class SlotGenerationService {
                 slot.setMaxBookings(slot.getCurrentBookings());
             }
         }
-
         slotRepository.saveAll(upcomingSlots);
     }
 

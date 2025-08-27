@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -137,7 +136,10 @@ public class GarageManagementService {
         handleGarageBreakHours ( save, garageRequest.getWorkingDays ( ), garageRequest.getBreakStartTime ( ), garageRequest.getBreakEndTime ( ) );
         save.setServices ( garageServices );
         Garage saved = garageRepository.save ( save );
-        slotGenerationService.generateSlotsForGarageAndDate ( saved, LocalDate.now () );
+        garageRepository.flush ( );
+        workingHoursRepository.flush ( );
+        garageBreakTimeRepository.flush ( );
+        slotGenerationService.generateSlotsForDays ( saved, 60 );
         return garageMapper.entityToResponse ( saved );
     }
 

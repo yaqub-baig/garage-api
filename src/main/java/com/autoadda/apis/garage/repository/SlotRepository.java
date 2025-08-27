@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,4 +43,20 @@ public interface SlotRepository extends JpaRepository<AppointmentSlot, Integer> 
 
     @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId AND s.slotDate= :slotDate AND s.startTime = :time")
     Optional<AppointmentSlot> findByGarageIdAndStartTime(@Param("garageId") Integer garageId, @Param("slotDate") LocalDate date, @Param("time") LocalTime time);
+    @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId " +
+            "AND s.slotDate >= :startDate AND s.slotDate <= :endDate " +
+            "ORDER BY s.slotDate, s.startTime")
+    List<AppointmentSlot> findMonthlySlots(
+            @Param("garageId") Integer garageId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    List<AppointmentSlot> findAvailableSlotsByGarageId(Integer garageId);
+
+    Optional<AppointmentSlot> findByGarageIdAndSlotDateAndStartTime(Integer id, LocalDate date, LocalTime currentTime);
+    @Query("SELECT s FROM AppointmentSlot s WHERE " +
+            "(s.slotDate < :currentDate) OR " +
+            "(s.slotDate = :currentDate AND s.endTime <= :currentTime)")
+    List<AppointmentSlot> findPastSlots(  @Param("currentDate") LocalDate currentDate,
+                                          @Param("currentTime") LocalTime currentTime);
 }

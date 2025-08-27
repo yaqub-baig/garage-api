@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.AppointmentSlotRequest;
 import com.autoadda.apis.garage.response.AppointmentSlotResponse;
+import com.autoadda.apis.garage.response.MonthlyAvailabilityResponse;
 import com.autoadda.apis.garage.service.SlotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,8 +30,13 @@ public class SlotController {
 
     @GetMapping("/available-slots")
     public ResponseEntity<List<AppointmentSlotResponse>> getAvailableSlots(@RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime startTime,
-                                               @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
+                                                                           @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
         return ResponseEntity.ok ( appointmentSlotService.getAvailableSlots ( startTime, endTime ) );
+    }
+
+    @GetMapping("/available-slots/{garageId}")
+    public ResponseEntity<List<AppointmentSlotResponse>> getAvailableSlots(@PathVariable Integer garageId) {
+        return ResponseEntity.ok ( appointmentSlotService.getAvailableSlots ( garageId ) );
     }
 
     @GetMapping("/{id}")
@@ -47,5 +53,14 @@ public class SlotController {
     public ResponseEntity<?> deleteSlot(@PathVariable Integer id) {
         appointmentSlotService.deleteSlot ( id );
         return ResponseEntity.ok ( "Slot deleted successfully." );
+    }
+
+    @GetMapping("/{garageId}/availability")
+    public ResponseEntity<MonthlyAvailabilityResponse> getMonthlyAvailability(
+            @PathVariable Integer garageId) {
+
+        MonthlyAvailabilityResponse response = appointmentSlotService
+                .getMonthlyAvailability ( garageId );
+        return ResponseEntity.ok ( response );
     }
 }
