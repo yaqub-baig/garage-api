@@ -95,9 +95,7 @@ public class SlotService {
     public AppointmentSlot findAvailableSlotByGarageIdAndTime(Integer garageId, LocalDate date, LocalTime time) {
         return slotRepository
                 .findByGarageIdAndStartTime ( garageId, date, time )
-                .orElseThrow ( () -> new ResourceNotFoundException ( "slot not found" ) );
-
-
+                .orElseThrow ( () -> new ResourceNotFoundException ( "either slot not found or slot is fully booked" ) );
     }
 
 

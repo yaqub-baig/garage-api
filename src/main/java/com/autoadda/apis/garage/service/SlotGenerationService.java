@@ -43,8 +43,8 @@ public class SlotGenerationService {
         LocalDate today = LocalDate.now ( );
         for (int i = 0; i < days; i++) {
             LocalDate targetDate = today.plusDays ( i );
-                if ( garage.getConcurrentAppointmentCapacity ( ) != null )
-                    generateSlotsForGarageAndDate ( garage, targetDate );
+            if ( garage.getConcurrentAppointmentCapacity ( ) != null )
+                generateSlotsForGarageAndDate ( garage, targetDate );
         }
     }
 
