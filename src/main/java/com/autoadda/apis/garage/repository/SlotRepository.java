@@ -41,7 +41,7 @@ public interface SlotRepository extends JpaRepository<AppointmentSlot, Integer> 
 
     List<AppointmentSlot> findByGarageIdAndSlotDate(Integer garageId, LocalDate date);
 
-    @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId AND s.slotDate= :slotDate AND s.startTime = :time")
+    @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId AND s.slotDate= :slotDate AND s.startTime = :time AND s.currentBookings < s.maxBookings")
     Optional<AppointmentSlot> findByGarageIdAndStartTime(@Param("garageId") Integer garageId, @Param("slotDate") LocalDate date, @Param("time") LocalTime time);
     @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId " +
             "AND s.slotDate >= :startDate AND s.slotDate <= :endDate " +
