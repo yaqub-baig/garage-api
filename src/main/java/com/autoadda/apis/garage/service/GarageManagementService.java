@@ -256,6 +256,12 @@ public class GarageManagementService {
         if ( request.getWorkingDays ( ) != null ) {
             existing.setWorkingDays ( request.getWorkingDays ( ).toString ( ) );
         }
+        if ( request.getBreakStartTime ( ) != null ) {
+            existing.setBreakStartTime ( request.getBreakStartTime ( ).toString ( ) );
+        }
+        if ( request.getBreakEndTime ( ) != null ) {
+            existing.setBreakEndTime ( request.getBreakEndTime ( ).toString ( ) );
+        }
 
         if ( request.getGarageBrandName ( ) != null ) {
             existing.setGarageBrandName ( request.getGarageBrandName ( ) );
