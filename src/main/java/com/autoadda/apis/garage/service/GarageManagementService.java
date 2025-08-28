@@ -51,6 +51,13 @@ public class GarageManagementService {
         if ( garageRequest.getGarageBrandName ( ) != null )
             garage.setGarageBrandName ( garageRequest.getGarageBrandName ( ) );
 
+        if(garageRequest.getBreakStartTime ()!=null){
+            garage.setBreakStartTime(garageRequest.getBreakStartTime().toString());
+        }
+        if(garageRequest.getBreakEndTime ()!=null){
+            garage.setBreakEndTime(garageRequest.getBreakEndTime().toString());
+        }
+
         if ( garageRequest.getName ( ) != null )
             garage.setName ( garageRequest.getName ( ) );
 
@@ -113,6 +120,7 @@ public class GarageManagementService {
         if ( garageRequest.getLogoId ( ) != null )
             garage.setGarageLogo ( mediaFileRepository.findById ( garageRequest.getLogoId ( ) )
                     .orElseThrow ( () -> new ResourceNotFoundException ( "garage logo not found" ) ) );
+
 
         if ( garageRequest.getVatCertificateIds ( ) != null && ! garageRequest.getVatCertificateIds ( ).isEmpty ( ) )
             garage.setVatCertificate ( mediaFileRepository.findAllById ( garageRequest.getVatCertificateIds ( ) ) );

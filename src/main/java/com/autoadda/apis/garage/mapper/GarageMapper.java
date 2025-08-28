@@ -39,6 +39,8 @@ public class GarageMapper {
         garageResponse.setTradeLicenseAttachment ( garage.getTradeLicenseAttachment() != null ? garage.getTradeLicenseAttachment(): null );
         garageResponse.setVatCertificate ( garage.getVatCertificate() != null ? garage.getVatCertificate(): null );
         garageResponse.setLocation (garage.getGarageLocation ()!=null?garage.getGarageLocation():null);
+        garageResponse.setBreakStartTime(garage.getBreakStartTime() != null ? garage.getBreakStartTime() : null);
+        garageResponse.setBreakEndTime(garage.getBreakEndTime() != null ? garage.getBreakEndTime() : null);
         return garageResponse;
     }
 
