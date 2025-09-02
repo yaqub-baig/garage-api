@@ -2,9 +2,9 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.exception.GarageNotFoundException;
-import com.autoadda.apis.garage.repository.AppointmentDetailsRepository;
 import com.autoadda.apis.garage.request.AppointmentStatusRequest;
 import com.autoadda.apis.garage.request.CustomerAppointmentRequest;
+import com.autoadda.apis.garage.response.AppointmentDetailResponse;
 import com.autoadda.apis.garage.response.AppointmentResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.service.AppointmentService;
@@ -40,11 +40,12 @@ public class AppointmentController {
     @PostMapping("/{garageId}/book")
     public ResponseEntity<?> bookAppointment(@PathVariable Integer garageId, @RequestParam Integer vehicleId,
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
-                                             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+                                             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
+                                             @RequestParam(required = false) String selectedGarageServiceIds) {
         try {
             LocalDate date = time.toLocalDate ( );
             LocalTime timestamp = time.toLocalTime ( );
-            AppointmentDetails booking = appointmentSlotService.bookSlot ( garageId, vehicleId, date, timestamp,autoAddaId );
+            AppointmentDetails booking = appointmentSlotService.bookSlot ( garageId, vehicleId, date, timestamp, autoAddaId, selectedGarageServiceIds );
             return ResponseEntity.ok ( booking );
         }
         catch ( IllegalStateException e ) {
@@ -62,7 +63,7 @@ public class AppointmentController {
     @PutMapping("/status")
     public ResponseEntity<GenericResponse> updateAppointmentStatus(@RequestBody AppointmentStatusRequest request) {
         AppointmentDetails updated = appointmentService.updateAppointmentStatus ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( updated ));
+        return ResponseEntity.ok ( GenericResponse.success ( updated ) );
     }
 
     @GetMapping("/{appointmentId}")
@@ -76,24 +77,24 @@ public class AppointmentController {
                                                                  @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date) {
 
         // Use the new method that returns detailed slot information
-        List<Map<String, Object>> slots = appointmentSlotService.getAvailableSlotsWithDetails(garageId, date);
+        List<Map<String, Object>> slots = appointmentSlotService.getAvailableSlotsWithDetails ( garageId, date );
 
-        Map<String, Object> res = new HashMap<>();
-        res.put("garageId", garageId);
-        res.put("date", date);
-        res.put("availableSlots", slots);
-        return ResponseEntity.ok(res);
+        Map<String, Object> res = new HashMap<> ( );
+        res.put ( "garageId", garageId );
+        res.put ( "date", date );
+        res.put ( "availableSlots", slots );
+        return ResponseEntity.ok ( res );
     }
 
     @GetMapping("/user/bookings")
-    public ResponseEntity<List<AppointmentDetails>> getUserBookings(@RequestHeader(value = "X-Auto-Adda-Id") String userId) {
+    public ResponseEntity<List<AppointmentDetailResponse>> getUserBookings(@RequestHeader(value = "X-Auto-Adda-Id") String userId) {
         return ResponseEntity.ok ( appointmentSlotService.getBookingsByUser ( userId ) );
     }
 
     @DeleteMapping("/{appointmentId}/cancel")
     public ResponseEntity<?> cancelAppointment(@PathVariable Integer appointmentId, @RequestHeader(value = "X-Auto-Adda-Id") String userId) {
-            appointmentSlotService.cancelBooking ( appointmentId );
-            return ResponseEntity.ok ( "Booking cancelled successfully." );
+        appointmentSlotService.cancelBooking ( appointmentId );
+        return ResponseEntity.ok ( "Booking cancelled successfully." );
     }
 
     @PutMapping("/edit/appointment")

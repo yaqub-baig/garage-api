@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.autoadda.apis.garage.entity.GarageFavorite;
 
 public interface GarageFavoriteRepository extends JpaRepository<GarageFavorite, Integer> {
-	List<GarageFavorite> findByGarageOwnerId(Integer garageOwnerId);
+	List<GarageFavorite> findByVehicleOwnerId(Integer garageOwnerId);
 
-	boolean existsByGarageOwnerIdAndFavoriteGarageId(Integer ownerId, Integer favoriteId);
+	boolean existsByVehicleOwnerIdAndFavoriteGarageId(Integer ownerId, Integer favoriteId);
 }

@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+
 @Entity
 @Data
 public class AppointmentSlot {
@@ -19,7 +21,6 @@ public class AppointmentSlot {
     @JoinColumn(name = "garage_id")
     private Garage garage;
     private Integer currentBookings;
-
     public boolean isAvailable() {
         return currentBookings < maxBookings;
     }
