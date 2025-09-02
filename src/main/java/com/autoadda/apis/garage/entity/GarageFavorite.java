@@ -2,10 +2,7 @@ package com.autoadda.apis.garage.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,9 +20,8 @@ public class GarageFavorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    private Integer garageOwnerId; // The owner adding to favorites
-    private Integer favoriteGarageId; // The garage being added
-
+    private Integer vehicleOwnerId; // The owner adding to favorites
+    @ManyToOne
+    private Garage favoriteGarage; // The garage being added
     private LocalDateTime addedAt;
 }

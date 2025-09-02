@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Request object for creating or updating a GarageSubscription.
@@ -15,12 +16,13 @@ import java.util.List;
 @AllArgsConstructor
 public class GarageSubscriptionRequest {
 
-    private List<Integer> garageIds;
     private String name;
     private String description;
     private Double price;
     private Integer durationMonths;
+    private List<Integer> garageIds;
     private List<Integer> servicesIds;
+    private Map<Integer, Integer> services;
     private String benefits;
     private String brands;
 

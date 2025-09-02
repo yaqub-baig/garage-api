@@ -47,21 +47,21 @@ class FavoriteServiceTest {
 	// --- Tests for addFavoriteGarage ---
 	@Test
 	void addFavoriteGarage_success() {
-		when(garageFavoriteRepository.existsByGarageOwnerIdAndFavoriteGarageId(garageOwnerId, favGarageId))
+		when(garageFavoriteRepository.existsByVehicleOwnerIdAndFavoriteGarageId (garageOwnerId, favGarageId))
 				.thenReturn(false);
 		when(garageFavoriteRepository.save(any(GarageFavorite.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 
 		GarageFavorite result = garagefavoriteService.addFavoriteGarage(garageOwnerId, favGarageId);
 
-		assertEquals(garageOwnerId, result.getGarageOwnerId());
+		assertEquals(garageOwnerId, result.getVehicleOwnerId ());
 		assertEquals(favGarageId, result.getFavoriteGarageId());
 		assertNotNull(result.getAddedAt());
 	}
 
 	@Test
 	void addFavoriteGarage_alreadyExists_throwsException() {
-		when(garageFavoriteRepository.existsByGarageOwnerIdAndFavoriteGarageId(garageOwnerId, favGarageId))
+		when(garageFavoriteRepository.existsByVehicleOwnerIdAndFavoriteGarageId (garageOwnerId, favGarageId))
 				.thenReturn(true);
 
 		assertThrows(RuntimeException.class, () -> garagefavoriteService.addFavoriteGarage(garageOwnerId, favGarageId));
@@ -95,7 +95,7 @@ class FavoriteServiceTest {
 	@Test
 	void getFavoriteGarages_returnsList() {
 		List<GarageFavorite> mockList = List.of(new GarageFavorite(), new GarageFavorite());
-		when(garageFavoriteRepository.findByGarageOwnerId(garageOwnerId)).thenReturn(mockList);
+		when(garageFavoriteRepository.findByVehicleOwnerId (garageOwnerId)).thenReturn(mockList);
 
 		List<GarageFavorite> result = garagefavoriteService.getFavoriteGarages(garageOwnerId);
 
@@ -117,7 +117,7 @@ class FavoriteServiceTest {
 	@Test
 	void removeFavoriteGarage_deletesIfExists() {
 		GarageFavorite fav = new GarageFavorite();
-		fav.setGarageOwnerId(garageOwnerId);
+		fav.setVehicleOwnerId (garageOwnerId);
 		fav.setFavoriteGarageId(favGarageId);
 		when(garageFavoriteRepository.findAll()).thenReturn(List.of(fav));
 

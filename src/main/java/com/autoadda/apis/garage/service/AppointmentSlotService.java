@@ -2,7 +2,9 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
+import com.autoadda.apis.garage.mapper.AppointmentDetailMapper;
 import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.response.AppointmentDetailResponse;
 import com.autoadda.apis.garage.util.DateHelper;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.transaction.Transactional;
@@ -17,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class AppointmentSlotService {
     private final AppointmentService appointmentService;
     private final SlotService slotService;
     private final SlotRepository slotRepository;
+    private final AppointmentDetailMapper appointmentDetailMapper;
 
     /**
      * Retrieves available time slots for a garage on a specific date.
@@ -104,12 +106,13 @@ public class AppointmentSlotService {
     /**
      * Retrieves all available slots for a garage on a specific date.
      *
-     * @param garageId The ID of the garage.
-     * @param date     The date for which to retrieve all slots.
+     * @param garageId                 The ID of the garage.
+     * @param date                     The date for which to retrieve all slots.
+     * @param selectedGarageServiceIds
      * @return A list of LocalTime slots.
      */
     @Transactional
-    public AppointmentDetails bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId) {
+    public AppointmentDetails bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId, String selectedGarageServiceIds) {
 
         Integer userId = Integer.parseInt ( autoAddaId );
 //        Optional<AppointmentDetails> existing = bookingRepo.findLockedSlot ( garageId, date, time );
@@ -126,6 +129,7 @@ public class AppointmentSlotService {
                 .serviceStartTime ( time ).status ( Status.CONFIRMED ).comments ( "Booked via platform" )
                 .vehicleId ( vehicleId )
                 .customerId ( userId )
+                .selectedGarageServiceIds ( selectedGarageServiceIds )
                 .appointmentReferenceId ( appointmentService.generateAppointmentCode ( ) )
                 .slot ( slot )
                 .insert_tms ( DateHelper.dbDate ( ) ).build ( );
@@ -148,9 +152,14 @@ public class AppointmentSlotService {
      * @return A list of AppointmentDetails for the user's bookings.
      */
     @Transactional
-    public List<AppointmentDetails> getBookingsByUser(String userId) {
+    public List<AppointmentDetailResponse> getBookingsByUser(String userId) {
         Integer user = Integer.parseInt ( userId );
-        return bookingRepo.findByCustomerId(user).stream().sorted(Comparator.comparing(AppointmentDetails::getServiceStartTime).reversed()).toList();
+        List<AppointmentDetails> list = bookingRepo.findByCustomerId ( user )
+                .stream ( )
+                .sorted ( Comparator.comparing ( AppointmentDetails::getServiceStartTime )
+                        .reversed ( ) )
+                .toList ( );
+        return list.stream ().map(appointmentDetailMapper::entityToResponse).toList ();
     }
 
     @Transactional

@@ -43,27 +43,29 @@ public class GarageSubscriptionService {
      */
     @Transactional
     public List<GarageSubscription> createPlan(GarageSubscriptionRequest plan) {
-
-        // ✅ Use Optional to handle null safely
-        return Optional.ofNullable ( plan.getGarageIds ( ) )
-                .filter ( ids -> ! ids.isEmpty ( ) )
-                .orElseThrow ( () -> new IllegalArgumentException ( "Garage IDs cannot be null or empty" ) )
-                .stream ( )
-                .map ( garageId -> createSubscriptionForGarage ( plan, garageId ) )
-                .toList ( );
-    }
-
-    private GarageSubscription createSubscriptionForGarage(GarageSubscriptionRequest plan, Integer garageId) {
-        Garage garage = garageRepository.findById ( garageId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found with ID: " + garageId ) );
-
-        // Collect all services first
         List<AvailableService> services = Optional.ofNullable ( plan.getServicesIds ( ) )
                 .orElse ( Collections.emptyList ( ) )
                 .stream ( )
                 .map ( serviceId -> availableServiceManagementService.getServiceById ( serviceId )
                         .orElseThrow ( () -> new ResourceNotFoundException ( "Service not found with ID: " + serviceId ) ) )
                 .toList ( );
+
+
+
+        // ✅ Use Optional to handle null safely
+        return Optional.ofNullable ( plan.getGarageIds ( ) )
+                .filter ( ids -> ! ids.isEmpty ( ) )
+                .orElseThrow ( () -> new IllegalArgumentException ( "Garage IDs cannot be null or empty" ) )
+                .stream ( )
+                .map ( garageId -> createSubscriptionForGarage ( plan, garageId, services ) )
+                .toList ( );
+    }
+
+    private GarageSubscription createSubscriptionForGarage(GarageSubscriptionRequest plan, Integer garageId,List<AvailableService> services ) {
+        Garage garage = garageRepository.findById ( garageId )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found with ID: " + garageId ) );
+
+        // Collect all services first
 
         GarageSubscription newPlan = new GarageSubscription ( );
         newPlan.setName ( plan.getName ( ) );
@@ -74,7 +76,7 @@ public class GarageSubscriptionService {
         newPlan.setBrands ( plan.getBrands ( ) );
         newPlan.setBenefits ( plan.getBenefits ( ) );
         newPlan.setServicesIncluded ( services ); // Set all at once
-
+        newPlan.setServiceQuantity ( plan.getServices () );
         System.out.println ( "About to save subscription with " + services.size ( ) + " services" );
 
         return subscriptionRepository.save ( newPlan );
