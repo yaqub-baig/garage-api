@@ -13,7 +13,7 @@ import com.autoadda.apis.garage.service.VehicleFavoriteService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/favorites")
+@RequestMapping("/favorites")
 @RequiredArgsConstructor
 public class VehicleFavoriteController {
 

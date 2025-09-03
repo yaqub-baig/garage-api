@@ -3,6 +3,7 @@ package com.autoadda.apis.garage.controller;
 import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.entity.VehicleOwnerSubscription;
 import com.autoadda.apis.garage.request.SubscriptionRequest;
+import com.autoadda.apis.garage.response.VehicleOwnerSubscriptionResponse;
 import com.autoadda.apis.garage.service.GarageSubscriptionService;
 import com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService;
 import lombok.RequiredArgsConstructor;
@@ -63,35 +64,35 @@ public class VehicleSubscriptionController {
     }
 
     @GetMapping("/active")
-    public List<VehicleOwnerSubscription> getActiveSubscriptions() {
+    public List<VehicleOwnerSubscriptionResponse> getActiveSubscriptions() {
         return ownerSubscriptionService.getActiveSubscriptions ( );
     }
 
     @GetMapping("/by-date-range/{ownerId}/{startDate}/{endDate}")
-    public List<VehicleOwnerSubscription> getSubscriptionsByDateRange(@PathVariable Integer ownerId,
+    public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByDateRange(@PathVariable Integer ownerId,
                                                                       @PathVariable LocalDate startDate, @PathVariable LocalDate endDate) {
         return ownerSubscriptionService.getSubscriptionsByDateRange ( ownerId, startDate, endDate );
     }
 
     @GetMapping("/by-plan/{planId}")
-    public List<VehicleOwnerSubscription> getSubscriptionsByPlan(@PathVariable Integer planId) {
+    public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByPlan(@PathVariable Integer planId) {
         return ownerSubscriptionService.getSubscriptionsByPlan ( planId );
     }
 
     @GetMapping("/by-owner-and-plan/{ownerId}/{planId}")
-    public List<VehicleOwnerSubscription> getSubscriptionsByOwnerAndPlan(@PathVariable Integer ownerId,
+    public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwnerAndPlan(@PathVariable Integer ownerId,
                                                                          @PathVariable Integer planId) {
         return ownerSubscriptionService.getSubscriptionsByOwnerAndPlan ( ownerId, planId );
     }
 
     @GetMapping("/by-owner-and-status/{ownerId}/{status}")
-    public List<VehicleOwnerSubscription> getSubscriptionsByOwnerAndStatus(@PathVariable Integer ownerId,
+    public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwnerAndStatus(@PathVariable Integer ownerId,
                                                                            @PathVariable String status) {
         return ownerSubscriptionService.getSubscriptionsByOwnerAndStatus ( ownerId, status );
     }
 
     @GetMapping("/by-plan-and-status/{planId}/{status}")
-    public List<VehicleOwnerSubscription> getSubscriptionsByPlanAndStatus(@PathVariable Integer planId,
+    public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByPlanAndStatus(@PathVariable Integer planId,
                                                                           @PathVariable String status) {
         return ownerSubscriptionService.getSubscriptionsByPlanAndStatus ( planId, status );
     }
