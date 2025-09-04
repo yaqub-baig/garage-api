@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.autoadda.apis.garage.request.SubscriptionRequest;
+import com.autoadda.apis.garage.response.VehicleOwnerSubscriptionResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -165,7 +166,7 @@ class VehicleOwnerSubscriptionServiceTest {
 		when(vehicleOwnerSubscriptionRepository.findByStatus(SubscriptionStatus.ACTIVE))
 				.thenReturn(List.of(subscription));
 
-		List<VehicleOwnerSubscription> activeSubscriptions = vehicleOwnerSubscriptionService.getActiveSubscriptions();
+		List<VehicleOwnerSubscriptionResponse> activeSubscriptions = vehicleOwnerSubscriptionService.getActiveSubscriptions();
 		assertEquals(1, activeSubscriptions.size());
 		assertEquals(1001, activeSubscriptions.get(0).getId());
 

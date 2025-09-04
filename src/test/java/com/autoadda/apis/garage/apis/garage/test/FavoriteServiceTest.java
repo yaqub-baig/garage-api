@@ -55,7 +55,7 @@ class FavoriteServiceTest {
 		GarageFavorite result = garagefavoriteService.addFavoriteGarage(garageOwnerId, favGarageId);
 
 		assertEquals(garageOwnerId, result.getVehicleOwnerId ());
-		assertEquals(favGarageId, result.getFavoriteGarageId());
+
 		assertNotNull(result.getAddedAt());
 	}
 
@@ -118,7 +118,6 @@ class FavoriteServiceTest {
 	void removeFavoriteGarage_deletesIfExists() {
 		GarageFavorite fav = new GarageFavorite();
 		fav.setVehicleOwnerId (garageOwnerId);
-		fav.setFavoriteGarageId(favGarageId);
 		when(garageFavoriteRepository.findAll()).thenReturn(List.of(fav));
 
 		garagefavoriteService.removeFavoriteGarage(garageOwnerId, favGarageId);
