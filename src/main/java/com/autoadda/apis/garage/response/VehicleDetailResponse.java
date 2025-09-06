@@ -3,10 +3,17 @@ package com.autoadda.apis.garage.response;
 
 import com.autoadda.apis.garage.util.PolicyTypeEnum;
 import com.autoadda.apis.garage.util.VehicleTypeCategoryEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class VehicleDetailResponse {
     private Integer id;
     private String brand;

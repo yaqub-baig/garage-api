@@ -1,6 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
-import com.autoadda.apis.garage.config.AuthClient;
+import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.VehicleOwnerSubscription;
 import com.autoadda.apis.garage.response.VehicleOwnerSubscriptionResponse;
 import lombok.RequiredArgsConstructor;

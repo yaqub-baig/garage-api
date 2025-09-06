@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
@@ -8,6 +9,9 @@ import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
+import com.autoadda.apis.garage.response.GenericResponse;
+import com.autoadda.apis.garage.response.UserResponse;
+import com.autoadda.apis.garage.util.ERole;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +46,7 @@ public class GarageManagementService {
     private final AvailableServiceRepository availableServiceRepository;
     private final SlotGenerationService slotGenerationService;
     private final GarageMapper garageMapper;
-
+    private final AuthClient authClient;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage ( );
@@ -110,7 +114,7 @@ public class GarageManagementService {
 
     @Transactional
     public GarageResponse createGarage(GarageRequest garageRequest, String autoAddaId) {
-        validateTradingLicenseNumber ( garageRequest.getTradeLicenceNumber ( ) );
+        validateGarageOwnerExists(Integer.parseInt ( autoAddaId ));
         Garage garage = mapToEntity ( garageRequest );
         if ( garageRequest.getGarageLocation ( ) != null ) {
             Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
@@ -144,11 +148,22 @@ public class GarageManagementService {
         handleGarageBreakHours ( save, garageRequest.getWorkingDays ( ), garageRequest.getBreakStartTime ( ), garageRequest.getBreakEndTime ( ) );
         save.setServices ( garageServices );
         Garage saved = garageRepository.save ( save );
+        GenericResponse genericResponse = authClient.updateRole ( saved.getGarageOwner ( ), ERole.GARAGE_OWNER );
+        if ( genericResponse == null ) {
+            throw new ResourceNotFoundException ( "error while updating role" );
+        }
         garageRepository.flush ( );
         workingHoursRepository.flush ( );
         garageBreakTimeRepository.flush ( );
         slotGenerationService.generateSlotsForDays ( saved, 60 );
         return garageMapper.entityToResponse ( saved );
+    }
+
+    private void validateGarageOwnerExists(int id) {
+        UserResponse user = authClient.getUser ( id );
+        if ( user == null ) {
+            throw new ResourceNotFoundException ( "user not found" );
+        }
     }
 
     private void handleGarageBreakHours(Garage save, List<DayOfWeek> workingDays, LocalTime breakStartTime, LocalTime breakEndTime) {

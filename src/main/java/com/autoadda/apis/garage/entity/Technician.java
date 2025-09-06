@@ -34,9 +34,6 @@ public class Technician {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Integer id;
-	
-	@Column(name = "emirates_id")
-	private String emiratesId;
 
 	@Column(name = "first_name")
 	private String firstName;

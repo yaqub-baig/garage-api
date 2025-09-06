@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.response;
 
 import com.autoadda.apis.garage.util.Status;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,8 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class AppointmentDetailResponse {
 
     private Integer id;
@@ -28,4 +30,5 @@ public class AppointmentDetailResponse {
     private Integer vehicleId;
     private AppointmentSlotResponse slot;
     private Integer technicianId;
+    private VehicleDetailResponse vehicle;
 }
