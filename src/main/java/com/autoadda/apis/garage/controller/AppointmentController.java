@@ -56,7 +56,7 @@ public class AppointmentController {
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<GenericResponse> getGarageAppointments(@PathVariable Integer garageId,
                                                                  @RequestParam(required = false) String status) throws GarageNotFoundException {
-        List<AppointmentDetails> appointments = appointmentService.getAppointmentsByGarage ( garageId, status );
+        List<AppointmentDetailResponse> appointments = appointmentService.getAppointmentsByGarage ( garageId, status );
         return ResponseEntity.ok ( GenericResponse.success ( appointments ) );
     }
 

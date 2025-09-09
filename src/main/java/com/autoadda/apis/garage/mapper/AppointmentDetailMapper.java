@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.response.AppointmentDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class AppointmentDetailMapper {
     private final SlotMapper appointmentSlotMapper;
     private final GarageMapper garageMapper;
-
+    private final VehicleClient vehicleClient;
     public AppointmentDetailResponse entityToResponse(AppointmentDetails appointmentDetail) {
         AppointmentDetailResponse appointmentDetailResponse = new AppointmentDetailResponse ( );
         appointmentDetailResponse.setId ( appointmentDetail.getId ( ) );
@@ -26,6 +27,7 @@ public class AppointmentDetailMapper {
         appointmentDetailResponse.setSelectedGarageServiceIds ( appointmentDetail.getSelectedGarageServiceIds ( )  );
         appointmentDetailResponse.setGarageSubscriptionPlanId ( appointmentDetail.getGarageSubscriptionPlanId ( ) );
         appointmentDetailResponse.setVehicleId ( appointmentDetail.getVehicleId ( ) );
+        appointmentDetailResponse.setVehicle(vehicleClient.getVehicleDetailsByIdResponse (appointmentDetail.getVehicleId()));
             return appointmentDetailResponse;
     }
 }

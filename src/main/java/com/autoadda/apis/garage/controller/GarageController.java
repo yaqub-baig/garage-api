@@ -2,9 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
-import com.autoadda.apis.garage.service.AppointmentSlotService;
 import com.autoadda.apis.garage.service.GarageManagementService;
-import com.autoadda.apis.garage.service.MediaFileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +19,9 @@ import java.util.List;
 @RequestMapping("/garages")
 @RequiredArgsConstructor
 public class GarageController {
-    private final AppointmentSlotService bookingService;
+
     private final GarageManagementService garageService;
-    private final MediaFileService mediaFileService;
+
 
     @PostMapping
     public ResponseEntity<GarageResponse> createGarage(
@@ -80,7 +78,7 @@ public class GarageController {
     //search garage based on  city,postal code,available services ,brand, garage name
 
     @GetMapping("/search")
-    public ResponseEntity<List<GarageResponse>> searchGarages(@RequestParam(required = false) String model,@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String zip, @RequestParam(required = false) String garageName, @RequestParam(required = false) List<Integer> availableServiceIds) {
+    public ResponseEntity<List<GarageResponse>> searchGarages(@RequestParam(required = false) String model, @RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String zip, @RequestParam(required = false) String garageName, @RequestParam(required = false) List<Integer> availableServiceIds) {
         return ResponseEntity.ok ( garageService.searchGarages ( brand, city, zip, garageName, availableServiceIds, model ) );
     }
 

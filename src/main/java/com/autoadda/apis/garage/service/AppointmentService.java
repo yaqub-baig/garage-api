@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.autoadda.apis.garage.mapper.AppointmentDetailMapper;
+import com.autoadda.apis.garage.response.AppointmentDetailResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -51,7 +53,7 @@ public class AppointmentService {
 	private final GarageServiceRepository garageServiceRepo;
 	private final JobCardRepository jobCardRepo;
 	private final JobCardService jobCardService;
-
+	private final AppointmentDetailMapper appointmentDetailMapper;
 	private final BusinessValidator validator;
 
 	/**
@@ -235,16 +237,16 @@ public class AppointmentService {
 	 * @throws GarageNotFoundException if the garage does not exist.
 	 */
 	@Transactional(readOnly = true)
-	public List<AppointmentDetails> getAppointmentsByGarage(Integer garageId, String statusStr)
+	public List<AppointmentDetailResponse> getAppointmentsByGarage(Integer garageId, String statusStr)
 			throws GarageNotFoundException {
 		validator.validateAndGetGarage(garageId);
 
 		if (StringUtils.isBlank(statusStr)) {
-			return appointmentRepo.findByGarage_Id(garageId);
+			return appointmentRepo.findByGarage_Id(garageId).stream().map(appointmentDetailMapper::entityToResponse).toList();
 		}
 
 		Status status = Status.valueOf(statusStr.toUpperCase());
-		return appointmentRepo.findByGarage_IdAndStatus(garageId, status);
+		return appointmentRepo.findByGarage_IdAndStatus(garageId, status).stream().map(appointmentDetailMapper::entityToResponse).toList();
 	}
 
 	public String generateAppointmentCode() {
