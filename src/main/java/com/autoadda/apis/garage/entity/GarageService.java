@@ -32,7 +32,6 @@ public class GarageService {
 
 	@ManyToOne
     @JoinColumn(name = "garage_id")
-	@JsonIgnore
     private Garage garage;
 
     @ManyToOne

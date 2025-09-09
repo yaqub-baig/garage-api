@@ -3,7 +3,7 @@ package com.autoadda.apis.garage.controller;
 import com.autoadda.apis.garage.entity.CommunicationPreference;
 import com.autoadda.apis.garage.request.CommunicationPreferenceRequest;
 import com.autoadda.apis.garage.service.CommunicationPreferenceService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

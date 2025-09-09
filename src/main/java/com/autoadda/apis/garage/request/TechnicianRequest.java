@@ -1,48 +1,38 @@
 package com.autoadda.apis.garage.request;
 
-import java.util.List;
-
-import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.Status;
+import lombok.*;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class TechnicianRequest {
 
-	private Integer id;
-	
-	private String emiratesId;
+    private String emiratesId;
 
-	private String firstName;
+    private String firstName;
 
-	private String lastName;
+    private String lastName;
 
-	private String emailId;
+    private String emailId;
 
-	private String mobileNumber;
+    private String mobileNumber;
 
-	private String vatNumber;
+    private String vatNumber;
 
-    private List<String> skillSet;
+    private List<Integer> skillSetIds;
 
-    @Enumerated(EnumType.STRING)
     private Status status;
 
-    private Garage garage;
-    private Integer garageId;    
-	
-	private String profileImg;
-	
+    private Integer garageId;
+
+    private EMPLOYEE_ROLE employeeRole;
+
+    private String profileImg;
+
 }

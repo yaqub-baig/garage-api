@@ -1,17 +1,12 @@
 package com.autoadda.apis.garage.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.autoadda.apis.garage.entity.PickupDropRequest;
 import com.autoadda.apis.garage.service.GarageManagementService;
 import com.autoadda.apis.garage.util.Status;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 
 @RestController

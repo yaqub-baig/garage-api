@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.entity;
 
 import com.autoadda.apis.garage.util.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -116,6 +117,7 @@ public class Garage {
     private List<GarageService> services = new ArrayList<> ( );
 
     @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Technician> technicians = new ArrayList<> ( );
 
     @OneToMany

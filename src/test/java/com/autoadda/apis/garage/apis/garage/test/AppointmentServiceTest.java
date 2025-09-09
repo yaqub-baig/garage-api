@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.autoadda.apis.garage.response.AppointmentDetailResponse;
 import com.autoadda.apis.garage.service.AppointmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -217,7 +218,7 @@ public class AppointmentServiceTest {
 		when(validator.validateAndGetGarage(1)).thenReturn(garage);
 		when(appointmentRepo.findByGarage_IdAndStatus(1, Status.NEW)).thenReturn(List.of(new AppointmentDetails()));
 
-		List<AppointmentDetails> result = appointmentService.getAppointmentsByGarage(1, "NEW");
+		List<AppointmentDetailResponse> result = appointmentService.getAppointmentsByGarage(1, "NEW");
 		assertEquals(1, result.size());
 	}
 
@@ -226,7 +227,7 @@ public class AppointmentServiceTest {
 		when(validator.validateAndGetGarage(1)).thenReturn(garage);
 		when(appointmentRepo.findByGarage_Id(1)).thenReturn(List.of(new AppointmentDetails()));
 
-		List<AppointmentDetails> result = appointmentService.getAppointmentsByGarage(1, " ");
+		List<AppointmentDetailResponse> result = appointmentService.getAppointmentsByGarage(1, " ");
 		assertEquals(1, result.size());
 	}
 }

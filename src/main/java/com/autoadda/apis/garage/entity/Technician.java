@@ -1,25 +1,15 @@
 package com.autoadda.apis.garage.entity;
 
-import java.util.Date;
-import java.util.List;
-
+import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -27,31 +17,41 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class Technician {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-	@Column(name = "first_name")
-	private String firstName;
+    @Column(name = "emirates_id")
+    private String emiratesId;
 
-	@Column(name = "last_name")
-	private String lastName;
+    @Column(name = "auto_adda_id")
+    private Integer autoAddaId;
 
-	@Column(name = "email_id")
-	private String emailId;
+    @Column(name = "first_name")
+    private String firstName;
 
-	@Column(name = "mobile_number")
-	private String mobileNumber;
+    @Column(name = "last_name")
+    private String lastName;
 
-	@Column(name = "vat_number")
-	private String vatNumber;
+    @Column(name = "email_id")
+    private String emailId;
 
-	@ElementCollection
-    private List<String> skillSet;
+    @Column(name = "mobile_number",unique = true)
+    private String mobileNumber;
+
+    @Column(name = "vat_number")
+    private String vatNumber;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "technician_skill_set",
+            joinColumns = @JoinColumn(name = "technician_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_set_id")
+    )
+    private List<AvailableService> skillSet = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -59,10 +59,17 @@ public class Technician {
     @ManyToOne
     @JoinColumn(name = "garage_id")
     private Garage garage;
-	
-	@Column(name = "profile_img")
-	private String profileImg;
-	
-	@Column(name = "insert_tms")
-	private Date insertTms;
+
+    @Column(name = "profile_img")
+    private String profileImg;
+
+    @Enumerated(EnumType.STRING)
+    private EMPLOYEE_ROLE employeeRole;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    private void prePersist() {
+        createdAt = LocalDateTime.now ( );
+    }
 }
