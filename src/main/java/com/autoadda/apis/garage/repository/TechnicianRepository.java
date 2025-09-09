@@ -1,25 +1,27 @@
 package com.autoadda.apis.garage.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.autoadda.apis.garage.entity.Technician;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.autoadda.apis.garage.entity.Technician;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TechnicianRepository extends JpaRepository<Technician, Integer> {
 
-	Optional<Technician> findByEmailId(String email);
+    Optional<Technician> findByEmailId(String email);
 
-	Optional<Technician> findByMobileNumber(String phone);
+    Optional<Technician> findByMobileNumber(String phone);
 
-	List<Technician> findByGarage_Id(Integer garageId);
+    List<Technician> findByGarageId(Integer garageId);
 
-	List<Technician> findBySkillSetContaining(String skill); // if skillSet is stored as a list
+    @Query("SELECT t FROM Technician t JOIN t.skillSet s WHERE s.id = :skillId")
+    List<Technician> findBySkillSetId(@Param("skillId") Integer skillId);
 
-	List<Technician> findByStatus(String status);
+    List<Technician> findByStatus(String status);
 
-	int countByGarageId(Integer id);
+    int countByGarageId(Integer id);
 }
