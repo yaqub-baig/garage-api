@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,8 @@ public class AppointmentSlotService {
     private final SlotService slotService;
     private final SlotRepository slotRepository;
     private final AppointmentDetailMapper appointmentDetailMapper;
+    private final GarageServiceRepository garageServiceRepository;
+    private final AppointmentServiceRepository appointmentServiceRepository;
 
     /**
      * Retrieves available time slots for a garage on a specific date.
@@ -112,11 +115,9 @@ public class AppointmentSlotService {
      * @return A list of LocalTime slots.
      */
     @Transactional
-    public AppointmentDetails bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId, String selectedGarageServiceIds) {
+    public AppointmentDetailResponse bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId, String selectedGarageServiceIds) {
 
         Integer userId = Integer.parseInt ( autoAddaId );
-//        Optional<AppointmentDetails> existing = bookingRepo.findLockedSlot ( garageId, date, time );
-//        log.info ( "existing: {}", existing.toString ( ) );
         AppointmentSlot slot = slotService.findAvailableSlotByGarageIdAndTime ( garageId, date, time );
 
         if ( ! slot.isAvailable ( ) ) {
@@ -134,7 +135,28 @@ public class AppointmentSlotService {
                 .slot ( slot )
                 .insert_tms ( DateHelper.dbDate ( ) ).build ( );
         slotService.incrementSlotBookings ( slot.getId ( ) );
-        return bookingRepo.save ( appointment );
+        AppointmentDetails save = bookingRepo.save ( appointment );
+        generateAppointmentServices(save, selectedGarageServiceIds, garageId);
+        return appointmentDetailMapper.entityToResponse ( save);
+    }
+
+    private void generateAppointmentServices(AppointmentDetails appointment, String selectedGarageServiceIds, Integer garageId) {
+        List<Integer> serviceIds = Arrays.stream ( selectedGarageServiceIds.split ( "," ) )
+                .map ( Integer::parseInt )
+                .toList ( ) ;
+
+        List<GarageService> services = garageServiceRepository.findAllById ( serviceIds );
+
+        List<AppointmentServices> appointmentServices = services.stream ( )
+                .map ( service -> AppointmentServices.builder ( )
+                        .appointmentId ( appointment.getId () )
+                        .service  ( service )
+                        .status ( Status.PENDING )
+                        .build ( ) )
+                        .toList ( ) ;
+
+        appointmentServiceRepository.saveAll ( appointmentServices );
+
     }
 
     @Transactional

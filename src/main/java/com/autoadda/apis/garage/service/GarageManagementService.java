@@ -11,6 +11,7 @@ import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.UserResponse;
+import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.ERole;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
@@ -47,7 +48,7 @@ public class GarageManagementService {
     private final SlotGenerationService slotGenerationService;
     private final GarageMapper garageMapper;
     private final AuthClient authClient;
-
+    private final TechnicianService technicianService;
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage ( );
         log.info ( "------>" + garageRequest.getBreakStartTime ( ).format ( DateTimeFormatter.ofPattern ( "HH:mm" ) ) );
@@ -156,6 +157,7 @@ public class GarageManagementService {
         workingHoursRepository.flush ( );
         garageBreakTimeRepository.flush ( );
         slotGenerationService.generateSlotsForDays ( saved, 60 );
+        onboardTechnician ( saved.getId (),new Technician (),saved.getGarageOwner () );
         return garageMapper.entityToResponse ( saved );
     }
 
@@ -541,18 +543,14 @@ public class GarageManagementService {
 
     @Transactional
     public Technician onboardTechnician(Integer garageId, Technician technician, Integer ownerId)
-            throws AccessDeniedException {
+             {
         Garage garage = garageRepository.findById ( garageId )
                 .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found" ) );
-
-        if ( ! garage.getGarageOwner ( ).equals ( ownerId ) ) {
-            throw new AccessDeniedException ( "Only garage owner can onboard technicians" );
-        }
-
+        technician.setAutoAddaId ( ownerId );
         // You may check for duplicate email, phone etc.
         technician.setStatus ( Status.ACTIVE );
         technician.setGarage ( garage );
-
+        technician.setEmployeeRole ( EMPLOYEE_ROLE.OWNER );
         return technicianRepository.save ( technician );
     }
 

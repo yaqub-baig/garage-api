@@ -45,7 +45,7 @@ public class AppointmentController {
         try {
             LocalDate date = time.toLocalDate ( );
             LocalTime timestamp = time.toLocalTime ( );
-            AppointmentDetails booking = appointmentSlotService.bookSlot ( garageId, vehicleId, date, timestamp, autoAddaId, selectedGarageServiceIds );
+            AppointmentDetailResponse booking = appointmentSlotService.bookSlot ( garageId, vehicleId, date, timestamp, autoAddaId, selectedGarageServiceIds );
             return ResponseEntity.ok ( booking );
         }
         catch ( IllegalStateException e ) {

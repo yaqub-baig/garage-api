@@ -33,9 +33,6 @@ public class Technician {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name")
-    private String lastName;
-
     @Column(name = "email_id")
     private String emailId;
 
@@ -66,10 +63,13 @@ public class Technician {
     @Enumerated(EnumType.STRING)
     private EMPLOYEE_ROLE employeeRole;
 
+    private Boolean isDeleted ;
+
     private LocalDateTime createdAt;
 
     @PrePersist
     private void prePersist() {
         createdAt = LocalDateTime.now ( );
+        isDeleted= false;
     }
 }

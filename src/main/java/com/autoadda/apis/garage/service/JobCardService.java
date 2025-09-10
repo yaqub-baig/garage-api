@@ -3,6 +3,9 @@ package com.autoadda.apis.garage.service;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.autoadda.apis.garage.exception.ResourceNotFoundException;
+import com.autoadda.apis.garage.mapper.JobCardMapper;
+import com.autoadda.apis.garage.response.JobCardResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,38 +41,52 @@ public class JobCardService {
 	private final GarageRepository garageRepo;
 	private final TechnicianRepository technicianRepo;
 	private final AppointmentDetailsRepository appointmentRepo;
-
+	private final JobCardMapper jobCardMapper;
 	private final BusinessValidator validator;
 
 	@Transactional
-	public JobCard assignTechnicianToService(AssignServiceRequest request) {
+	public JobCardResponse assignTechnicianToService(AssignServiceRequest request) {
 		AppointmentDetails appointment = appointmentRepo.findById(request.getAppointmentId())
-				.orElseThrow(() -> new RuntimeException("Appointment not found"));
+														.orElseThrow(() -> new ResourceNotFoundException ("Appointment not found"));
 
 		AppointmentServices service = appointmentServiceRepo.findById(request.getServiceId())
-				.orElseThrow(() -> new RuntimeException("Service not found"));
+															.orElseThrow(() -> new ResourceNotFoundException ("Service not found"));
 
 		Garage garage = garageRepo.findById(request.getGarageId())
-				.orElseThrow(() -> new RuntimeException("Garage not found"));
+								  .orElseThrow(() -> new ResourceNotFoundException ("Garage not found"));
 
 		Technician technician = technicianRepo.findById(request.getTechnicianId())
-				.orElseThrow(() -> new RuntimeException("Technician not found"));
+											  .orElseThrow(() -> new ResourceNotFoundException ("Technician not found"));
 
-		JobCard jobCard = JobCard.builder().appointment(appointment).garage(garage).technician(technician)
-				.service(service).status(Status.ASSIGNED).createdAt(DateHelper.dbDate().atTime(LocalTime.now()))
-				.serviceStartTime(DateHelper.dbTime()).comments(request.getComments()).build();
+		JobCard jobCard = JobCard.builder()
+									.appointment(appointment)
+									.garage(garage)
+									.technician(technician)
+									.service(service)
+									.status(Status.ASSIGNED)
+									.createdAt(DateHelper.dbDate()
+			    					.atTime(LocalTime.now()))
+									.serviceStartTime(DateHelper.dbTime())
+									.comments(request.getComments())
+								 .build();
 
 		jobCardRepo.save(jobCard);
 
-		jobcardStatusActivityRepo.save(JobCardStatusActivity.builder().jobcardId(jobCard.getId())
-				.status(Status.ASSIGNED).memberId(request.getMemberId()).memberType(request.getMemberType())
-				.comments(request.getComments()).insert_tms(DateHelper.dbDate()).build());
+		jobcardStatusActivityRepo.save(JobCardStatusActivity
+									.builder()
+										.jobcardId(jobCard.getId())
+										.status(Status.ASSIGNED)
+										.memberId(request.getMemberId())
+										.memberType(request.getMemberType())
+										.comments(request.getComments())
+										.insert_tms(DateHelper.dbDate())
+									.build());
 
 		service.setStatus(Status.ASSIGNED);
 		service.setTechnician(technician);
 		appointmentServiceRepo.save(service);
 
-		return jobCard;
+		return jobCardMapper.entityToResponse(jobCard);
 	}
 
 	/**

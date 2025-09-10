@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import java.util.List;
 
+import com.autoadda.apis.garage.response.JobCardResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class JobCardController {
 
 	@PostMapping("/assign")
 	public ResponseEntity<GenericResponse> assignTechnician(@RequestBody AssignServiceRequest request) {
-		JobCard jobCard = jobCardService.assignTechnicianToService(request);
+		JobCardResponse jobCard = jobCardService.assignTechnicianToService(request);
 		return ResponseEntity.ok(GenericResponse.success("Technician assigned", jobCard));
 	}
 

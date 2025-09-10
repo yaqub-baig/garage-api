@@ -42,7 +42,7 @@ public class TechnicianService {
      */
     @Transactional
     public List<TechnicianResponse> getTechniciansByGarage(Integer garageId) {
-        return technicianRepository.findByGarageId ( garageId ).stream().map ( technicianMapper::entityToResponse ).toList();
+        return technicianRepository.findByGarageId ( garageId ).stream().filter ( t -> !t.getIsDeleted() ).map ( technicianMapper::entityToResponse ).toList();
     }
 
     Technician mapToEntity(TechnicianRequest technicianRequest) {
@@ -50,7 +50,6 @@ public class TechnicianService {
         return Technician
                 .builder ( )
                 .emailId ( technicianRequest.getEmailId ( ) )
-                .lastName ( technicianRequest.getLastName ( ) )
                 .vatNumber ( technicianRequest.getVatNumber ( ) )
                 .firstName ( technicianRequest.getFirstName ( ) )
                 .emiratesId ( technicianRequest.getEmiratesId ( ) )
@@ -110,7 +109,9 @@ public class TechnicianService {
      */
     @Transactional
     public void deleteTechnician(Integer id) {
-        technicianRepository.deleteById ( id );
+        Technician technician = technicianRepository.findById ( id ).orElseThrow ( () -> new ResourceNotFoundException ( "technician not found" ) );
+        technician.setIsDeleted ( true );
+        technicianRepository.save ( technician );
     }
 
     /**
@@ -133,7 +134,7 @@ public class TechnicianService {
      */
     @Transactional
     public List<TechnicianResponse> findBySkillSet(Integer skillId) {
-        return technicianRepository.findBySkillSetId ( skillId ).stream ( ).map ( technicianMapper::entityToResponse ).toList ( );
+        return technicianRepository.findBySkillSetId ( skillId ).stream ( ).filter ( t -> !t.getIsDeleted() ).map ( technicianMapper::entityToResponse ).toList ( );
     }
 
     /**
@@ -144,7 +145,11 @@ public class TechnicianService {
      */
     @Transactional
     public List<TechnicianResponse> findByStatus(String status) {
-        return technicianRepository.findByStatus ( status ).stream ( ).map ( technicianMapper::entityToResponse ).toList ( );
+        return technicianRepository
+                .findByStatus ( status )
+                .stream ( )
+                .filter(t -> !t.getIsDeleted())
+                .map ( technicianMapper::entityToResponse ).toList ( );
     }
 
     /**
@@ -166,7 +171,7 @@ public class TechnicianService {
      * @return the updated Technician entity
      */
     @Transactional
-    public TechnicianResponse updateTechnician(Integer id, TechnicianRequest technicianRequest) {
+    public TechnicianResponse updateTechnician(Integer id,  TechnicianRequest technicianRequest) {
         Technician technician = technicianRepository.findById ( id )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Technician not found with id: " + id ) );
         Technician garageTechnician = technicianMapper.updateTechnician ( technician, technicianRequest );

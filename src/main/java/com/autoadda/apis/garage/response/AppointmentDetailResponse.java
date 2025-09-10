@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -25,6 +26,7 @@ public class AppointmentDetailResponse {
     private String comments;
     private GarageResponse garage;
     private String selectedGarageServiceIds;
+    private List<AvailableServiceResponse> garageServicesResponse;
     private String garageSubscriptionPlanId;
     private Integer customerId;
     private Integer vehicleId;

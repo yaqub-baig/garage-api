@@ -34,7 +34,6 @@ public class WorkOrderService {
 		workOrder.setJobCards(jobCards);
 		workOrder.setStatus(Status.CREATED);
 		workOrder.setCreatedDate(LocalDateTime.now());
-
 		return workOrderRepository.save(workOrder);
 	}
 
