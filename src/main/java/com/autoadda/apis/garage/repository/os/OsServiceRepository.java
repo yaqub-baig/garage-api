@@ -1,0 +1,36 @@
+package com.autoadda.apis.garage.repository.os;
+
+import java.util.List;
+
+import com.autoadda.apis.garage.entity.os.OsService;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.autoadda.apis.garage.entity.GarageService;
+
+@Repository
+public interface OsServiceRepository extends JpaRepository<OsService, Integer> {
+
+    //find by id
+
+
+
+    List<OsService> findByOtherServiceId(Integer otherServiceId);
+
+    List<OsService> findByIsActive(Boolean isActive);
+
+    List<OsService> findByIsActiveAndOtherServiceId(Boolean isActive, Integer otherServiceId);
+
+    List<OsService> findByAvailableService_NameContainingIgnoreCase(String name);
+
+    List<OsService> findByAvailableService_NameContainingIgnoreCaseAndIsActive(String name, Boolean isActive);
+
+    List<OsService> findByAvailableService_NameContainingIgnoreCaseAndIsActiveAndGarage_Id(String name,
+                                                                                               Boolean isActive, Integer otherServiceId);
+
+    List<OsService> findByAvailableService_Id(Integer serviceId);
+
+    List<OsService> findByGarage_IdAndIsActive(Integer otherServiceId, Boolean isActive);
+
+    List<OsService> findByGarage_IdAndAvailableService_Id(Integer garageId, Integer serviceId);
+}

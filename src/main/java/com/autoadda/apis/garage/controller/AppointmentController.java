@@ -71,7 +71,7 @@ public class AppointmentController {
         AppointmentResponse response = appointmentService.getAppointmentsDetails ( appointmentId );
         return ResponseEntity.ok ( GenericResponse.success ( response ) );
     }
-
+//TODO:33
     @GetMapping("/{garageId}/available-slots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@PathVariable Integer garageId,
                                                                  @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date) {

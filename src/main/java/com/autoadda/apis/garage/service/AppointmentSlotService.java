@@ -49,7 +49,7 @@ public class AppointmentSlotService {
     @Transactional
     public List<AppointmentSlot> getAvailableSlots(Integer garageId, LocalDate date) {
         DayOfWeek day = date.getDayOfWeek ( );
-
+//TODO:1
         // Check if garage is closed (holiday or working hours)
         Optional<GarageHolidayOverride> overrideOpt = holidayRepo.findByGarageIdAndDate ( garageId, date );
 
