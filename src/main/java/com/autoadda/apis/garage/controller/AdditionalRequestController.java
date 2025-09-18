@@ -1,15 +1,12 @@
 package com.autoadda.apis.garage.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.autoadda.apis.garage.entity.JobCardAdditionalRequest;
 import com.autoadda.apis.garage.request.JobCardAdditionalAPIRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.service.AdditionalRequestService;
-
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/additional-requests")
@@ -20,14 +17,14 @@ public class AdditionalRequestController {
 
     @PostMapping
     public ResponseEntity<GenericResponse> createRequest(@RequestBody JobCardAdditionalAPIRequest request) {
-        JobCardAdditionalRequest result = additionalRequestService.createAdditionalRequest(request);
-        return ResponseEntity.ok(GenericResponse.success("Additional request created", result));
+        JobCardAdditionalRequest result = additionalRequestService.createAdditionalRequest ( request );
+        return ResponseEntity.ok ( GenericResponse.success ( "Additional request created", result ) );
     }
 
 
     @PutMapping
     public ResponseEntity<GenericResponse> updateRequest(@RequestBody JobCardAdditionalAPIRequest request) {
-        JobCardAdditionalRequest result = additionalRequestService.updateAdditionalRequest(request);
-        return ResponseEntity.ok(GenericResponse.success("Additional request updated", result));
+        JobCardAdditionalRequest result = additionalRequestService.updateAdditionalRequest ( request );
+        return ResponseEntity.ok ( GenericResponse.success ( "Additional request updated", result ) );
     }
 }

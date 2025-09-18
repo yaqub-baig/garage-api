@@ -3,25 +3,12 @@ package com.autoadda.apis.garage.entity;
 import com.autoadda.apis.garage.util.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
@@ -44,19 +31,19 @@ public class Garage {
     @Column(name = "garage_name")
     private String name;
 
-    @Column(name ="trade_licence_number", unique = true)
+    @Column(name = "trade_licence_number", unique = true)
     private String tradeLicenceNumber;
 
-    @Column(name ="opening_time")
+    @Column(name = "opening_time")
     private String openingTime;
 
-    @Column(name ="closing_time")
+    @Column(name = "closing_time")
     private String closingTime;
 
-    @Column(name ="break_start_time")
+    @Column(name = "break_start_time")
     private String breakStartTime;
 
-    @Column(name ="break_end_time")
+    @Column(name = "break_end_time")
     private String breakEndTime;
 
     @Column(name = "working_days")
@@ -129,16 +116,17 @@ public class Garage {
         isActive = true;
         createdAt = LocalDateTime.now ( );
     }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Garage)) return false;
+        if ( this == o ) return true;
+        if ( ! (o instanceof Garage) ) return false;
         Garage garage = (Garage) o;
-        return Objects.equals(id, garage.id);
+        return Objects.equals ( id, garage.id );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash ( id );
     }
 }

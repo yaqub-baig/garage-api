@@ -1,14 +1,12 @@
 package com.autoadda.apis.garage.clients;
 
+import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.UserResponse;
 import com.autoadda.apis.garage.util.ERole;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "identity-api", url = "http://localhost:8010/api/v1")
 public interface AuthClient {
@@ -21,4 +19,7 @@ public interface AuthClient {
 
     @GetMapping("/auth/byNumber/{phoneNumber}")
     ResponseEntity<UserResponse> getUserDetails(@PathVariable String phoneNumber);
+
+    @PostMapping("/auth/send-sms")
+    public GenericResponse sendSms(@RequestBody SmsRequest request);
 }

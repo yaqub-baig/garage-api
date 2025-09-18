@@ -1,14 +1,9 @@
 package com.autoadda.apis.garage.response;
 
-import java.util.Date;
-
 import com.autoadda.apis.garage.util.Status;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -18,25 +13,25 @@ import lombok.Setter;
 
 public class GarageTechnician {
 
-	private Integer id;
+    private Integer id;
 
-	private String emiratesId;
+    private String emiratesId;
 
-	private String firstName;
+    private String firstName;
 
-	private String lastName;
+    private String lastName;
 
-	private String emailId;
+    private String emailId;
 
-	private String mobileNumber;
+    private String mobileNumber;
 
-	private String vatNumber;
+    private String vatNumber;
 
-	private Status accountStatus;
+    private Status accountStatus;
 
-	private String profileImg;
+    private String profileImg;
 
-	private Integer garageId;
+    private Integer garageId;
 
-	private Date insertTms;
+    private Date insertTms;
 }

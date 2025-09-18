@@ -1,8 +1,8 @@
 package com.autoadda.apis.garage.response;
 
 import com.autoadda.apis.garage.entity.MediaFile;
+import com.autoadda.apis.garage.util.VehicleRecievedStatus;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +21,19 @@ public class VehicleRecievedResponse {
     private LocalDateTime recievedTime;
     private String comment;
     private List<MediaFile> vehicleRecievedImages;
+    private Boolean isMainKeyReceived;
+    private Boolean isSpareKeyReceived;
+    private Boolean isToolKitReceived;
+    private Boolean isJackReceived;
+    private Boolean isWheelSpannerReceived;
+    private Boolean isSpareTyreReceived;
+    private Boolean isFireExtinguisherReceived;
+    private Boolean isFirstAidKitReceived;
+    private Boolean isCentralLockRemoteReceived;
+    private Boolean isRCBookReceived;
+    private Boolean isInsuranceCopyReceived;
+    private Boolean isPUCReceived;
+    private VehicleRecievedStatus status;
 
 
 }

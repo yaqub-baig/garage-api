@@ -1,11 +1,11 @@
 package com.autoadda.apis.garage.response;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Date;
 
 @Getter
 @Setter
@@ -13,28 +13,28 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Customer {
 
-	private Integer id;
+    private Integer id;
 
-	private String customerType;
+    private String customerType;
 
-	private String emiratesId;
+    private String emiratesId;
 
-	private String firstName;
+    private String firstName;
 
-	private String lastName;
+    private String lastName;
 
-	private String emailId;
+    private String emailId;
 
-	private String mobileNumber;
+    private String mobileNumber;
 
-	private String webSite;
+    private String webSite;
 
-	private String companyName;
+    private String companyName;
 
-	private String vatNumber;
+    private String vatNumber;
 
-	private String accountStatus;
+    private String accountStatus;
 
-	private Date insertTms;
+    private Date insertTms;
 
 }

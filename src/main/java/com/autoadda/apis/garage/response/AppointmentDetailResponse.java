@@ -26,7 +26,7 @@ public class AppointmentDetailResponse {
     private String comments;
     private GarageResponse garage;
     private String selectedGarageServiceIds;
-    private List<AvailableServiceResponse> garageServicesResponse;
+    private List<GarageServiceResponse> garageServicesResponse;
     private String garageSubscriptionPlanId;
     private Integer customerId;
     private Integer vehicleId;

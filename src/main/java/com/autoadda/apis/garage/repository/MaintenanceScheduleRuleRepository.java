@@ -1,10 +1,9 @@
 package com.autoadda.apis.garage.repository;
 
-import java.util.Optional;
-
+import com.autoadda.apis.garage.entity.MaintenanceScheduleRule;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.autoadda.apis.garage.entity.MaintenanceScheduleRule;
+import java.util.Optional;
 
 public interface MaintenanceScheduleRuleRepository extends JpaRepository<MaintenanceScheduleRule, Integer> {
     Optional<MaintenanceScheduleRule> findByMakeAndModelAndIsActiveTrue(String make, String model);

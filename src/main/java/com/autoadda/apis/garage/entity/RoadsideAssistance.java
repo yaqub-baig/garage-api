@@ -1,20 +1,10 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDateTime;
-
 import com.autoadda.apis.garage.util.Status;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -24,30 +14,30 @@ import lombok.Setter;
 @Builder
 public class RoadsideAssistance {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	private Integer vehicleOwnerId;
+    private Integer vehicleOwnerId;
 
-	private String vehicleNumber;
+    private String vehicleNumber;
 
-	private String issueDescription;
+    private String issueDescription;
 
-	private String location;
+    private String location;
 
-	private LocalDateTime requestTime;
+    private LocalDateTime requestTime;
 
-	@Enumerated(EnumType.STRING)
-	private Status status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-	private String assignedTechnician;
+    private String assignedTechnician;
 
-	private String contactNumber;
+    private String contactNumber;
 
-	private boolean isTowed;
+    private boolean isTowed;
 
-	private String remarks;
+    private String remarks;
 
-	private LocalDateTime completedAt;
+    private LocalDateTime completedAt;
 }

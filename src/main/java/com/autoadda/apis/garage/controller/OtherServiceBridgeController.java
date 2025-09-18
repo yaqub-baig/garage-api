@@ -1,7 +1,6 @@
 package com.autoadda.apis.garage.controller;
 
 
-
 import com.autoadda.apis.garage.entity.OtherServiceBridge;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.service.OtherServiceBridgeManagementService;
@@ -21,33 +20,33 @@ public class OtherServiceBridgeController {
 
     @PostMapping
     public ResponseEntity<OtherServiceBridge> create(@RequestBody GarageServiceRequest garageService) {
-        return ResponseEntity.ok( otherServiceBridgeManagementService.createOtherServiceBridge(garageService));
+        return ResponseEntity.ok ( otherServiceBridgeManagementService.createOtherServiceBridge ( garageService ) );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<OtherServiceBridge>> getById(@PathVariable Integer id) {
-        return ResponseEntity.ok( otherServiceBridgeManagementService.getOtherServiceBridgeById(id));
+        return ResponseEntity.ok ( otherServiceBridgeManagementService.getOtherServiceBridgeById ( id ) );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<OtherServiceBridge> update(@PathVariable Integer id, @RequestBody OtherServiceBridge updated) {
-        return ResponseEntity.ok( otherServiceBridgeManagementService.updateOtherServiceBridge(id, updated));
+        return ResponseEntity.ok ( otherServiceBridgeManagementService.updateOtherServiceBridge ( id, updated ) );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        otherServiceBridgeManagementService.deleteOtherServiceBridge(id);
-        return ResponseEntity.noContent().build();
+        otherServiceBridgeManagementService.deleteOtherServiceBridge ( id );
+        return ResponseEntity.noContent ( ).build ( );
     }
 
     @GetMapping
     public ResponseEntity<List<OtherServiceBridge>> getAll() {
-        return ResponseEntity.ok( otherServiceBridgeManagementService.getAllOtherServiceBridges());
+        return ResponseEntity.ok ( otherServiceBridgeManagementService.getAllOtherServiceBridges ( ) );
     }
 
     @GetMapping("/other-service/{garageId}")
     public ResponseEntity<List<OtherServiceBridge>> getByGarage(@PathVariable Integer garageId) {
-        return ResponseEntity.ok( otherServiceBridgeManagementService.getByOtherServiceId(garageId));
+        return ResponseEntity.ok ( otherServiceBridgeManagementService.getByOtherServiceId ( garageId ) );
     }
 }
 

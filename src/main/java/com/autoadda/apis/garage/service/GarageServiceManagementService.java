@@ -2,10 +2,12 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
+import com.autoadda.apis.garage.mapper.GarageServiceMapper;
 import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.GarageServiceRepository;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import com.autoadda.apis.garage.response.GarageServiceResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,12 +21,15 @@ public class GarageServiceManagementService {
     private final GarageRepository garageRepository;
     private final AvailableServiceRepository availableServiceRepository;
     private final GarageServiceRepository garageServiceRepository;
+    private final GarageServiceMapper garageServiceMapper;
 
     private GarageService mapToEntity(GarageServiceRequest service) {
         GarageService garageService = new GarageService ( );
         garageService.setIsActive ( service.isActive ( ) );
         garageService.setGarage ( garageRepository.findById ( service.getGarageId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
         garageService.setAvailableService ( availableServiceRepository.findById ( service.getServiceId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) ) );
+        garageService.setLabourPrice ( garageService.getAvailableService ( ).getLaborPrice ( ) );
+        garageService.setPrice ( garageService.getPrice ( ) );
         return garageService;
     }
 
@@ -75,6 +80,8 @@ public class GarageServiceManagementService {
             existing.setIsActive ( updated.getIsActive ( ) );
             existing.setAvailableService ( updated.getAvailableService ( ) );
             existing.setGarage ( updated.getGarage ( ) );
+            existing.setLabourPrice ( updated.getLabourPrice ( ) );
+            existing.setPrice ( updated.getPrice ( ) );
             return garageServiceRepository.save ( existing );
         } ).orElseThrow ( () -> new RuntimeException ( "Garage service not found with ID: " + id ) );
     }
@@ -97,8 +104,8 @@ public class GarageServiceManagementService {
      * ID.
      */
     @Transactional
-    public List<GarageService> getByGarageId(Integer garageId) {
-        return garageServiceRepository.findByGarage_Id ( garageId );
+    public List<GarageServiceResponse> getByGarageId(Integer garageId) {
+        return garageServiceRepository.findByGarage_Id ( garageId ).stream ( ).map ( garageServiceMapper::entityToResponse ).toList ( );
     }
 
     /**

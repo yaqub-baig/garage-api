@@ -1,12 +1,8 @@
 package com.autoadda.apis.garage.request;
 
-import java.time.LocalDate;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,15 +11,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class InspectionReportRequest {
 
-	private Integer id;
+    private Integer id;
 
-	private LocalDate inspectionDate;
+    private LocalDate inspectionDate;
 
-	private String inspectorName;
+    private String inspectorName;
 
-	private String remarks;
+    private String remarks;
 
-	private Boolean passed;
+    private Boolean passed;
 
-	private VehicleSaleRequest vehicleSale;
+    private VehicleSaleRequest vehicleSale;
 }

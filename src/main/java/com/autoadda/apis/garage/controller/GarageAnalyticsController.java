@@ -1,41 +1,40 @@
 package com.autoadda.apis.garage.controller;
 
-import java.time.LocalDateTime;
-
+import com.autoadda.apis.garage.request.RevenueSummaryDTO;
+import com.autoadda.apis.garage.service.GarageAnalyticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.autoadda.apis.garage.request.RevenueSummaryDTO;
-import com.autoadda.apis.garage.service.GarageAnalyticsService;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/garage-analytics")
 public class GarageAnalyticsController {
 
-	private final GarageAnalyticsService analyticsService;
+    private final GarageAnalyticsService analyticsService;
 
-	public GarageAnalyticsController(GarageAnalyticsService analyticsService) {
-		this.analyticsService = analyticsService;
-	}
+    public GarageAnalyticsController(GarageAnalyticsService analyticsService) {
+        this.analyticsService = analyticsService;
+    }
 
 //	@GetMapping("/{garageId}/today")
 //	public ResponseEntity<GarageAnalyticsDTO> getTodayStats(@PathVariable Integer garageId) {
 //		return ResponseEntity.ok(analyticsService.getTodayAnalytics(garageId));
 //	}
 
-	@GetMapping("/summary/weekly")
-	public ResponseEntity<RevenueSummaryDTO> getWeeklySummary() {
-		return ResponseEntity.ok(analyticsService.getWeeklySummary());
-	}
+    @GetMapping("/summary/weekly")
+    public ResponseEntity<RevenueSummaryDTO> getWeeklySummary() {
+        return ResponseEntity.ok ( analyticsService.getWeeklySummary ( ) );
+    }
 
-	@GetMapping("/summary/monthly")
-	public ResponseEntity<RevenueSummaryDTO> getMonthlySummary() {
-		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime monthAgo = now.minusMonths(1);
-		return ResponseEntity.ok(analyticsService.getWeeklySummary());
-	}
+    @GetMapping("/summary/monthly")
+    public ResponseEntity<RevenueSummaryDTO> getMonthlySummary() {
+        LocalDateTime now = LocalDateTime.now ( );
+        LocalDateTime monthAgo = now.minusMonths ( 1 );
+        return ResponseEntity.ok ( analyticsService.getWeeklySummary ( ) );
+    }
 
 //	@GetMapping("/technician")
 //	public ResponseEntity<List<TechnicianSummaryDTO>> getTechnicianBreakdown(

@@ -13,15 +13,15 @@ public class GarageSubscriptionMapper {
 
     public GarageSubscriptionResponse toResponse(GarageSubscription garageSubscription) {
         GarageSubscriptionResponse garageSubscriptionResponse = new GarageSubscriptionResponse ( );
-        garageSubscriptionResponse.setId(garageSubscription.getId());
-        garageSubscriptionResponse.setName(garageSubscription.getName());
-        garageSubscriptionResponse.setDescription(garageSubscription.getDescription());
-        garageSubscriptionResponse.setPrice(garageSubscription.getPrice());
-        garageSubscriptionResponse.setDurationMonths(garageSubscription.getDurationMonths());
-        garageSubscriptionResponse.setBenefits(garageSubscription.getBenefits());
-        garageSubscriptionResponse.setBrands(garageSubscription.getBrands());
-        garageSubscriptionResponse.setServiceQuantity(garageSubscription.getServiceQuantity());
-        garageSubscriptionResponse.setServices(garageSubscription.getServicesIncluded().stream ().map(availableServiceMapper::toResponse).toList());
+        garageSubscriptionResponse.setId ( garageSubscription.getId ( ) );
+        garageSubscriptionResponse.setName ( garageSubscription.getName ( ) );
+        garageSubscriptionResponse.setDescription ( garageSubscription.getDescription ( ) );
+        garageSubscriptionResponse.setPrice ( garageSubscription.getPrice ( ) );
+        garageSubscriptionResponse.setDurationMonths ( garageSubscription.getDurationMonths ( ) );
+        garageSubscriptionResponse.setBenefits ( garageSubscription.getBenefits ( ) );
+        garageSubscriptionResponse.setBrands ( garageSubscription.getBrands ( ) );
+        garageSubscriptionResponse.setServiceQuantity ( garageSubscription.getServiceQuantity ( ) );
+        garageSubscriptionResponse.setServices ( garageSubscription.getServicesIncluded ( ).stream ( ).map ( availableServiceMapper::toResponse ).toList ( ) );
         return garageSubscriptionResponse;
     }
 }

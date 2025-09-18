@@ -70,5 +70,13 @@ public class TechnicianController {
         return new ResponseEntity<> ( technicianService.updateTechnician ( id, request ), HttpStatus.OK );
 
     }
+
+    @GetMapping("/autoadda-id/{autoAddaId}")
+    public ResponseEntity<TechnicianResponse> findByAutoAddaId(@PathVariable Integer autoAddaId) {
+        return technicianService.findByAutoAddaId ( autoAddaId )
+                .map ( ResponseEntity::ok )
+                .orElse ( ResponseEntity.notFound ( ).build ( ) );
+    }
+
     // Additional endpoints can be added as needed
 }

@@ -1,11 +1,7 @@
 package com.autoadda.apis.garage.entity;
 
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
@@ -15,8 +11,8 @@ import lombok.Setter;
 @Builder
 public class CompanyOwner extends VehicleOwner {
 
-	private String companyName;
-	private String tradeLicenseNumber;
+    private String companyName;
+    private String tradeLicenseNumber;
 
-	private String contactPerson;
+    private String contactPerson;
 }

@@ -1,10 +1,6 @@
 package com.autoadda.apis.garage.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -14,10 +10,10 @@ import lombok.Setter;
 
 public class AvailableServiceResponse {
 
-	private Integer id;
-	private String name;
-	private String description;
-	private Boolean isActive;
-	private Double price;
-	private Double laborPrice;
+    private Integer id;
+    private String name;
+    private String description;
+    private Boolean isActive;
+    private Double price;
+    private Double laborPrice;
 }

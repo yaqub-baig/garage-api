@@ -1,12 +1,7 @@
 package com.autoadda.apis.garage.request;
 
-import com.autoadda.apis.garage.util.Status;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.autoadda.apis.garage.util.JobCardStatus;
+import lombok.*;
 
 @Builder
 @NoArgsConstructor
@@ -14,9 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JobCardStatusRequest {
-	private Integer jobcardId;
-	private Status status;
-	private Integer memberId;
-	private String memberType;
-	private String comments;
+    private Integer jobcardId;
+    private JobCardStatus status;
+    private Integer memberId;
+    private String memberType;
+    private String comments;
 }

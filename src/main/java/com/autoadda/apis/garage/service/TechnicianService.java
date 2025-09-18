@@ -3,7 +3,6 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.AvailableService;
 import com.autoadda.apis.garage.entity.Garage;
-import com.autoadda.apis.garage.entity.GarageTechnician;
 import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.TechnicianMapper;
@@ -11,7 +10,6 @@ import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.request.TechnicianRequest;
-import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.TechnicianResponse;
 import com.autoadda.apis.garage.response.UserResponse;
 import com.autoadda.apis.garage.util.ERole;
@@ -42,7 +40,7 @@ public class TechnicianService {
      */
     @Transactional
     public List<TechnicianResponse> getTechniciansByGarage(Integer garageId) {
-        return technicianRepository.findByGarageId ( garageId ).stream().filter ( t -> !t.getIsDeleted() ).map ( technicianMapper::entityToResponse ).toList();
+        return technicianRepository.findByGarageId ( garageId ).stream ( ).filter ( t -> ! t.getIsDeleted ( ) ).map ( technicianMapper::entityToResponse ).toList ( );
     }
 
     Technician mapToEntity(TechnicianRequest technicianRequest) {
@@ -67,28 +65,38 @@ public class TechnicianService {
      */
     @Transactional
     public TechnicianResponse onboardTechnician(TechnicianRequest technician) {
+        // Check if technician with the same mobile number already exists
 
         Garage garage = garageRepo.findById ( technician.getGarageId ( ) )
 
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) );
 
         Technician garageTechnician = mapToEntity ( technician );
-
+        Optional<Technician> existingTechnician = technicianRepository.findByMobileNumber ( technician.getMobileNumber ( ) );
+        if ( existingTechnician.isPresent ( ) && ! existingTechnician.get ( ).getIsDeleted ( ) ) {
+            throw new IllegalStateException ( "Technician with this phone number already exists" );
+        }
+        if ( existingTechnician.isPresent ( ) && existingTechnician.get ( ).getIsDeleted ( ) ) {
+            existingTechnician.get ( ).setIsDeleted ( false );
+            garageTechnician = existingTechnician.get ( );
+        }
+        garageTechnician.setFirstName ( technician.getFirstName ( ) );
+        garageTechnician.setEmailId ( technician.getEmailId ( ) );
         garageTechnician.setGarage ( garage );
-
         garageTechnician.setSkillSet ( availableServiceRepository.findAllById ( technician.getSkillSetIds ( ) ) );
 
         ResponseEntity<UserResponse> userDetails = authClient.getUserDetails ( garageTechnician.getMobileNumber ( ) );
-        if(userDetails==null || !userDetails.getStatusCode ().is2xxSuccessful ()){
+        if ( userDetails == null || ! userDetails.getStatusCode ( ).is2xxSuccessful ( ) || userDetails.getBody ( ) == null ) {
             log.error ( "User not found in auth service with phone number: {}", garageTechnician.getMobileNumber ( ) );
             throw new ResourceNotFoundException ( "User not found in auth service with phone number: " + garageTechnician.getMobileNumber ( ) );
         }
-
-        garageTechnician.setAutoAddaId ( userDetails.getBody ().getId ( ) );
-
+        if ( garage.getGarageOwner ( ).equals ( userDetails.getBody ( ).getId ( ) ) ) {
+            throw new ResourceNotFoundException ( "Garage owner cannot be added as technician" );
+        }
+        garageTechnician.setAutoAddaId ( userDetails.getBody ( ).getId ( ) );
         authClient.updateRole ( garageTechnician.getAutoAddaId ( ), ERole.GARAGE_TECH );
 
-        return technicianMapper.entityToResponse ( technicianRepository.saveAndFlush ( garageTechnician ));
+        return technicianMapper.entityToResponse ( technicianRepository.saveAndFlush ( garageTechnician ) );
     }
 
     /**
@@ -134,7 +142,7 @@ public class TechnicianService {
      */
     @Transactional
     public List<TechnicianResponse> findBySkillSet(Integer skillId) {
-        return technicianRepository.findBySkillSetId ( skillId ).stream ( ).filter ( t -> !t.getIsDeleted() ).map ( technicianMapper::entityToResponse ).toList ( );
+        return technicianRepository.findBySkillSetId ( skillId ).stream ( ).filter ( t -> ! t.getIsDeleted ( ) ).map ( technicianMapper::entityToResponse ).toList ( );
     }
 
     /**
@@ -148,7 +156,7 @@ public class TechnicianService {
         return technicianRepository
                 .findByStatus ( status )
                 .stream ( )
-                .filter(t -> !t.getIsDeleted())
+                .filter ( t -> ! t.getIsDeleted ( ) )
                 .map ( technicianMapper::entityToResponse ).toList ( );
     }
 
@@ -171,16 +179,16 @@ public class TechnicianService {
      * @return the updated Technician entity
      */
     @Transactional
-    public TechnicianResponse updateTechnician(Integer id,  TechnicianRequest technicianRequest) {
+    public TechnicianResponse updateTechnician(Integer id, TechnicianRequest technicianRequest) {
         Technician technician = technicianRepository.findById ( id )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Technician not found with id: " + id ) );
         Technician garageTechnician = technicianMapper.updateTechnician ( technician, technicianRequest );
         if ( technicianRequest.getSkillSetIds ( ) != null && ! technicianRequest.getSkillSetIds ( ).isEmpty ( ) ) {
-            log.info ( "Updating 1 skill set for technician id {}: {}", id, garageTechnician.getSkillSet ( ).stream ().map( AvailableService::getId ).toList () );
+            log.info ( "Updating 1 skill set for technician id {}: {}", id, garageTechnician.getSkillSet ( ).stream ( ).map ( AvailableService::getId ).toList ( ) );
             garageTechnician.getSkillSet ( ).clear ( );
-            log.info ( "Updating 2 skill set for technician id {}: {}", id, garageTechnician.getSkillSet ( ).stream ().map( AvailableService::getId ).toList () );
+            log.info ( "Updating 2 skill set for technician id {}: {}", id, garageTechnician.getSkillSet ( ).stream ( ).map ( AvailableService::getId ).toList ( ) );
             garageTechnician.getSkillSet ( ).addAll ( availableServiceRepository.findAllById ( technicianRequest.getSkillSetIds ( ) ) );
-            log.info ( "Updating 3 skill set for technician id {}: {}", id, garageTechnician.getSkillSet ( ).stream ().map( AvailableService::getId ).toList () );
+            log.info ( "Updating 3 skill set for technician id {}: {}", id, garageTechnician.getSkillSet ( ).stream ( ).map ( AvailableService::getId ).toList ( ) );
         }
         return technicianMapper.entityToResponse ( technicianRepository.save ( garageTechnician ) );
     }
@@ -206,5 +214,10 @@ public class TechnicianService {
     public Technician getTechnicianById(Integer id) {
         return technicianRepository.findById ( id )
                 .orElseThrow ( () -> new RuntimeException ( "Technician not found with id: " + id ) );
+    }
+
+    public Optional<TechnicianResponse> findByAutoAddaId(Integer autoAddaId) {
+        return technicianRepository.findByAutoAddaId ( autoAddaId )
+                .map ( technicianMapper::entityToResponse );
     }
 }

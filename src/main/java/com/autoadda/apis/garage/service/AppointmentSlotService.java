@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -136,24 +135,26 @@ public class AppointmentSlotService {
                 .insert_tms ( DateHelper.dbDate ( ) ).build ( );
         slotService.incrementSlotBookings ( slot.getId ( ) );
         AppointmentDetails save = bookingRepo.save ( appointment );
-        generateAppointmentServices(save, selectedGarageServiceIds, garageId);
-        return appointmentDetailMapper.entityToResponse ( save);
+        generateAppointmentServices ( save, selectedGarageServiceIds, garageId );
+        return appointmentDetailMapper.entityToResponse ( save );
     }
 
     private void generateAppointmentServices(AppointmentDetails appointment, String selectedGarageServiceIds, Integer garageId) {
         List<Integer> serviceIds = Arrays.stream ( selectedGarageServiceIds.split ( "," ) )
                 .map ( Integer::parseInt )
-                .toList ( ) ;
+                .toList ( );
 
         List<GarageService> services = garageServiceRepository.findAllById ( serviceIds );
 
         List<AppointmentServices> appointmentServices = services.stream ( )
                 .map ( service -> AppointmentServices.builder ( )
-                        .appointmentId ( appointment.getId () )
-                        .service  ( service )
+                        .appointmentId ( appointment.getId ( ) )
+                        .service ( service )
+                        .price ( service.getPrice ( ) )
+                        .labourPrice ( service.getLabourPrice ( ) )
                         .status ( Status.PENDING )
                         .build ( ) )
-                        .toList ( ) ;
+                .toList ( );
 
         appointmentServiceRepository.saveAll ( appointmentServices );
 
@@ -181,11 +182,11 @@ public class AppointmentSlotService {
                 .sorted ( Comparator.comparing ( AppointmentDetails::getServiceStartTime )
                         .reversed ( ) )
                 .toList ( );
-        return list.stream ().map(appointmentDetailMapper::entityToResponse).toList ();
+        return list.stream ( ).map ( appointmentDetailMapper::entityToResponse ).toList ( );
     }
 
     @Transactional
-    public ResponseEntity<AppointmentDetails> editBooking(Integer garageId, Integer vehicleId, Integer appointmentId, LocalDateTime time, String autoAddaId) {
+    public ResponseEntity<AppointmentDetailResponse> editBooking(Integer garageId, Integer vehicleId, Integer appointmentId, LocalDateTime time, String autoAddaId, Status status) {
         AppointmentDetails appointmentDetails = bookingRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException ( "No such booking found to edit." ) );
         if ( garageId != null && time != null ) {
             LocalDate date = time.toLocalDate ( );
@@ -201,6 +202,11 @@ public class AppointmentSlotService {
             appointmentDetails.setGarage ( garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
 
         }
+
+        if ( status != null ) {
+            appointmentDetails.setStatus ( status );
+        }
+
         if ( vehicleId != null ) {
             appointmentDetails.setVehicleId ( vehicleId );
         }
@@ -208,7 +214,8 @@ public class AppointmentSlotService {
             appointmentDetails.setServiceStartTime ( time.toLocalTime ( ) );
             appointmentDetails.setScheduleDate ( time.toLocalDate ( ) );
         }
-        AppointmentDetails save = bookingRepo.save ( appointmentDetails );
+        AppointmentDetailResponse save = appointmentDetailMapper.entityToResponse ( bookingRepo.save ( appointmentDetails ) );
+
         return new ResponseEntity<> ( save, HttpStatus.OK );
 
     }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceInvoice {
-	private String service;
-	private Double amount;
-	private String comments;
+    private String service;
+    private Double amount;
+    private String comments;
 }

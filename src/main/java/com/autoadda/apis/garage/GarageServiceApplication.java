@@ -9,10 +9,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableFeignClients
 @EnableDiscoveryClient
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableScheduling
 public class GarageServiceApplication {
-	public static void main(String[] args) {
-		SpringApplication.run( GarageServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run ( GarageServiceApplication.class, args );
+    }
 }

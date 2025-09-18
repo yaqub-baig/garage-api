@@ -1,26 +1,25 @@
 package com.autoadda.apis.garage.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.autoadda.apis.garage.entity.AvailableService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.autoadda.apis.garage.entity.AvailableService;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AvailableServiceRepository extends JpaRepository<AvailableService, Integer> {
 
-	Optional<AvailableService> findById(Integer id);
+    Optional<AvailableService> findById(Integer id);
 
-	List<AvailableService> findByNameContainingIgnoreCase(String name);
+    List<AvailableService> findByNameContainingIgnoreCase(String name);
 
-	List<AvailableService> findByDescriptionContainingIgnoreCase(String description);
+    List<AvailableService> findByDescriptionContainingIgnoreCase(String description);
 
-	List<AvailableService> findByPriceBetween(Double minPrice, Double maxPrice);
+    List<AvailableService> findByPriceBetween(Double minPrice, Double maxPrice);
 
-	List<AvailableService> findByLaborPriceBetween(Double minLaborPrice, Double maxLaborPrice);
+    List<AvailableService> findByLaborPriceBetween(Double minLaborPrice, Double maxLaborPrice);
 
-	List<AvailableService> findByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(String name,
-			String description);
+    List<AvailableService> findByNameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(String name,
+                                                                                            String description);
 }

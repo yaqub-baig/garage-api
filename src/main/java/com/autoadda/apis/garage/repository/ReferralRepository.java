@@ -1,11 +1,10 @@
 package com.autoadda.apis.garage.repository;
 
-import java.util.Optional;
-
+import com.autoadda.apis.garage.entity.Referral;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.autoadda.apis.garage.entity.Referral;
+import java.util.Optional;
 
 public interface ReferralRepository extends JpaRepository<Referral, Integer> {
-	Optional<Referral> findByReferralCode(String code);
+    Optional<Referral> findByReferralCode(String code);
 }

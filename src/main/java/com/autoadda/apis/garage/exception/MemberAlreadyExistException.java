@@ -5,18 +5,18 @@ package com.autoadda.apis.garage.exception;
  */
 public class MemberAlreadyExistException extends RuntimeException {
 
-	private String message;
+    private String message;
 
-	public MemberAlreadyExistException() {
-		super();
-	}
+    public MemberAlreadyExistException() {
+        super ( );
+    }
 
-	public MemberAlreadyExistException(String message) {
-		super(message);
-		this.message = message;
-	}
+    public MemberAlreadyExistException(String message) {
+        super ( message );
+        this.message = message;
+    }
 
-	public MemberAlreadyExistException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public MemberAlreadyExistException(String message, Throwable cause) {
+        super ( message, cause );
+    }
 }

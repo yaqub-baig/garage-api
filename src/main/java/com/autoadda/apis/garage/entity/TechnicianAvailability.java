@@ -1,23 +1,11 @@
 package com.autoadda.apis.garage.entity;
 
+import com.autoadda.apis.garage.util.Status;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import com.autoadda.apis.garage.util.Status;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Setter
@@ -27,24 +15,24 @@ import lombok.Setter;
 @Builder
 public class TechnicianAvailability {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	private LocalDate date;
+    private LocalDate date;
 
-	private LocalTime startTime;
-	private LocalTime endTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
-	private Double availableHours;
+    private Double availableHours;
 
-	@Enumerated(EnumType.STRING)
-	private Status status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-	@ManyToOne
-	@JoinColumn(name = "technician_id")
-	private Technician technician;
+    @ManyToOne
+    @JoinColumn(name = "technician_id")
+    private Technician technician;
 
 
-	// Getters and setters
+    // Getters and setters
 }

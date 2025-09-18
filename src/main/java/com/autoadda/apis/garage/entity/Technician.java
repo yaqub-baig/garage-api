@@ -2,14 +2,12 @@ package com.autoadda.apis.garage.entity;
 
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.Status;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -36,7 +34,7 @@ public class Technician {
     @Column(name = "email_id")
     private String emailId;
 
-    @Column(name = "mobile_number",unique = true)
+    @Column(name = "mobile_number", unique = true)
     private String mobileNumber;
 
     @Column(name = "vat_number")
@@ -48,7 +46,7 @@ public class Technician {
             joinColumns = @JoinColumn(name = "technician_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_set_id")
     )
-    private List<AvailableService> skillSet = new ArrayList<>();
+    private List<AvailableService> skillSet = new ArrayList<> ( );
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -63,13 +61,13 @@ public class Technician {
     @Enumerated(EnumType.STRING)
     private EMPLOYEE_ROLE employeeRole;
 
-    private Boolean isDeleted ;
+    private Boolean isDeleted;
 
     private LocalDateTime createdAt;
 
     @PrePersist
     private void prePersist() {
         createdAt = LocalDateTime.now ( );
-        isDeleted= false;
+        isDeleted = false;
     }
 }
