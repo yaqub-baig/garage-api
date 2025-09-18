@@ -31,4 +31,13 @@ public class GenericResponse {
                 .body ( body )
                 .build ( );
     }
+
+    public static GenericResponse failed(String s, Object o) {
+        return GenericResponse.builder ( )
+                .status ( "success" )
+                .code ( "200" )
+                .message ( s )
+                .body ( o )
+                .build ( );
+    }
 }

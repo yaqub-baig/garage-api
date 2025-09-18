@@ -76,4 +76,10 @@ public class InvoiceController {
         Invoice invoice = invoiceService.updateInvoicePaymentStatus(invoiceId, paymentStatus);
         return ResponseEntity.ok(GenericResponse.success("Invoice payment status updated", invoice));
     }
+
+    @PostMapping("/{invoiceId}/send-to-customer")
+    public ResponseEntity<GenericResponse> sendInvoiceToCustomer(@PathVariable Integer invoiceId) {
+        GenericResponse smsResponse = invoiceService.sendInvoiceToCustomer(invoiceId);
+        return ResponseEntity.ok(smsResponse);
+    }
 }

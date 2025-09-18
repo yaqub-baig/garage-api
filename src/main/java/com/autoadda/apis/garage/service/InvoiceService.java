@@ -1,5 +1,7 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.clients.AuthClient;
+import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.mapper.AppointmentInvoiceMapper;
 import com.autoadda.apis.garage.mapper.InvoiceLineItemMapper;
@@ -9,10 +11,14 @@ import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
 import com.autoadda.apis.garage.request.AppointmentPayRequest;
 import com.autoadda.apis.garage.request.InvoiceRequest;
+import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.response.AppointmentInvoiceResponse;
+import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.InvoiceResponse;
+import com.autoadda.apis.garage.response.VehicleDetailResponse;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.Status;
+import com.autoadda.apis.garage.util.WorkOrderStatus;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +43,8 @@ public class InvoiceService {
     private final InvoiceLineItemMapper lineItemMapper;
     private final InvoiceResponseMapper invoiceResponseMapper;
     private final InvoiceLineItemGeneratorService lineItemGenerator;
+    private final AuthClient authClient;
+    private final VehicleClient vehicleClient;
 
     /**
      * Prepares an invoice for a given appointment and garage.
@@ -118,6 +126,15 @@ public class InvoiceService {
 
         invoice.setLineItems ( lineItems );
 
+        // Update WorkOrder status to INVOICE_INITIATED when invoice is created
+        if (workOrder.getStatus() != WorkOrderStatus.INVOICE_INITIATED &&
+            workOrder.getStatus() != WorkOrderStatus.INVOICED &&
+            workOrder.getStatus() != WorkOrderStatus.PENDING_PAYMENT &&
+            workOrder.getStatus() != WorkOrderStatus.PAYMENT_RECEIVED) {
+            workOrder.updateStatus(WorkOrderStatus.INVOICE_INITIATED);
+            workOrderRepository.save(workOrder);
+        }
+
 //		double totalCost = lineItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
 //		int pointsValue = pointsToRedeem; // 1 point = $1 for example
 //		BigDecimal discount = BigDecimal.valueOf(pointsValue);
@@ -184,11 +201,18 @@ public class InvoiceService {
         invoice.setPaymentStatus ( paymentStatus );
         invoice.setIsPaid ( "PAID".equalsIgnoreCase ( paymentStatus.toString ( ) ) );
 
+        WorkOrder workOrder = invoice.getWorkOrder ( );
+
         if ( invoice.getIsPaid ( ) ) {
             // Update WorkOrder status when payment is received
-            WorkOrder workOrder = invoice.getWorkOrder ( );
-            if ( workOrder.getStatus ( ) != com.autoadda.apis.garage.util.WorkOrderStatus.PAYMENT_RECEIVED ) {
-                workOrder.updateStatus ( com.autoadda.apis.garage.util.WorkOrderStatus.PAYMENT_RECEIVED );
+            if ( workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
+                workOrder.updateStatus ( WorkOrderStatus.PAYMENT_RECEIVED );
+                workOrderRepository.save ( workOrder );
+            }
+        } else {
+            // If not paid, update to appropriate pending status based on current state
+            if ( workOrder.getStatus ( ) == WorkOrderStatus.INVOICE_INITIATED ) {
+                workOrder.updateStatus ( WorkOrderStatus.PENDING_PAYMENT );
                 workOrderRepository.save ( workOrder );
             }
         }
@@ -249,6 +273,15 @@ public class InvoiceService {
             // TODO: Integrate with loyalty service
         }
 
+        // Update WorkOrder status to INVOICE_INITIATED when invoice is created
+        if (workOrder.getStatus() != WorkOrderStatus.INVOICE_INITIATED &&
+            workOrder.getStatus() != WorkOrderStatus.INVOICED &&
+            workOrder.getStatus() != WorkOrderStatus.PENDING_PAYMENT &&
+            workOrder.getStatus() != WorkOrderStatus.PAYMENT_RECEIVED) {
+            workOrder.updateStatus(WorkOrderStatus.INVOICE_INITIATED);
+            workOrderRepository.save(workOrder);
+        }
+
         Invoice savedInvoice = invoiceRepository.save ( invoice );
         return invoiceResponseMapper.toResponse ( savedInvoice );
     }
@@ -281,6 +314,106 @@ public class InvoiceService {
     public InvoiceResponse getInvoiceResponse(Integer invoiceId) {
         Invoice invoice = getInvoiceById ( invoiceId );
         return invoiceResponseMapper.toResponse ( invoice );
+    }
+
+    /**
+     * Sends invoice details to customer via SMS
+     *
+     * @param invoiceId the ID of the invoice to send
+     * @return GenericResponse indicating SMS status
+     */
+    @Transactional
+    public GenericResponse sendInvoiceToCustomer(Integer invoiceId) {
+        try {
+            // Get invoice details
+            Invoice invoice = getInvoiceById(invoiceId);
+            WorkOrder workOrder = invoice.getWorkOrder();
+            AppointmentDetails appointment = workOrder.getAppointment();
+
+            if (appointment == null) {
+                return GenericResponse.failed("No appointment found for this invoice", null);
+            }
+
+            // Get vehicle details to extract customer phone number
+            Integer vehicleId = appointment.getVehicleId();
+            VehicleDetailResponse vehicleDetails = vehicleClient.getVehicleDetailsByIdResponse(vehicleId);
+
+            if (vehicleDetails == null || vehicleDetails.getOwner() == null ||
+                vehicleDetails.getOwner().getMobileNumber() == null) {
+                return GenericResponse.failed("Customer mobile number not found", null);
+            }
+
+            String customerPhone = vehicleDetails.getOwner().getMobileNumber();
+
+            // Create SMS message with invoice details
+            String message = buildInvoiceMessage(invoice, workOrder, appointment, vehicleDetails);
+
+            // Send SMS
+            SmsRequest smsRequest = new SmsRequest(customerPhone, message);
+            GenericResponse smsResponse = authClient.sendSms(smsRequest);
+
+            if ("SUCCESS".equalsIgnoreCase(smsResponse.getStatus())) {
+                return GenericResponse.success("Invoice sent to customer successfully", smsResponse);
+            } else {
+                return GenericResponse.failed("Failed to send invoice to customer", smsResponse);
+            }
+
+        } catch (Exception e) {
+            return GenericResponse.failed("Error sending invoice to customer: " + e.getMessage(), null);
+        }
+    }
+
+    /**
+     * Builds the SMS message for invoice notification
+     */
+    private String buildInvoiceMessage(Invoice invoice, WorkOrder workOrder, AppointmentDetails appointment, VehicleDetailResponse vehicleDetails) {
+        StringBuilder message = new StringBuilder();
+
+        // Header
+        message.append("🧾 INVOICE READY - AutoAdda\n\n");
+
+        // Vehicle info
+        message.append("Vehicle: ").append(vehicleDetails.getBrand ())
+                .append(" ").append(vehicleDetails.getModel()).append("\n");
+        message.append("Reg. No: ").append(vehicleDetails.getNumber()).append("\n\n");
+
+        // Invoice details
+        message.append("Invoice ID: ").append(invoice.getId()).append("\n");
+        message.append("Work Order: ").append(workOrder.getId()).append("\n");
+
+        // Amount details
+        if (invoice.getTotalAmount() != null) {
+            message.append("Total Amount: ₹").append(String.format("%.2f", invoice.getTotalAmount())).append("\n");
+        }
+
+        if (invoice.getTaxAmount() != null && invoice.getTaxAmount() > 0) {
+            message.append("Tax: ₹").append(String.format("%.2f", invoice.getTaxAmount())).append("\n");
+        }
+
+        // Payment status
+        if (invoice.getIsPaid() != null && invoice.getIsPaid()) {
+            message.append("Status: ✅ PAID\n");
+        } else {
+            message.append("Status: ⏳ PENDING PAYMENT\n");
+        }
+
+        // Service summary
+        if (invoice.getLineItems() != null && !invoice.getLineItems().isEmpty()) {
+            message.append("\nServices:\n");
+            invoice.getLineItems().stream()
+                    .limit(3) // Show max 3 services
+                    .forEach(item -> message.append("• ").append(item.getDescription()).append("\n"));
+
+            if (invoice.getLineItems().size() > 3) {
+                message.append("• ... and ").append(invoice.getLineItems().size() - 3).append(" more\n");
+            }
+        }
+
+        // Footer
+        message.append("\nView full details in your AutoAdda app.");
+        message.append("\nFor queries: Contact your garage");
+
+        return message.toString();
     }
 
     /**
