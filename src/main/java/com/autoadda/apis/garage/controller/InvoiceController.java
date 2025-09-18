@@ -59,7 +59,7 @@ public class InvoiceController {
 
     @GetMapping("/work-order/{workOrderId}")
     public ResponseEntity<GenericResponse> getInvoiceByWorkOrderId(@PathVariable Integer workOrderId) {
-        Invoice invoice = invoiceService.getInvoiceByWorkOrderId(workOrderId);
+        InvoiceResponse invoice = invoiceService.getInvoiceByWorkOrderId(workOrderId);
         return ResponseEntity.ok(GenericResponse.success("Invoice retrieved successfully", invoice));
     }
 

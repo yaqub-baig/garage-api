@@ -203,9 +203,9 @@ public class InvoiceService {
      * @return the Invoice if found
      */
     @Transactional
-    public Invoice getInvoiceByWorkOrderId(Integer workOrderId) {
-        return invoiceRepository.findByWorkOrderId ( workOrderId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Invoice not found for WorkOrder ID: " + workOrderId ) );
+    public InvoiceResponse getInvoiceByWorkOrderId(Integer workOrderId) {
+        return invoiceResponseMapper.toResponse(invoiceRepository.findByWorkOrderId ( workOrderId )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Invoice not found for WorkOrder ID: " + workOrderId ) ));
     }
 
     // New DTO-based methods

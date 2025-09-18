@@ -8,6 +8,7 @@ import com.autoadda.apis.garage.util.WorkOrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -128,6 +129,7 @@ public class WorkOrderStatusFlowService {
         // Update WorkOrder status logic
         if (allCompleted && workOrder.getStatus() != WorkOrderStatus.JOB_COMPLETED) {
             workOrder.updateStatus(WorkOrderStatus.JOB_COMPLETED);
+            workOrder.setWorkCompletedDate ( LocalDateTime.now() );
             workOrderRepository.save(workOrder);
         } else if (anyInProgress && workOrder.getStatus() == WorkOrderStatus.ASSIGNED) {
             workOrder.updateStatus(WorkOrderStatus.WORK_IN_PROGRESS);
