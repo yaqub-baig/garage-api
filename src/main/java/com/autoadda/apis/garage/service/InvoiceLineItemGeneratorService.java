@@ -55,18 +55,25 @@ public class InvoiceLineItemGeneratorService {
             }
         }
 
-        // Add labor charges if applicable
-        double laborHours = calculateTotalLaborHours(completedJobCards);
-        if (laborHours > 0) {
-            InvoiceLineItemRequest laborItem = InvoiceLineItemRequest.builder()
-                    .description("Labor Charges")
-                    .quantity((int) Math.ceil(laborHours))
-                    .price(calculateLaborRate(workOrder))
-                    .category("LABOR")
-                    .notes("Total hours: " + laborHours)
-                    .build();
+        // Add labor charges from each appointment service
+        for (JobCard jobCard : completedJobCards) {
+            AppointmentServices appointmentService = jobCard.getService();
+            if (appointmentService != null && appointmentService.getLabourPrice() != null && appointmentService.getLabourPrice() > 0) {
+                InvoiceLineItemRequest laborItem = InvoiceLineItemRequest.builder()
+                        .description("Labor - " + (appointmentService.getService() != null &&
+                                                   appointmentService.getService().getAvailableService() != null ?
+                                                   appointmentService.getService().getAvailableService().getName() : "Service"))
+                        .quantity(1)
+                        .price(appointmentService.getLabourPrice())
+                        .category("LABOR")
+                        .serviceId(appointmentService.getService() != null &&
+                                   appointmentService.getService().getAvailableService() != null ?
+                                   appointmentService.getService().getAvailableService().getId() : null)
+                        .notes("JobCard ID: " + jobCard.getId())
+                        .build();
 
-            lineItems.add(laborItem);
+                lineItems.add(laborItem);
+            }
         }
 
         // TODO: Add parts/materials if you have that data structure
@@ -75,42 +82,6 @@ public class InvoiceLineItemGeneratorService {
         return lineItems;
     }
 
-    /**
-     * Calculates total labor hours from completed job cards
-     */
-    private double calculateTotalLaborHours(List<JobCard> jobCards) {
-        return jobCards.stream()
-                .mapToDouble(this::calculateJobCardLaborHours)
-                .sum();
-    }
-
-    /**
-     * Calculates labor hours for a single job card
-     */
-    private double calculateJobCardLaborHours(JobCard jobCard) {
-        if (jobCard.getServiceStartTime() != null && jobCard.getServiceEndTime() != null) {
-            // Convert LocalTime to hours (assuming same day)
-            double startHours = jobCard.getServiceStartTime().getHour() +
-                              jobCard.getServiceStartTime().getMinute() / 60.0;
-            double endHours = jobCard.getServiceEndTime().getHour() +
-                            jobCard.getServiceEndTime().getMinute() / 60.0;
-
-            double totalHours = endHours - startHours;
-            return Math.max(totalHours, 0); // Ensure non-negative
-        }
-
-        // Default estimate if no time tracking
-        return 1.0; // 1 hour default per service
-    }
-
-    /**
-     * Calculates labor rate based on garage or service type
-     */
-    private Double calculateLaborRate(WorkOrder workOrder) {
-        // You can implement dynamic labor rate calculation here
-        // Based on garage settings, service type, technician level, etc.
-        return 50.0; // Default $50/hour
-    }
 
     /**
      * Generates standard line items that can be customized
