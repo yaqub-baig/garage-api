@@ -1,7 +1,6 @@
 package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.Invoice;
-import com.autoadda.apis.garage.entity.InvoiceLineItem;
 import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
 import com.autoadda.apis.garage.request.AppointmentPayRequest;
 import com.autoadda.apis.garage.request.InvoiceRequest;
@@ -38,8 +37,8 @@ public class InvoiceController {
 
     @PostMapping("/generate")
     public ResponseEntity<GenericResponse> generateInvoice(@RequestBody InvoiceRequest request) {
-        InvoiceResponse invoice = invoiceService.generateInvoiceFromRequest(request);
-        return ResponseEntity.ok(GenericResponse.success("Invoice generated successfully", invoice));
+        InvoiceResponse invoice = invoiceService.generateInvoiceFromRequest ( request );
+        return ResponseEntity.ok ( GenericResponse.success ( "Invoice generated successfully", invoice ) );
     }
 
     @PostMapping("/work-order/{workOrderId}/auto-generate")
@@ -47,39 +46,39 @@ public class InvoiceController {
             @PathVariable Integer workOrderId,
             @RequestParam(required = false, defaultValue = "10.0") Double taxRate,
             @RequestParam(required = false) String notes) {
-        InvoiceResponse invoice = invoiceService.generateInvoiceFromWorkOrder(workOrderId, taxRate, notes);
-        return ResponseEntity.ok(GenericResponse.success("Invoice auto-generated successfully", invoice));
+        InvoiceResponse invoice = invoiceService.generateInvoiceFromWorkOrder ( workOrderId, taxRate, notes );
+        return ResponseEntity.ok ( GenericResponse.success ( "Invoice auto-generated successfully", invoice ) );
     }
 
     @GetMapping("/{invoiceId}")
     public ResponseEntity<GenericResponse> getInvoiceById(@PathVariable Integer invoiceId) {
-        InvoiceResponse invoice = invoiceService.getInvoiceResponse(invoiceId);
-        return ResponseEntity.ok(GenericResponse.success("Invoice retrieved successfully", invoice));
+        InvoiceResponse invoice = invoiceService.getInvoiceResponse ( invoiceId );
+        return ResponseEntity.ok ( GenericResponse.success ( "Invoice retrieved successfully", invoice ) );
     }
 
     @GetMapping("/work-order/{workOrderId}")
     public ResponseEntity<GenericResponse> getInvoiceByWorkOrderId(@PathVariable Integer workOrderId) {
-        InvoiceResponse invoice = invoiceService.getInvoiceByWorkOrderId(workOrderId);
-        return ResponseEntity.ok(GenericResponse.success("Invoice retrieved successfully", invoice));
+        InvoiceResponse invoice = invoiceService.getInvoiceByWorkOrderId ( workOrderId );
+        return ResponseEntity.ok ( GenericResponse.success ( "Invoice retrieved successfully", invoice ) );
     }
 
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<GenericResponse> getInvoicesForGarage(@PathVariable Integer garageId) {
-        List<Invoice> invoices = invoiceService.getInvoicesForGarage(garageId);
-        return ResponseEntity.ok(GenericResponse.success("Invoices retrieved successfully", invoices));
+        List<Invoice> invoices = invoiceService.getInvoicesForGarage ( garageId );
+        return ResponseEntity.ok ( GenericResponse.success ( "Invoices retrieved successfully", invoices ) );
     }
 
     @PutMapping("/{invoiceId}/payment-status")
     public ResponseEntity<GenericResponse> updateInvoicePaymentStatus(
             @PathVariable Integer invoiceId,
             @RequestParam com.autoadda.apis.garage.util.Status paymentStatus) {
-        Invoice invoice = invoiceService.updateInvoicePaymentStatus(invoiceId, paymentStatus);
-        return ResponseEntity.ok(GenericResponse.success("Invoice payment status updated", invoice));
+        Invoice invoice = invoiceService.updateInvoicePaymentStatus ( invoiceId, paymentStatus );
+        return ResponseEntity.ok ( GenericResponse.success ( "Invoice payment status updated", invoice ) );
     }
 
     @PostMapping("/{invoiceId}/send-to-customer")
     public ResponseEntity<GenericResponse> sendInvoiceToCustomer(@PathVariable Integer invoiceId) {
-        GenericResponse smsResponse = invoiceService.sendInvoiceToCustomer(invoiceId);
-        return ResponseEntity.ok(smsResponse);
+        GenericResponse smsResponse = invoiceService.sendInvoiceToCustomer ( invoiceId );
+        return ResponseEntity.ok ( smsResponse );
     }
 }

@@ -12,24 +12,24 @@ public class InvoiceResponseMapper {
     private final InvoiceLineItemMapper lineItemMapper;
 
     public InvoiceResponse toResponse(Invoice invoice) {
-        if (invoice == null) return null;
+        if ( invoice == null ) return null;
 
-        return InvoiceResponse.builder()
-                .id(invoice.getId())
-                .workOrderId(invoice.getWorkOrder() != null ? invoice.getWorkOrder().getId() : null)
-                .jobCardId(invoice.getJobCard() != null ? invoice.getJobCard().getId() : null)
-                .lineItems(lineItemMapper.toResponseList(invoice.getLineItems()))
-                .totalAmount(invoice.getTotalAmount())
-                .taxRate(invoice.getTaxRate())
-                .taxAmount(invoice.getTaxAmount())
-                .amountPaid(invoice.getAmountPaid())
-                .loyaltyPointsUsed(invoice.getLoyaltyPointsUsed())
-                .loyaltyPointsEarned(invoice.getLoyaltyPointsEarned())
-                .paymentStatus(invoice.getPaymentStatus())
-                .paymentMethod(invoice.getPaymentMethod())
-                .isPaid(invoice.getIsPaid())
-                .notes(invoice.getNotes())
-                .createdAt(invoice.getCreatedAt())
-                .build();
+        return InvoiceResponse.builder ( )
+                .id ( invoice.getId ( ) )
+                .workOrderId ( invoice.getWorkOrder ( ) != null ? invoice.getWorkOrder ( ).getId ( ) : null )
+                .jobCardId ( invoice.getJobCard ( ) != null ? invoice.getJobCard ( ).getId ( ) : null )
+                .lineItems ( lineItemMapper.toResponseList ( invoice.getLineItems ( ) ) )
+                .totalAmount ( invoice.getTotalAmount ( ) )
+                .taxRate ( invoice.getTaxRate ( ) )
+                .taxAmount ( invoice.getTaxAmount ( ) )
+                .amountPaid ( invoice.getAmountPaid ( ) )
+                .loyaltyPointsUsed ( invoice.getLoyaltyPointsUsed ( ) )
+                .loyaltyPointsEarned ( invoice.getLoyaltyPointsEarned ( ) )
+                .paymentStatus ( invoice.getPaymentStatus ( ) )
+                .paymentMethod ( invoice.getPaymentMethod ( ) )
+                .isPaid ( invoice.getIsPaid ( ) )
+                .notes ( invoice.getNotes ( ) )
+                .createdAt ( invoice.getCreatedAt ( ) )
+                .build ( );
     }
 }

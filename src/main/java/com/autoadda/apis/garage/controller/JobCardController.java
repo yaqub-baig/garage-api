@@ -29,7 +29,7 @@ public class JobCardController {
 
     @PutMapping("/status/{jobCardId}")
     public ResponseEntity<GenericResponse> updateJobCardStatus(@PathVariable Integer jobCardId, @RequestParam JobCardStatus status) {
-            JobCardResponse updated = jobCardService.updateJobCardStatus ( jobCardId, status );
+        JobCardResponse updated = jobCardService.updateJobCardStatus ( jobCardId, status );
         return ResponseEntity.ok ( GenericResponse.success ( "Jobcard status updated", updated ) );
     }
 

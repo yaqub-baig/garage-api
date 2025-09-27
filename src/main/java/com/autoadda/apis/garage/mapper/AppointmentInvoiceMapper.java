@@ -10,23 +10,24 @@ import org.springframework.stereotype.Component;
 public class AppointmentInvoiceMapper {
     private final GarageMapper garageMapper;
     private final AppointmentDetailMapper appointmentDetailMapper;
+
     public AppointmentInvoiceResponse fromEntity(AppointmentInvoice invoice) {
-        if (invoice == null) {
+        if ( invoice == null ) {
             return null;
         }
 
-        return AppointmentInvoiceResponse.builder()
-                .id(invoice.getId())
-                .status(invoice.getStatus())
-                .comments(invoice.getComments())
-                .insertTms(invoice.getInsert_tms())
-                .netAmount(invoice.getNetAmount())
-                .taxAmount(invoice.getTaxAmount())
-                .totalAmount(invoice.getTotalAmount())
-                .taxId(invoice.getTaxId())
-                .garage(garageMapper.entityToResponse (invoice.getGarage()))
-                .appointment(appointmentDetailMapper.entityToResponse ( invoice.getAppointment()))
-                .build();
+        return AppointmentInvoiceResponse.builder ( )
+                .id ( invoice.getId ( ) )
+                .status ( invoice.getStatus ( ) )
+                .comments ( invoice.getComments ( ) )
+                .insertTms ( invoice.getInsert_tms ( ) )
+                .netAmount ( invoice.getNetAmount ( ) )
+                .taxAmount ( invoice.getTaxAmount ( ) )
+                .totalAmount ( invoice.getTotalAmount ( ) )
+                .taxId ( invoice.getTaxId ( ) )
+                .garage ( garageMapper.entityToResponse ( invoice.getGarage ( ) ) )
+                .appointment ( appointmentDetailMapper.entityToResponse ( invoice.getAppointment ( ) ) )
+                .build ( );
     }
 
 }

@@ -12,45 +12,45 @@ import java.util.stream.Collectors;
 public class InvoiceLineItemMapper {
 
     public InvoiceLineItem toEntity(InvoiceLineItemRequest request) {
-        if (request == null) return null;
+        if ( request == null ) return null;
 
-        InvoiceLineItem lineItem = new InvoiceLineItem();
-        lineItem.setDescription(request.getDescription());
-        lineItem.setQuantity(request.getQuantity());
-        lineItem.setPrice(request.getPrice());
-        lineItem.setCategory(request.getCategory());
-        lineItem.setServiceId(request.getServiceId());
-        lineItem.setNotes(request.getNotes());
+        InvoiceLineItem lineItem = new InvoiceLineItem ( );
+        lineItem.setDescription ( request.getDescription ( ) );
+        lineItem.setQuantity ( request.getQuantity ( ) );
+        lineItem.setPrice ( request.getPrice ( ) );
+        lineItem.setCategory ( request.getCategory ( ) );
+        lineItem.setServiceId ( request.getServiceId ( ) );
+        lineItem.setNotes ( request.getNotes ( ) );
 
         return lineItem;
     }
 
     public InvoiceLineItemResponse toResponse(InvoiceLineItem entity) {
-        if (entity == null) return null;
+        if ( entity == null ) return null;
 
-        return InvoiceLineItemResponse.builder()
-                .id(entity.getId())
-                .description(entity.getDescription())
-                .quantity(entity.getQuantity())
-                .price(entity.getPrice())
-                .totalAmount(entity.getPrice() * entity.getQuantity())
-                .category(entity.getCategory())
-                .serviceId(entity.getServiceId())
-                .notes(entity.getNotes())
-                .build();
+        return InvoiceLineItemResponse.builder ( )
+                .id ( entity.getId ( ) )
+                .description ( entity.getDescription ( ) )
+                .quantity ( entity.getQuantity ( ) )
+                .price ( entity.getPrice ( ) )
+                .totalAmount ( entity.getPrice ( ) * entity.getQuantity ( ) )
+                .category ( entity.getCategory ( ) )
+                .serviceId ( entity.getServiceId ( ) )
+                .notes ( entity.getNotes ( ) )
+                .build ( );
     }
 
     public List<InvoiceLineItem> toEntityList(List<InvoiceLineItemRequest> requests) {
-        if (requests == null) return null;
-        return requests.stream()
-                .map(this::toEntity)
-                .collect(Collectors.toList());
+        if ( requests == null ) return null;
+        return requests.stream ( )
+                .map ( this::toEntity )
+                .collect ( Collectors.toList ( ) );
     }
 
     public List<InvoiceLineItemResponse> toResponseList(List<InvoiceLineItem> entities) {
-        if (entities == null) return null;
-        return entities.stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        if ( entities == null ) return null;
+        return entities.stream ( )
+                .map ( this::toResponse )
+                .collect ( Collectors.toList ( ) );
     }
 }

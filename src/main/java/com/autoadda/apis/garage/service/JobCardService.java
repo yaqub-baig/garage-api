@@ -49,7 +49,6 @@ public class JobCardService {
     private final WorkOrderStatusFlowService workOrderStatusFlowService;
 
 
-
     @Transactional
     public JobCardResponse assignTechnicianToService(AssignServiceRequest request) {
         AppointmentDetails appointment = appointmentRepo.findById ( request.getAppointmentId ( ) )
@@ -157,20 +156,20 @@ public class JobCardService {
                 .orElseThrow ( () -> new RuntimeException ( "Jobcard not found" ) );
 
         jobCard.updateStatus ( request );
-            Integer appointmentId = jobCard.getService ( ).getAppointmentId ( );
-            AppointmentDetails appointmentDetails = appointmentRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException ( "Appointment not found" ) );
-            VehicleDetailResponse vehicleDetailsByIdResponse = vehicleClient.getVehicleDetailsByIdResponse ( appointmentDetails.getVehicleId ( ) );
-            String vehicleOwnerNumber = vehicleDetailsByIdResponse.getOwner ( ).getMobileNumber ();
+        Integer appointmentId = jobCard.getService ( ).getAppointmentId ( );
+        AppointmentDetails appointmentDetails = appointmentRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException ( "Appointment not found" ) );
+        VehicleDetailResponse vehicleDetailsByIdResponse = vehicleClient.getVehicleDetailsByIdResponse ( appointmentDetails.getVehicleId ( ) );
+        String vehicleOwnerNumber = vehicleDetailsByIdResponse.getOwner ( ).getMobileNumber ( );
 
         if ( JobCardStatus.IN_PROGRESS.equals ( request ) ) {
             jobCard.setServiceStartTime ( DateHelper.dbTime ( ) );
-            String message = "Your work order service has started for "+jobCard.getService().getService ().getAvailableService ().getName (  ) +"    at : "+ LocalDateTime.now();
+            String message = "Your work order service has started for " + jobCard.getService ( ).getService ( ).getAvailableService ( ).getName ( ) + "    at : " + LocalDateTime.now ( );
             GenericResponse genericResponse = authClient.sendSms ( new SmsRequest ( vehicleOwnerNumber, message ) );
             log.info ( genericResponse.getStatus ( ) );
         }
         if ( JobCardStatus.COMPLETED.equals ( request ) ) {
             jobCard.setServiceEndTime ( DateHelper.dbTime ( ) );
-            String message = "Your work order service has Completed for "+jobCard.getService().getService ().getAvailableService ().getName (  ) +"    at : "+ LocalDateTime.now();
+            String message = "Your work order service has Completed for " + jobCard.getService ( ).getService ( ).getAvailableService ( ).getName ( ) + "    at : " + LocalDateTime.now ( );
             GenericResponse genericResponse = authClient.sendSms ( new SmsRequest ( vehicleOwnerNumber, message ) );
             log.info ( genericResponse.getStatus ( ) );
         }
@@ -179,8 +178,8 @@ public class JobCardService {
         appointmentServiceRepo.save ( service );
 
         // Update WorkOrder status based on JobCard statuses
-        if (jobCard.getWorkOrder() != null) {
-            workOrderStatusFlowService.updateWorkOrderStatusBasedOnJobCards(jobCard.getWorkOrder());
+        if ( jobCard.getWorkOrder ( ) != null ) {
+            workOrderStatusFlowService.updateWorkOrderStatusBasedOnJobCards ( jobCard.getWorkOrder ( ) );
         }
 
         return jobCardMapper.entityToResponse ( jobCardRepo.save ( jobCard ) );

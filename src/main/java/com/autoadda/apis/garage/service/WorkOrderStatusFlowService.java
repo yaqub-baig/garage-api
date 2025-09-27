@@ -17,9 +17,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WorkOrderStatusFlowService {
 
-    private final WorkOrderRepository workOrderRepository;
-    private final JobCardStatusFlowService jobCardStatusFlowService;
-
     // Define valid status transitions
     private static final Map<WorkOrderStatus, List<WorkOrderStatus>> VALID_TRANSITIONS = Map.ofEntries (
             Map.entry ( WorkOrderStatus.CREATED, Arrays.asList (
@@ -100,6 +97,8 @@ public class WorkOrderStatusFlowService {
                     WorkOrderStatus.CANCELLED
             ) )
     );
+    private final WorkOrderRepository workOrderRepository;
+    private final JobCardStatusFlowService jobCardStatusFlowService;
 
     public boolean isValidTransition(WorkOrderStatus currentStatus, WorkOrderStatus newStatus) {
         List<WorkOrderStatus> validNextStates = VALID_TRANSITIONS.get ( currentStatus );
@@ -117,23 +116,23 @@ public class WorkOrderStatusFlowService {
     }
 
     public void updateWorkOrderStatusBasedOnJobCards(WorkOrder workOrder) {
-        List<JobCard> jobCards = workOrder.getJobCards();
+        List<JobCard> jobCards = workOrder.getJobCards ( );
 
-        if (jobCards.isEmpty()) return;
+        if ( jobCards.isEmpty ( ) ) return;
 
-        boolean allCompleted = jobCards.stream()
-                .allMatch(j -> j.getStatus() == JobCardStatus.WORK_COMPLETED);
-        boolean anyInProgress = jobCards.stream()
-                .anyMatch(jc -> jobCardStatusFlowService.isActiveWorkStatus(jc.getStatus()));
+        boolean allCompleted = jobCards.stream ( )
+                .allMatch ( j -> j.getStatus ( ) == JobCardStatus.WORK_COMPLETED );
+        boolean anyInProgress = jobCards.stream ( )
+                .anyMatch ( jc -> jobCardStatusFlowService.isActiveWorkStatus ( jc.getStatus ( ) ) );
 
         // Update WorkOrder status logic
-        if (allCompleted && workOrder.getStatus() != WorkOrderStatus.JOB_COMPLETED) {
-            workOrder.updateStatus(WorkOrderStatus.JOB_COMPLETED);
-            workOrder.setWorkCompletedDate ( LocalDateTime.now() );
-            workOrderRepository.save(workOrder);
-        } else if (anyInProgress && workOrder.getStatus() == WorkOrderStatus.ASSIGNED) {
-            workOrder.updateStatus(WorkOrderStatus.WORK_IN_PROGRESS);
-            workOrderRepository.save(workOrder);
+        if ( allCompleted && workOrder.getStatus ( ) != WorkOrderStatus.JOB_COMPLETED ) {
+            workOrder.updateStatus ( WorkOrderStatus.JOB_COMPLETED );
+            workOrder.setWorkCompletedDate ( LocalDateTime.now ( ) );
+            workOrderRepository.save ( workOrder );
+        } else if ( anyInProgress && workOrder.getStatus ( ) == WorkOrderStatus.ASSIGNED ) {
+            workOrder.updateStatus ( WorkOrderStatus.WORK_IN_PROGRESS );
+            workOrderRepository.save ( workOrder );
         }
     }
 }

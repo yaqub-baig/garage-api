@@ -127,12 +127,12 @@ public class InvoiceService {
         invoice.setLineItems ( lineItems );
 
         // Update WorkOrder status to INVOICE_INITIATED when invoice is created
-        if (workOrder.getStatus() != WorkOrderStatus.INVOICE_INITIATED &&
-            workOrder.getStatus() != WorkOrderStatus.INVOICED &&
-            workOrder.getStatus() != WorkOrderStatus.PENDING_PAYMENT &&
-            workOrder.getStatus() != WorkOrderStatus.PAYMENT_RECEIVED) {
-            workOrder.updateStatus(WorkOrderStatus.INVOICE_INITIATED);
-            workOrderRepository.save(workOrder);
+        if ( workOrder.getStatus ( ) != WorkOrderStatus.INVOICE_INITIATED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.INVOICED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PENDING_PAYMENT &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
+            workOrder.updateStatus ( WorkOrderStatus.INVOICE_INITIATED );
+            workOrderRepository.save ( workOrder );
         }
 
 //		double totalCost = lineItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
@@ -228,8 +228,8 @@ public class InvoiceService {
      */
     @Transactional
     public InvoiceResponse getInvoiceByWorkOrderId(Integer workOrderId) {
-        return invoiceResponseMapper.toResponse(invoiceRepository.findByWorkOrderId ( workOrderId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Invoice not found for WorkOrder ID: " + workOrderId ) ));
+        return invoiceResponseMapper.toResponse ( invoiceRepository.findByWorkOrderId ( workOrderId )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Invoice not found for WorkOrder ID: " + workOrderId ) ) );
     }
 
     // New DTO-based methods
@@ -274,12 +274,12 @@ public class InvoiceService {
         }
 
         // Update WorkOrder status to INVOICE_INITIATED when invoice is created
-        if (workOrder.getStatus() != WorkOrderStatus.INVOICE_INITIATED &&
-            workOrder.getStatus() != WorkOrderStatus.INVOICED &&
-            workOrder.getStatus() != WorkOrderStatus.PENDING_PAYMENT &&
-            workOrder.getStatus() != WorkOrderStatus.PAYMENT_RECEIVED) {
-            workOrder.updateStatus(WorkOrderStatus.INVOICE_INITIATED);
-            workOrderRepository.save(workOrder);
+        if ( workOrder.getStatus ( ) != WorkOrderStatus.INVOICE_INITIATED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.INVOICED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PENDING_PAYMENT &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
+            workOrder.updateStatus ( WorkOrderStatus.INVOICE_INITIATED );
+            workOrderRepository.save ( workOrder );
         }
 
         Invoice savedInvoice = invoiceRepository.save ( invoice );
@@ -326,40 +326,41 @@ public class InvoiceService {
     public GenericResponse sendInvoiceToCustomer(Integer invoiceId) {
         try {
             // Get invoice details
-            Invoice invoice = getInvoiceById(invoiceId);
-            WorkOrder workOrder = invoice.getWorkOrder();
-            AppointmentDetails appointment = workOrder.getAppointment();
+            Invoice invoice = getInvoiceById ( invoiceId );
+            WorkOrder workOrder = invoice.getWorkOrder ( );
+            AppointmentDetails appointment = workOrder.getAppointment ( );
 
-            if (appointment == null) {
-                return GenericResponse.failed("No appointment found for this invoice", null);
+            if ( appointment == null ) {
+                return GenericResponse.failed ( "No appointment found for this invoice", null );
             }
 
             // Get vehicle details to extract customer phone number
-            Integer vehicleId = appointment.getVehicleId();
-            VehicleDetailResponse vehicleDetails = vehicleClient.getVehicleDetailsByIdResponse(vehicleId);
+            Integer vehicleId = appointment.getVehicleId ( );
+            VehicleDetailResponse vehicleDetails = vehicleClient.getVehicleDetailsByIdResponse ( vehicleId );
 
-            if (vehicleDetails == null || vehicleDetails.getOwner() == null ||
-                vehicleDetails.getOwner().getMobileNumber() == null) {
-                return GenericResponse.failed("Customer mobile number not found", null);
+            if ( vehicleDetails == null || vehicleDetails.getOwner ( ) == null ||
+                    vehicleDetails.getOwner ( ).getMobileNumber ( ) == null ) {
+                return GenericResponse.failed ( "Customer mobile number not found", null );
             }
 
-            String customerPhone = vehicleDetails.getOwner().getMobileNumber();
+            String customerPhone = vehicleDetails.getOwner ( ).getMobileNumber ( );
 
             // Create SMS message with invoice details
-            String message = buildInvoiceMessage(invoice, workOrder, appointment, vehicleDetails);
+            String message = buildInvoiceMessage ( invoice, workOrder, appointment, vehicleDetails );
 
             // Send SMS
-            SmsRequest smsRequest = new SmsRequest(customerPhone, message);
-            GenericResponse smsResponse = authClient.sendSms(smsRequest);
+            SmsRequest smsRequest = new SmsRequest ( customerPhone, message );
+            GenericResponse smsResponse = authClient.sendSms ( smsRequest );
 
-            if ("SUCCESS".equalsIgnoreCase(smsResponse.getStatus())) {
-                return GenericResponse.success("Invoice sent to customer successfully", smsResponse);
+            if ( "SUCCESS".equalsIgnoreCase ( smsResponse.getStatus ( ) ) ) {
+                return GenericResponse.success ( "Invoice sent to customer successfully", smsResponse );
             } else {
-                return GenericResponse.failed("Failed to send invoice to customer", smsResponse);
+                return GenericResponse.failed ( "Failed to send invoice to customer", smsResponse );
             }
 
-        } catch (Exception e) {
-            return GenericResponse.failed("Error sending invoice to customer: " + e.getMessage(), null);
+        }
+        catch ( Exception e ) {
+            return GenericResponse.failed ( "Error sending invoice to customer: " + e.getMessage ( ), null );
         }
     }
 
@@ -367,53 +368,53 @@ public class InvoiceService {
      * Builds the SMS message for invoice notification
      */
     private String buildInvoiceMessage(Invoice invoice, WorkOrder workOrder, AppointmentDetails appointment, VehicleDetailResponse vehicleDetails) {
-        StringBuilder message = new StringBuilder();
+        StringBuilder message = new StringBuilder ( );
 
         // Header
-        message.append("🧾 INVOICE READY - AutoAdda\n\n");
+        message.append ( "🧾 INVOICE READY - AutoAdda\n\n" );
 
         // Vehicle info
-        message.append("Vehicle: ").append(vehicleDetails.getBrand ())
-                .append(" ").append(vehicleDetails.getModel()).append("\n");
-        message.append("Reg. No: ").append(vehicleDetails.getNumber()).append("\n\n");
+        message.append ( "Vehicle: " ).append ( vehicleDetails.getBrand ( ) )
+                .append ( " " ).append ( vehicleDetails.getModel ( ) ).append ( "\n" );
+        message.append ( "Reg. No: " ).append ( vehicleDetails.getNumber ( ) ).append ( "\n\n" );
 
         // Invoice details
-        message.append("Invoice ID: ").append(invoice.getId()).append("\n");
-        message.append("Work Order: ").append(workOrder.getId()).append("\n");
+        message.append ( "Invoice ID: " ).append ( invoice.getId ( ) ).append ( "\n" );
+        message.append ( "Work Order: " ).append ( workOrder.getId ( ) ).append ( "\n" );
 
         // Amount details
-        if (invoice.getTotalAmount() != null) {
-            message.append("Total Amount: ₹").append(String.format("%.2f", invoice.getTotalAmount())).append("\n");
+        if ( invoice.getTotalAmount ( ) != null ) {
+            message.append ( "Total Amount: ₹" ).append ( String.format ( "%.2f", invoice.getTotalAmount ( ) ) ).append ( "\n" );
         }
 
-        if (invoice.getTaxAmount() != null && invoice.getTaxAmount() > 0) {
-            message.append("Tax: ₹").append(String.format("%.2f", invoice.getTaxAmount())).append("\n");
+        if ( invoice.getTaxAmount ( ) != null && invoice.getTaxAmount ( ) > 0 ) {
+            message.append ( "Tax: ₹" ).append ( String.format ( "%.2f", invoice.getTaxAmount ( ) ) ).append ( "\n" );
         }
 
         // Payment status
-        if (invoice.getIsPaid() != null && invoice.getIsPaid()) {
-            message.append("Status: ✅ PAID\n");
+        if ( invoice.getIsPaid ( ) != null && invoice.getIsPaid ( ) ) {
+            message.append ( "Status: ✅ PAID\n" );
         } else {
-            message.append("Status: ⏳ PENDING PAYMENT\n");
+            message.append ( "Status: ⏳ PENDING PAYMENT\n" );
         }
 
         // Service summary
-        if (invoice.getLineItems() != null && !invoice.getLineItems().isEmpty()) {
-            message.append("\nServices:\n");
-            invoice.getLineItems().stream()
-                    .limit(3) // Show max 3 services
-                    .forEach(item -> message.append("• ").append(item.getDescription()).append("\n"));
+        if ( invoice.getLineItems ( ) != null && ! invoice.getLineItems ( ).isEmpty ( ) ) {
+            message.append ( "\nServices:\n" );
+            invoice.getLineItems ( ).stream ( )
+                    .limit ( 3 ) // Show max 3 services
+                    .forEach ( item -> message.append ( "• " ).append ( item.getDescription ( ) ).append ( "\n" ) );
 
-            if (invoice.getLineItems().size() > 3) {
-                message.append("• ... and ").append(invoice.getLineItems().size() - 3).append(" more\n");
+            if ( invoice.getLineItems ( ).size ( ) > 3 ) {
+                message.append ( "• ... and " ).append ( invoice.getLineItems ( ).size ( ) - 3 ).append ( " more\n" );
             }
         }
 
         // Footer
-        message.append("\nView full details in your AutoAdda app.");
-        message.append("\nFor queries: Contact your garage");
+        message.append ( "\nView full details in your AutoAdda app." );
+        message.append ( "\nFor queries: Contact your garage" );
 
-        return message.toString();
+        return message.toString ( );
     }
 
     /**
