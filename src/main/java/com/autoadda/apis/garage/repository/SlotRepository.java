@@ -1,7 +1,9 @@
 package com.autoadda.apis.garage.repository;
 
 import com.autoadda.apis.garage.entity.AppointmentSlot;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -40,6 +42,7 @@ public interface SlotRepository extends JpaRepository<AppointmentSlot, Integer> 
 
     List<AppointmentSlot> findByGarageIdAndSlotDate(Integer garageId, LocalDate date);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId AND s.slotDate= :slotDate AND s.startTime = :time AND s.currentBookings < s.maxBookings")
     Optional<AppointmentSlot> findByGarageIdAndStartTime(@Param("garageId") Integer garageId, @Param("slotDate") LocalDate date, @Param("time") LocalTime time);
 

@@ -117,13 +117,21 @@ public class AppointmentSlotService {
     public AppointmentDetailResponse bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId, String selectedGarageServiceIds) {
 
         Integer userId = Integer.parseInt ( autoAddaId );
-        AppointmentSlot slot = slotService.findAvailableSlotByGarageIdAndTime ( garageId, date, time );
 
+        // Fetch slot with pessimistic write lock to prevent concurrent bookings
+        AppointmentSlot slot = slotRepository.findByGarageIdAndStartTime ( garageId, date, time )
+                .orElseThrow ( () -> new ResourceNotFoundException ( "Slot not available or fully booked" ) );
+
+        // Double-check availability (should always be true due to query condition, but defensive programming)
         if ( ! slot.isAvailable ( ) ) {
-            throw new IllegalStateException ( "Slot is Fully booked." );
+            throw new IllegalStateException ( "Slot is fully booked." );
         }
 
         Garage garage = garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) );
+
+        // Increment bookings immediately within the same transaction
+        slot.setCurrentBookings ( slot.getCurrentBookings ( ) + 1 );
+        slotRepository.save ( slot );
 
         AppointmentDetails appointment = AppointmentDetails.builder ( ).garage ( garage ).scheduleDate ( date )
                 .serviceStartTime ( time ).status ( Status.CONFIRMED ).comments ( "Booked via platform" )
@@ -133,7 +141,7 @@ public class AppointmentSlotService {
                 .appointmentReferenceId ( appointmentService.generateAppointmentCode ( ) )
                 .slot ( slot )
                 .insert_tms ( DateHelper.dbDate ( ) ).build ( );
-        slotService.incrementSlotBookings ( slot.getId ( ) );
+
         AppointmentDetails save = bookingRepo.save ( appointment );
         generateAppointmentServices ( save, selectedGarageServiceIds, garageId );
         return appointmentDetailMapper.entityToResponse ( save );
