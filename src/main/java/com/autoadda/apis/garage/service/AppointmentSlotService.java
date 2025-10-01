@@ -172,6 +172,12 @@ public class AppointmentSlotService {
     public void cancelBooking(Integer appointmentId) {
         AppointmentDetails booking = bookingRepo.findById ( appointmentId )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "No such booking found to cancel." ) );
+
+        // Only decrement if booking was previously confirmed and has an associated slot
+        if ( booking.getStatus ( ) == Status.CONFIRMED && booking.getSlot ( ) != null ) {
+            slotService.decrementSlotBookings ( booking.getSlot ( ).getId ( ) );
+        }
+
         booking.setStatus ( Status.CANCELLED );
         bookingRepo.save ( booking );
     }
@@ -208,7 +214,6 @@ public class AppointmentSlotService {
                 throw new IllegalStateException ( "Slot already booked." );
             }
             appointmentDetails.setGarage ( garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
-
         }
 
         if ( status != null ) {
@@ -230,3 +235,72 @@ public class AppointmentSlotService {
 
 
 }
+/* @Transactional
+    public ResponseEntity<AppointmentDetailResponse> editBooking(Integer garageId, Integer vehicleId, Integer appointmentId, LocalDateTime time, String autoAddaId, Status status) {
+        AppointmentDetails appointmentDetails = bookingRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException ( "No such booking found to edit." ) );
+
+        AppointmentSlot oldSlot = appointmentDetails.getSlot ( );
+        boolean timeChanged = false;
+
+        if ( garageId != null && time != null ) {
+            LocalDate date = time.toLocalDate ( );
+            LocalTime time1 = time.toLocalTime ( );
+
+            if ( garageRepo.findById ( garageId ).isEmpty ( ) ) {
+                throw new IllegalArgumentException ( "Invalid garage ID." );
+            }
+
+            // Check if time/date is actually changing
+            timeChanged = ! date.equals ( appointmentDetails.getScheduleDate ( ) ) ||
+                         ! time1.equals ( appointmentDetails.getServiceStartTime ( ) );
+
+            if ( timeChanged ) {
+                // Find and lock the new slot
+                AppointmentSlot newSlot = slotRepository.findByGarageIdAndStartTime ( garageId, date, time1 )
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "New slot not available or fully booked" ) );
+
+                if ( ! newSlot.isAvailable ( ) ) {
+                    throw new IllegalStateException ( "New slot is fully booked." );
+                }
+
+                // Decrement old slot if appointment was confirmed
+                if ( appointmentDetails.getStatus ( ) == Status.CONFIRMED && oldSlot != null ) {
+                    slotService.decrementSlotBookings ( oldSlot.getId ( ) );
+                }
+
+                // Increment new slot
+                newSlot.setCurrentBookings ( newSlot.getCurrentBookings ( ) + 1 );
+                slotRepository.save ( newSlot );
+
+                // Update appointment with new slot
+                appointmentDetails.setSlot ( newSlot );
+                appointmentDetails.setServiceStartTime ( time1 );
+                appointmentDetails.setScheduleDate ( date );
+                bookingRepo.save(appointmentDetails);
+            }
+
+            appointmentDetails.setGarage ( garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
+        }
+
+        // Handle status changes (e.g., cancelling without time change)
+        if ( status != null && status != appointmentDetails.getStatus ( ) ) {
+            // If changing from CONFIRMED to CANCELLED and time didn't change, decrement slot
+            if ( appointmentDetails.getStatus ( ) == Status.CONFIRMED &&
+                 status == Status.CANCELLED &&
+                 ! timeChanged &&
+                 oldSlot != null ) {
+                slotService.decrementSlotBookings ( oldSlot.getId ( ) );
+            }
+            appointmentDetails.setStatus ( status );
+        }
+
+        if ( vehicleId != null ) {
+            appointmentDetails.setVehicleId ( vehicleId );
+        }
+
+        AppointmentDetailResponse save = appointmentDetailMapper.entityToResponse ( bookingRepo.save ( appointmentDetails ) );
+
+        return new ResponseEntity<> ( save, HttpStatus.OK );
+
+    }
+*/
