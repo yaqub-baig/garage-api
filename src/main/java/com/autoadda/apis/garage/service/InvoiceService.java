@@ -353,6 +353,11 @@ public class InvoiceService {
             GenericResponse smsResponse = authClient.sendSms ( smsRequest );
 
             if ( "SUCCESS".equalsIgnoreCase ( smsResponse.getStatus ( ) ) ) {
+                // Update WorkOrder status to INVOICED when invoice is successfully sent to customer
+                if ( workOrder.getStatus ( ) == WorkOrderStatus.INVOICE_INITIATED ) {
+                    workOrder.updateStatus ( WorkOrderStatus.INVOICED );
+                    workOrderRepository.save ( workOrder );
+                }
                 return GenericResponse.success ( "Invoice sent to customer successfully", smsResponse );
             } else {
                 return GenericResponse.failed ( "Failed to send invoice to customer", smsResponse );
