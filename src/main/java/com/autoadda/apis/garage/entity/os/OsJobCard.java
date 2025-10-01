@@ -53,9 +53,9 @@ public class OsJobCard {
     @JoinColumn(name = "technician_id", referencedColumnName = "id")
     private Technician technician;
 
-    @ManyToOne
-    @JoinColumn(name = "os_appointment_id", referencedColumnName = "id")
-    private OsAppointmentDetails osAppointment;
+//    @ManyToOne
+//    @JoinColumn(name = "os_appointment_details_id", referencedColumnName = "id")
+    private Integer osAppointmentId;
 
     @ManyToOne
     @JoinColumn(name = "appointment_service_id", referencedColumnName = "id")

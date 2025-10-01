@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface OtherServiceBridgeRepository extends JpaRepository<OtherServiceBridge, Integer> {
     List<OtherServiceBridge> findByOtherServiceGarageId(Integer garageId);
+    List<OtherServiceBridge> findByOtherServiceGarageIdAndAvailableServiceId(Integer garageId ,Integer availableServiceId);
 }

@@ -29,12 +29,12 @@ public interface OsAppointmentDetailsRepository extends JpaRepository<OsAppointm
 
     List<OsAppointmentDetails> findByOtherServiceIdAndStatus(Integer otherServiceId, Status status);
 
-    Set<OsAppointmentDetails> findByGarageIdAndScheduleDate(Integer otherServiceId, LocalDate date);
+    Set<OsAppointmentDetails> findByOtherServiceIdAndScheduleDate(Integer otherServiceId, LocalDate date);
 
-    Optional<OsAppointmentDetails> findByGarage_IdAndScheduleDateAndServiceStartTime(Integer otherServiceId,
+    Optional<OsAppointmentDetails> findByOtherService_IdAndScheduleDateAndServiceStartTime(Integer otherServiceId,
                                                                                    LocalDate scheduleDate, LocalTime serviceStartTime);
 
-    boolean existsByGarage_IdAndScheduleDateAndServiceStartTimeAndStatus(Integer otherServiceId, LocalDate scheduleDate,
+    boolean existsByOtherService_IdAndScheduleDateAndServiceStartTimeAndStatus(Integer otherServiceId, LocalDate scheduleDate,
                                                                          LocalTime serviceStartTime, Status status);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

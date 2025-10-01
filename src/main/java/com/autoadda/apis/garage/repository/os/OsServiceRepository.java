@@ -25,12 +25,12 @@ public interface OsServiceRepository extends JpaRepository<OsService, Integer> {
 
     List<OsService> findByAvailableService_NameContainingIgnoreCaseAndIsActive(String name, Boolean isActive);
 
-    List<OsService> findByAvailableService_NameContainingIgnoreCaseAndIsActiveAndGarage_Id(String name,
+    List<OsService> findByAvailableService_NameContainingIgnoreCaseAndIsActiveAndOtherServiceId(String name,
                                                                                                Boolean isActive, Integer otherServiceId);
 
     List<OsService> findByAvailableService_Id(Integer serviceId);
 
-    List<OsService> findByGarage_IdAndIsActive(Integer otherServiceId, Boolean isActive);
+    List<OsService> findByOtherService_IdAndIsActive(Integer otherServiceId, Boolean isActive);
 
-    List<OsService> findByGarage_IdAndAvailableService_Id(Integer garageId, Integer serviceId);
+    List<OsService> findByOtherService_IdAndAvailableService_Id(Integer otherServiceId, Integer serviceId);
 }

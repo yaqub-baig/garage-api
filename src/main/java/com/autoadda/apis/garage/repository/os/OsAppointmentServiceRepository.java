@@ -9,6 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OsAppointmentServiceRepository extends JpaRepository<OsAppointmentServices, Integer>{
 
-    List<OsAppointmentServices> findByOsAppointmentId(Integer osAppointmentId);
-
+    List<OsAppointmentServices> findByAppointmentId(Integer id);
 }

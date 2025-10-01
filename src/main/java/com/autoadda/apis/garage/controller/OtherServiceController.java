@@ -3,6 +3,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.OtherService;
 import com.autoadda.apis.garage.request.OtherServiceRequest;
+import com.autoadda.apis.garage.response.OsResponse;
 import com.autoadda.apis.garage.service.OtherServiceManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -70,5 +71,10 @@ public class OtherServiceController {
     @GetMapping("/service/{serviceType}")
     public ResponseEntity<List<OtherService>> getOtherServicesByServiceType(@PathVariable String serviceType) {
         return ResponseEntity.ok ( otherService.findOtherServicesByServiceType ( serviceType ) );
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<OsResponse>> searchOsServices( @RequestParam(required = false) String city, @RequestParam(required = false) String zip, @RequestParam(required = false) String garageName, @RequestParam(required = false) List<Integer> availableServiceIds) {
+        return ResponseEntity.ok ( otherService.searchOtherServices(  city, zip, garageName, availableServiceIds ) );
     }
 }

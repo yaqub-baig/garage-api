@@ -1,6 +1,8 @@
 package com.autoadda.apis.garage.entity;
 
+import com.autoadda.apis.garage.entity.os.OsAvailableService;
 import com.autoadda.apis.garage.util.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -68,6 +70,10 @@ public class OtherService {
     @Column(name = "service_type")
     private String serviceType;
 
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    @JsonIgnore
+    private OtherServiceBridge  osService;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

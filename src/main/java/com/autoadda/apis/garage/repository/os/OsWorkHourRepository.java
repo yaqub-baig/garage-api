@@ -12,6 +12,6 @@ public interface OsWorkHourRepository extends JpaRepository<OsWorkHours, Integer
 
 
     @Query("SELECT g FROM OsWorkHours g WHERE g.otherService.id = :otherServiceId AND g.dayOfWeek = :dayOfWeek")
-    Optional<OsWorkHours> findByGarageDetailsIdAndDayOfWeek(@Param("garageId") Integer garageId, @Param("dayOfWeek") DayOfWeek dayOfWeek);
+    Optional<OsWorkHours> findByOtherServiceDetailsIdAndDayOfWeek(@Param("otherServiceId") Integer garageId, @Param("dayOfWeek") DayOfWeek dayOfWeek);
 
 }

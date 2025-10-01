@@ -58,7 +58,7 @@ public class OsJobCardService {
                 .orElseThrow(() -> new ResourceNotFoundException ("Technician not found"));
 
         OsJobCard jobCard = OsJobCard.builder()
-                .osAppointment(appointment)
+                .osAppointmentId(appointment.getId())
                 .otherService(otherService1)
                 .technician(technician)
                 .service(service)
@@ -142,7 +142,7 @@ public class OsJobCardService {
         if (status == null || StringUtils.isBlank(status.toString()))
             return osJobCardRepository.findByOtherServiceId(otherServiceId);
         else
-            return osJobCardRepository.findByGarage_IdAndStatus(otherServiceId, status);
+            return osJobCardRepository.findByOtherServiceIdAndStatus(otherServiceId, status);
     }
 
     /**
@@ -153,7 +153,7 @@ public class OsJobCardService {
      */
     @Transactional(readOnly = true)
     public List<OsJobCard> getJobCardsByAppointmentId(Integer osAppointmentId) {
-        return osJobCardRepository.findByAppointmentId(osAppointmentId);
+        return osJobCardRepository.findByOsAppointmentId(osAppointmentId);
     }
 
     /**

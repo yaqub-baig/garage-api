@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.entity;
 
+import com.autoadda.apis.garage.entity.os.OsAvailableService;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -28,6 +29,6 @@ public class OtherServiceBridge {
 
     @ManyToOne
     @JoinColumn(name = "service_id")
-    private AvailableService availableService;
+    private OsAvailableService availableService;
 
 }

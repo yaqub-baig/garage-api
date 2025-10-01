@@ -4,6 +4,7 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.OtherService;
 import com.autoadda.apis.garage.request.OtherServiceRequest;
+import com.autoadda.apis.garage.response.OsResponse;
 import com.autoadda.apis.garage.util.Status;
 
 import java.util.List;
@@ -68,4 +69,6 @@ public interface OtherServiceManagementService {
      * Find other service by contact number
      */
     Optional<OtherService> findOtherServiceByContact(String contact);
+
+    List<OsResponse> searchOtherServices( String city, String zip, String garageName, List<Integer> availableServiceIds);
 }

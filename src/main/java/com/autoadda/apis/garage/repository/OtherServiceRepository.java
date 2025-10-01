@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.repository;
 
 
+import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.OtherService;
 import com.autoadda.apis.garage.util.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface OtherServiceRepository extends JpaRepository<OtherService, Integer> {
@@ -85,4 +87,9 @@ public interface OtherServiceRepository extends JpaRepository<OtherService, Inte
     List<OtherService> findByCompanyBrandNameContainingIgnoreCaseAndIsActiveTrue(@Param("brandName") String brandName);
 
     Optional<OtherService> findByTradeLicenceNumber(String tradeLicenceNumber);
+    @Query("SELECT DISTINCT g FROM OtherService g " +
+            "LEFT JOIN FETCH g.companyLocation " +
+            "LEFT JOIN FETCH g.services s " +
+            "LEFT JOIN FETCH s.availableService")
+    Set<OtherService> findAllWithLocationAndServices();
 }

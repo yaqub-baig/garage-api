@@ -3,9 +3,9 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.OtherServiceBridge;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
-import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.repository.OtherServiceBridgeRepository;
 import com.autoadda.apis.garage.repository.OtherServiceRepository;
+import com.autoadda.apis.garage.repository.os.OsAvailableServiceRepository;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,14 +17,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OtherServiceBridgeManagementService {
     private final OtherServiceRepository otherServiceRepository;
-    private final AvailableServiceRepository availableServiceRepository;
+    private final OsAvailableServiceRepository osAvailableServiceRepository;
     private final OtherServiceBridgeRepository otherServiceBridgeRepository;
 
     private OtherServiceBridge mapToEntity(GarageServiceRequest service) {
         OtherServiceBridge otherServiceBridge = new OtherServiceBridge ( );
         otherServiceBridge.setIsActive ( service.isActive ( ) );
         otherServiceBridge.setOtherServiceGarage ( otherServiceRepository.findById ( service.getGarageId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
-        otherServiceBridge.setAvailableService ( availableServiceRepository.findById ( service.getServiceId () ).orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) ) );
+        otherServiceBridge.setAvailableService ( osAvailableServiceRepository.findById ( service.getServiceId () ).orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) ) );
         return otherServiceBridge;
     }
 

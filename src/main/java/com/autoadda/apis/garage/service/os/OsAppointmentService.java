@@ -172,7 +172,7 @@ public class OsAppointmentService {
         OsAppointmentDetails appointment = osAppointmentDetailsRepository.findById(osAppointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-        List<com.autoadda.apis.garage.entity.os.OsAppointmentServices> services = serviceRepo.findByOsAppointmentId(osAppointmentId);
+        List<com.autoadda.apis.garage.entity.os.OsAppointmentServices> services = serviceRepo.findByAppointmentId(osAppointmentId);
         List<OsJobCard> jobCards = jobCardService.getJobCardsByAppointmentId(osAppointmentId);
 
         return OsAppointmentResponse.builder().appointment(appointment).services(services).jobcards(jobCards).build();
