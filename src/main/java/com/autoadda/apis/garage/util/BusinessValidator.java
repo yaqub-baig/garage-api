@@ -3,31 +3,22 @@ package com.autoadda.apis.garage.util;
 import com.autoadda.apis.garage.entity.AuthenticationDetails;
 import com.autoadda.apis.garage.entity.Customer;
 import com.autoadda.apis.garage.entity.Garage;
-import com.autoadda.apis.garage.exception.CustomerNotFoundException;
-import com.autoadda.apis.garage.exception.GarageNotFoundException;
-import com.autoadda.apis.garage.exception.MemberAlreadyExistException;
-import com.autoadda.apis.garage.exception.MemberNotFoundException;
-import com.autoadda.apis.garage.repository.AuthenticationDetailsRepository;
-import com.autoadda.apis.garage.repository.CustomerRepository;
-import com.autoadda.apis.garage.repository.GarageRepository;
-import com.autoadda.apis.garage.repository.TechnicianRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.autoadda.apis.garage.entity.OtherService;
+import com.autoadda.apis.garage.exception.*;
+import com.autoadda.apis.garage.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class BusinessValidator {
 
-    @Autowired
-    private GarageRepository garageRepository;
 
-    @Autowired
-    private CustomerRepository customerRepository;
-
-    @Autowired
-    private TechnicianRepository garageTechnicianRepository;
-
-    @Autowired
-    private AuthenticationDetailsRepository authenticationDetailsRepository;
+    private final GarageRepository garageRepository;
+    private final CustomerRepository customerRepository;
+    private final TechnicianRepository garageTechnicianRepository;
+    private final AuthenticationDetailsRepository authenticationDetailsRepository;
+    private final OtherServiceRepository otherServiceRepository;
 
     /**
      * Validates if the given garage ID exists.
@@ -59,4 +50,8 @@ public class BusinessValidator {
                 .orElseThrow ( () -> new CustomerNotFoundException ( "Customer not found" ) );
     }
 
+    public OtherService validateAndGetOtherService(Integer otherServiceId) {
+        return otherServiceRepository.findById ( otherServiceId )
+                .orElseThrow ( () -> new OtherServiceNotFoundException ( "Other Service not found" ) );
+    }
 }

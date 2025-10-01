@@ -24,7 +24,7 @@ public class OtherServiceBridgeManagementService {
         OtherServiceBridge otherServiceBridge = new OtherServiceBridge ( );
         otherServiceBridge.setIsActive ( service.isActive ( ) );
         otherServiceBridge.setOtherServiceGarage ( otherServiceRepository.findById ( service.getGarageId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
-        otherServiceBridge.setAvailableService ( availableServiceRepository.findById ( service.getServiceId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) ) );
+        otherServiceBridge.setAvailableService ( osAvailableServiceRepository.findById ( service.getServiceId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) ) );
         return otherServiceBridge;
     }
 
