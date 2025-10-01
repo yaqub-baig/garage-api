@@ -16,6 +16,8 @@ public class GarageServiceMapper {
         garageServiceResponse.setId ( garageService.getId ( ) );
         garageServiceResponse.setIsActive ( garageService.getIsActive ( ) );
         garageServiceResponse.setGarageId ( garageService.getGarage ( ).getId ( ) );
+        garageServiceResponse.setPrice ( garageService.getPrice ( ) );
+        garageServiceResponse.setLaborPrice ( garageService.getLabourPrice ( ) );
         garageServiceResponse.setAvailableService ( availableServiceMapper.toResponse ( garageService.getAvailableService ( ) ) );
         return garageServiceResponse;
     }

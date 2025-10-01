@@ -1,18 +1,8 @@
 package com.autoadda.apis.garage.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -22,20 +12,24 @@ import lombok.Setter;
 @Builder
 public class GarageService {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-	@Column(name = "is_active")
-	private Boolean isActive;
+    @Column(name = "is_active")
+    private Boolean isActive;
 
-	@ManyToOne
+    @ManyToOne
     @JoinColumn(name = "garage_id")
     private Garage garage;
 
     @ManyToOne
     @JoinColumn(name = "service_id")
-	@JsonIgnore
+    @JsonIgnore
     private AvailableService availableService;
+
+    private Double price;
+
+    private Double labourPrice;
 }

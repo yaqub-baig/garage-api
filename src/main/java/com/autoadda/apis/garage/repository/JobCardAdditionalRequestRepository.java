@@ -1,12 +1,11 @@
 package com.autoadda.apis.garage.repository;
 
+import com.autoadda.apis.garage.entity.JobCardAdditionalRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.autoadda.apis.garage.entity.JobCardAdditionalRequest;
-
 @Repository
-public interface JobCardAdditionalRequestRepository extends JpaRepository<JobCardAdditionalRequest, Integer>{
+public interface JobCardAdditionalRequestRepository extends JpaRepository<JobCardAdditionalRequest, Integer> {
 
 
 }

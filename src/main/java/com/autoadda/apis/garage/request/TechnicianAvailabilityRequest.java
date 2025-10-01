@@ -1,17 +1,12 @@
 package com.autoadda.apis.garage.request;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import com.autoadda.apis.garage.util.Status;
-
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Setter
 @Getter
@@ -20,18 +15,18 @@ import lombok.Setter;
 @Builder
 public class TechnicianAvailabilityRequest {
 
-	private Integer id;
+    private Integer id;
 
-	private LocalDate date;
+    private LocalDate date;
 
-	private LocalTime startTime;
-	private LocalTime endTime;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
-	@Enumerated(EnumType.STRING)
-	private Status status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-	private TechnicianRequest technician;
-	private Integer technicianId;
+    private TechnicianRequest technician;
+    private Integer technicianId;
 
-	// Getters and setters
+    // Getters and setters
 }

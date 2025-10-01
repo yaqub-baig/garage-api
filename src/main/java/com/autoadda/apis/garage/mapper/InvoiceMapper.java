@@ -1,11 +1,5 @@
 package com.autoadda.apis.garage.mapper;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.entity.AppointmentInvoice;
 import com.autoadda.apis.garage.entity.AppointmentInvoiceBreakDown;
@@ -13,6 +7,11 @@ import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
 import com.autoadda.apis.garage.request.ServiceInvoice;
 import com.autoadda.apis.garage.util.DateHelper;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", imports = {DateHelper.class})
 public interface InvoiceMapper {
@@ -31,7 +30,7 @@ public interface InvoiceMapper {
 
     // ✅ Wrapper for semantic clarity
     default AppointmentInvoice toInvoice(AppointmentInvoiceRequest request, Garage garage, AppointmentDetails appointment) {
-        return toEntity(request, garage, appointment);
+        return toEntity ( request, garage, appointment );
     }
 
     // ✅ Convert individual ServiceInvoice to AppointmentInvoiceBreakDown
@@ -48,16 +47,16 @@ public interface InvoiceMapper {
 
     // ✅ Map all service lines into breakdowns
     default List<AppointmentInvoiceBreakDown> toBreakdownList(AppointmentInvoiceRequest request, AppointmentInvoice invoice, Garage garage, AppointmentDetails appointment) {
-        return request.getService().stream()
-                .map(service -> toBreakdown(service, invoice, garage, appointment))
-                .collect(Collectors.toList());
+        return request.getService ( ).stream ( )
+                .map ( service -> toBreakdown ( service, invoice, garage, appointment ) )
+                .collect ( Collectors.toList ( ) );
     }
 
     // ✅ Helper method to calculate net amount
     default Double calculateNetAmount(AppointmentInvoiceRequest request) {
-        return request.getService().stream()
-                .mapToDouble(ServiceInvoice::getAmount)
-                .sum();
+        return request.getService ( ).stream ( )
+                .mapToDouble ( ServiceInvoice::getAmount )
+                .sum ( );
     }
 }
 // This mapper interface uses MapStruct to convert between request objects and entity objects for appointment invoices.

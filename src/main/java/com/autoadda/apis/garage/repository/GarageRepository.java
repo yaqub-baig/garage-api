@@ -1,7 +1,6 @@
 package com.autoadda.apis.garage.repository;
 
 import com.autoadda.apis.garage.entity.Garage;
-import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.util.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

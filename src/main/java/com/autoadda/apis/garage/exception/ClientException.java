@@ -8,25 +8,25 @@ public class ClientException extends RuntimeException {
     private final int statusCode;
 
     public ClientException(String clientName, String message) {
-        super(message);
+        super ( message );
         this.clientName = clientName;
         this.statusCode = 0;
     }
 
     public ClientException(String clientName, String message, int statusCode) {
-        super(message);
+        super ( message );
         this.clientName = clientName;
         this.statusCode = statusCode;
     }
 
     public ClientException(String clientName, String message, Throwable cause) {
-        super(message, cause);
+        super ( message, cause );
         this.clientName = clientName;
         this.statusCode = 0;
     }
 
     public ClientException(String clientName, String message, int statusCode, Throwable cause) {
-        super(message, cause);
+        super ( message, cause );
         this.clientName = clientName;
         this.statusCode = statusCode;
     }

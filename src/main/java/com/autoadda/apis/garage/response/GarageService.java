@@ -1,12 +1,8 @@
 package com.autoadda.apis.garage.response;
 
-import java.util.Date;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -14,14 +10,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class GarageService {
-	private Integer id;
+    private Integer id;
 
-	private String service;
+    private String service;
 
-	private String description;
+    private String description;
 
-	private Integer categoryId;
+    private Integer categoryId;
 
-	private Date insertTms;
+    private Date insertTms;
 
 }

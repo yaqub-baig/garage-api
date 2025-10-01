@@ -1,18 +1,17 @@
 package com.autoadda.apis.garage.repository;
 
-import java.util.Optional;
-
+import com.autoadda.apis.garage.entity.CompanyOwner;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.autoadda.apis.garage.entity.CompanyOwner;
+import java.util.Optional;
 
 @Repository
 public interface CompanyOwnerRepository extends JpaRepository<CompanyOwner, Integer> {
-	Optional<CompanyOwner> findByCompanyName(String companyName);
+    Optional<CompanyOwner> findByCompanyName(String companyName);
 
-	Optional<CompanyOwner> findByEmail(String email);
+    Optional<CompanyOwner> findByEmail(String email);
 
-	Optional<CompanyOwner> findByMobileNumber(String mobileNumber);
+    Optional<CompanyOwner> findByMobileNumber(String mobileNumber);
 
 }

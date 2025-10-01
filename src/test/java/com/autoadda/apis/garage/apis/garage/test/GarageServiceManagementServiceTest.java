@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import com.autoadda.apis.garage.response.GarageServiceResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -110,7 +111,7 @@ class GarageServiceManagementServiceTest {
 	@Test
 	void testGetByGarageId() {
 		when(garageServiceRepository.findByGarage_Id(1)).thenReturn(List.of(garageService));
-		List<GarageService> result = garageServiceManagementService.getByGarageId(1);
+		List<GarageServiceResponse> result = garageServiceManagementService.getByGarageId(1);
 		assertEquals(1, result.size());
 	}
 

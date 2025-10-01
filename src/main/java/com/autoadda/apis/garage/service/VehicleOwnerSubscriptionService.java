@@ -94,7 +94,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscriptionResponse> getActiveSubscriptions() {
-        return vehicleOwnerSubscriptionRepository.findByStatus ( SubscriptionStatus.ACTIVE ).stream ().map(vehicleOwnerSubscriptionMapper::toResponse).toList ();
+        return vehicleOwnerSubscriptionRepository.findByStatus ( SubscriptionStatus.ACTIVE ).stream ( ).map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ( );
     }
 
     /**
@@ -106,7 +106,7 @@ public class VehicleOwnerSubscriptionService {
     @Transactional
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByDateRange(Integer ownerId, LocalDate startDate,
                                                                               LocalDate endDate) {
-        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndStartDateBetween ( ownerId, startDate, endDate ).stream ().map(vehicleOwnerSubscriptionMapper::toResponse).toList ();
+        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndStartDateBetween ( ownerId, startDate, endDate ).stream ( ).map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ( );
     }
 
     /**
@@ -117,7 +117,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByPlan(Integer subscriptionId) {
-        return vehicleOwnerSubscriptionRepository.findByGarageSubscriptionId ( subscriptionId ).stream ().map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ();
+        return vehicleOwnerSubscriptionRepository.findByGarageSubscriptionId ( subscriptionId ).stream ( ).map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ( );
     }
 
     /**
@@ -130,7 +130,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwnerAndPlan(Integer ownerId, Integer subscriptionId) {
-        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndGarageSubscriptionId ( ownerId, subscriptionId ).stream ().map(vehicleOwnerSubscriptionMapper::toResponse).toList ();
+        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndGarageSubscriptionId ( ownerId, subscriptionId ).stream ( ).map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ( );
     }
 
     /**
@@ -142,7 +142,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwnerAndStatus(Integer ownerId, String status) {
-        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndStatus ( ownerId, status ).stream ().map(vehicleOwnerSubscriptionMapper::toResponse).toList ();
+        return vehicleOwnerSubscriptionRepository.findByCustomerIdAndStatus ( ownerId, status ).stream ( ).map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ( );
     }
 
     /**
@@ -155,7 +155,7 @@ public class VehicleOwnerSubscriptionService {
      */
     @Transactional
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByPlanAndStatus(Integer subscriptionId, String status) {
-        return vehicleOwnerSubscriptionRepository.findByGarageSubscriptionIdAndStatus ( subscriptionId, status ).stream ().map(vehicleOwnerSubscriptionMapper::toResponse).toList ();
+        return vehicleOwnerSubscriptionRepository.findByGarageSubscriptionIdAndStatus ( subscriptionId, status ).stream ( ).map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ( );
     }
 
     /**

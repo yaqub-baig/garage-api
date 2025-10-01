@@ -1,12 +1,7 @@
 package com.autoadda.apis.garage.entity;
 
 import com.autoadda.apis.garage.util.Status;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,23 +14,23 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VehicleRegistration {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Integer id;
 
-	@Column(name = "state")
-	private Status state;
+    @Column(name = "state")
+    private Status state;
 
-	@Column(name = "code")
-	private String code;
+    @Column(name = "code")
+    private String code;
 
-	@Column(name = "category")
-	private String category;
+    @Column(name = "category")
+    private String category;
 
-	@Column(name = "plate_number")
-	private String plateNumber;
+    @Column(name = "plate_number")
+    private String plateNumber;
 
-	@Column(name = "registered_name")
-	private String registeredName;
+    @Column(name = "registered_name")
+    private String registeredName;
 }

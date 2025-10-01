@@ -24,4 +24,6 @@ public interface TechnicianRepository extends JpaRepository<Technician, Integer>
     List<Technician> findByStatus(String status);
 
     int countByGarageId(Integer id);
+
+    Optional<Technician> findByAutoAddaId(Integer autoAddaId);
 }

@@ -2,12 +2,7 @@ package com.autoadda.apis.garage.request;
 
 import com.autoadda.apis.garage.util.IntervalType;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -32,7 +27,7 @@ public class MaintenanceScheduleRuleRequest {
 
     @JsonProperty("isActive")
     private boolean isActive;
-    
+
     @Override
     public String toString() {
         return "MaintenanceScheduleRuleRequest{" +

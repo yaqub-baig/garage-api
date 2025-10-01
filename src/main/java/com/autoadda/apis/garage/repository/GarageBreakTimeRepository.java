@@ -1,12 +1,11 @@
 package com.autoadda.apis.garage.repository;
 
+import com.autoadda.apis.garage.entity.GarageBreakTime;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.time.DayOfWeek;
 import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.autoadda.apis.garage.entity.GarageBreakTime;
-import org.springframework.stereotype.Repository;
 
 
 @Repository

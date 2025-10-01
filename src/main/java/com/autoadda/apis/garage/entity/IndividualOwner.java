@@ -1,12 +1,12 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Entity
 @DiscriminatorValue("INDIVIDUAL")

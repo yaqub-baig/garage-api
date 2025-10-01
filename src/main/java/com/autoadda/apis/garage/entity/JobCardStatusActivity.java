@@ -1,19 +1,10 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDate;
-
 import com.autoadda.apis.garage.util.Status;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -23,27 +14,27 @@ import lombok.Setter;
 @Builder
 public class JobCardStatusActivity {
 
-	@Id
-	@Column(name = "id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
 
-	@Column(name = "jobcard_id")
-	private Integer jobcardId;
+    @Column(name = "jobcard_id")
+    private Integer jobcardId;
 
-	@Column(name = "status")
-	private Status status;
+    @Column(name = "status")
+    private Status status;
 
-	@Column(name = "comments")
-	private String comments;
+    @Column(name = "comments")
+    private String comments;
 
-	@Column(name = "insert_tms")
-	private LocalDate insert_tms;
+    @Column(name = "insert_tms")
+    private LocalDate insert_tms;
 
-	@Column(name = "member_id")
-	private Integer memberId;
+    @Column(name = "member_id")
+    private Integer memberId;
 
-	@Column(name = "member_type")
-	private String memberType;
+    @Column(name = "member_type")
+    private String memberType;
 
 }

@@ -15,8 +15,8 @@ public class MediaFileMapper {
         response.setFilePath ( save.getFilePath ( ) );
         response.setMediaType ( save.getMediaType ( ) );
         response.setSize ( save.getSize ( ) );
-        response.setFileUrl (  url );
-        response.setCreatedAt ( save.getCreatedAt () );
+        response.setFileUrl ( url );
+        response.setCreatedAt ( save.getCreatedAt ( ) );
         return response;
     }
 
@@ -26,7 +26,7 @@ public class MediaFileMapper {
         mediaFile.setOriginalFileName ( originalFilename );
         mediaFile.setFilePath ( subFolder + "/" + fileName );
         mediaFile.setMediaType ( contentType );
-        mediaFile.setSize ( size);
+        mediaFile.setSize ( size );
         return mediaFile;
     }
 }

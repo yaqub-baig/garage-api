@@ -1,125 +1,139 @@
 package com.autoadda.apis.garage.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
-import com.autoadda.apis.garage.entity.AppointmentDetails;
-import com.autoadda.apis.garage.entity.AppointmentInvoice;
-import com.autoadda.apis.garage.entity.AppointmentInvoiceBreakDown;
-import com.autoadda.apis.garage.entity.Garage;
-import com.autoadda.apis.garage.entity.Invoice;
-import com.autoadda.apis.garage.entity.InvoiceLineItem;
-import com.autoadda.apis.garage.entity.WorkOrder;
+import com.autoadda.apis.garage.clients.AuthClient;
+import com.autoadda.apis.garage.clients.VehicleClient;
+import com.autoadda.apis.garage.entity.*;
+import com.autoadda.apis.garage.mapper.AppointmentInvoiceMapper;
+import com.autoadda.apis.garage.mapper.InvoiceLineItemMapper;
 import com.autoadda.apis.garage.mapper.InvoiceMapper;
-import com.autoadda.apis.garage.repository.AppointmentDetailsRepository;
-import com.autoadda.apis.garage.repository.AppointmentInvoiceBreakDownRepository;
-import com.autoadda.apis.garage.repository.AppointmentInvoiceRepository;
-import com.autoadda.apis.garage.repository.GarageRepository;
-import com.autoadda.apis.garage.repository.InvoiceRepository;
-import com.autoadda.apis.garage.repository.WorkOrderRepository;
+import com.autoadda.apis.garage.mapper.InvoiceResponseMapper;
+import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
 import com.autoadda.apis.garage.request.AppointmentPayRequest;
+import com.autoadda.apis.garage.request.InvoiceRequest;
+import com.autoadda.apis.garage.request.SmsRequest;
+import com.autoadda.apis.garage.response.AppointmentInvoiceResponse;
+import com.autoadda.apis.garage.response.GenericResponse;
+import com.autoadda.apis.garage.response.InvoiceResponse;
+import com.autoadda.apis.garage.response.VehicleDetailResponse;
+import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.Status;
-
+import com.autoadda.apis.garage.util.WorkOrderStatus;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
 public class InvoiceService {
 
-	private final AppointmentInvoiceRepository invoiceRepo;
-	private final AppointmentInvoiceBreakDownRepository breakdownRepo;
-	private final AppointmentDetailsRepository appointmentRepo;
-	private final GarageRepository garageRepo;
-	private final WorkOrderRepository workOrderRepository;
-	private final InvoiceRepository invoiceRepository;
+    private final AppointmentInvoiceRepository invoiceRepo;
+    private final AppointmentInvoiceBreakDownRepository breakdownRepo;
+    private final AppointmentDetailsRepository appointmentRepo;
+    private final GarageRepository garageRepo;
+    private final WorkOrderRepository workOrderRepository;
+    private final InvoiceRepository invoiceRepository;
+    private final AppointmentInvoiceMapper appointmentInvoiceMapper;
+    private final InvoiceMapper invoiceMapper;
+    private final InvoiceLineItemMapper lineItemMapper;
+    private final InvoiceResponseMapper invoiceResponseMapper;
+    private final InvoiceLineItemGeneratorService lineItemGenerator;
+    private final AuthClient authClient;
+    private final VehicleClient vehicleClient;
 
-	private final InvoiceMapper invoiceMapper;
+    /**
+     * Prepares an invoice for a given appointment and garage.
+     *
+     * @param request the request containing appointment and garage details
+     * @return the created AppointmentInvoice
+     */
+    @Transactional
+    public AppointmentInvoiceResponse prepareInvoice(AppointmentInvoiceRequest request) {
+        AppointmentDetails appointment = appointmentRepo.findById ( request.getAppointmentId ( ) )
+                .orElseThrow ( () -> new RuntimeException ( "Appointment not found" ) );
 
-	/**
-	 * Prepares an invoice for a given appointment and garage.
-	 *
-	 * @param request the request containing appointment and garage details
-	 * @return the created AppointmentInvoice
-	 */
-	@Transactional
-	public AppointmentInvoice prepareInvoice(AppointmentInvoiceRequest request) {
-		AppointmentDetails appointment = appointmentRepo.findById(request.getAppointmentId())
-				.orElseThrow(() -> new RuntimeException("Appointment not found"));
+        Garage garage = garageRepo.findById ( request.getGarageId ( ) )
+                .orElseThrow ( () -> new RuntimeException ( "Garage not found" ) );
 
-		Garage garage = garageRepo.findById(request.getGarageId())
-				.orElseThrow(() -> new RuntimeException("Garage not found"));
+        AppointmentInvoice invoice = invoiceMapper.toEntity ( request, garage, appointment );
+        invoiceRepo.save ( invoice );
 
-		AppointmentInvoice invoice = invoiceMapper.toEntity(request, garage, appointment);
-		invoiceRepo.save(invoice);
+        List<AppointmentInvoiceBreakDown> breakdowns = request.getService ( ).stream ( )
+                .map ( service -> invoiceMapper.toBreakdown ( service, invoice, garage, appointment ) )
+                .toList ( );
+        breakdownRepo.saveAll ( breakdowns );
 
-		List<AppointmentInvoiceBreakDown> breakdowns = request.getService().stream()
-				.map(service -> invoiceMapper.toBreakdown(service, invoice, garage, appointment))
-				.collect(Collectors.toList());
-		breakdownRepo.saveAll(breakdowns);
+        appointment.setStatus ( Status.INVOICE_INITIATED );
+        appointmentRepo.save ( appointment );
 
-		appointment.setStatus(Status.INVOICE_INITIATED);
-		appointmentRepo.save(appointment);
+        return appointmentInvoiceMapper.fromEntity ( invoice );
+    }
 
-		return invoice;
-	}
+    /**
+     * Updates the payment status of an invoice based on the appointment payment
+     * request.
+     *
+     * @param request the request containing appointment ID and payment status
+     * @return the updated AppointmentInvoice
+     */
+    @Transactional
+    public AppointmentInvoiceResponse updateInvoicePayment(AppointmentPayRequest request) {
+        AppointmentInvoice invoice = invoiceRepo.findByAppointmentId ( request.getAppointmentId ( ) );
+        invoice.setStatus ( request.getStatus ( ) );
 
-	/**
-	 * Updates the payment status of an invoice based on the appointment payment
-	 * request.
-	 *
-	 * @param request the request containing appointment ID and payment status
-	 * @return the updated AppointmentInvoice
-	 */
-	@Transactional
-	public AppointmentInvoice updateInvoicePayment(AppointmentPayRequest request) {
-		AppointmentInvoice invoice = invoiceRepo.findByAppointmentId(request.getAppointmentId());
-		invoice.setStatus(request.getStatus());
+        if ( "PAID".equalsIgnoreCase ( request.getStatus ( ) ) ) {
+            AppointmentDetails appointment = invoice.getAppointment ( );
+            appointment.setStatus ( Status.READY_FOR_DELIVERY );
+            appointmentRepo.save ( appointment );
+        }
 
-		if ("PAID".equalsIgnoreCase(request.getStatus())) {
-			AppointmentDetails appointment = invoice.getAppointment();
-			appointment.setStatus(Status.READY_FOR_DELIVERY);
-			appointmentRepo.save(appointment);
-		}
+        return appointmentInvoiceMapper.fromEntity ( invoiceRepo.save ( invoice ) );
+    }
 
-		return invoiceRepo.save(invoice);
-	}
+    /**
+     * Retrieves all invoices for a specific garage.
+     *
+     * @param garageId the ID of the garage
+     * @return a list of AppointmentInvoices for the specified garage
+     */
+    @Transactional
+    public Invoice generateInvoice(Integer workOrderId, List<InvoiceLineItem> lineItems) {
+        WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Work order not found" ) );
 
-	/**
-	 * Retrieves all invoices for a specific garage.
-	 *
-	 * @param garageId the ID of the garage
-	 * @return a list of AppointmentInvoices for the specified garage
-	 */
-	@Transactional
-	public Invoice generateInvoice(Integer workOrderId, List<InvoiceLineItem> lineItems) {
-		WorkOrder workOrder = workOrderRepository.findById(workOrderId)
-				.orElseThrow(() -> new EntityNotFoundException("Work order not found"));
+        boolean hasCompletedJobCards = workOrder.getJobCards ( ).stream ( )
+                .anyMatch ( j -> j.getStatus ( ) == JobCardStatus.COMPLETED );
 
-		boolean hasCompletedJobCards = workOrder.getJobCards().stream()
-				.anyMatch(j -> j.getStatus() == Status.COMPLETED);
+        if ( ! hasCompletedJobCards ) {
+            throw new IllegalStateException ( "Cannot generate invoice for a work order with no completed job cards." );
+        }
 
-		if (!hasCompletedJobCards) {
-			throw new IllegalStateException("Cannot generate invoice for a work order with no completed job cards.");
-		}
+        Invoice invoice = new Invoice ( );
+        invoice.setWorkOrder ( workOrder );
+        invoice.setCreatedAt ( LocalDateTime.now ( ) );
 
-		Invoice invoice = new Invoice();
-		invoice.setWorkOrder(workOrder);
-		invoice.setCreatedAt(LocalDateTime.now());
+        for (InvoiceLineItem item : lineItems) {
+            if ( item.getPrice ( ) < 0 || item.getQuantity ( ) <= 0 ) {
+                throw new IllegalArgumentException ( "Invalid line item: Price or quantity not valid." );
+            }
+            item.setInvoice ( invoice ); // link line item back to invoice
+        }
 
-		for (InvoiceLineItem item : lineItems) {
-			if (item.getPrice() < 0 || item.getQuantity() <= 0) {
-				throw new IllegalArgumentException("Invalid line item: Price or quantity not valid.");
-			}
-			item.setInvoice(invoice); // link line item back to invoice
-		}
+        invoice.setLineItems ( lineItems );
 
-		invoice.setLineItems(lineItems);
+        // Update WorkOrder status to INVOICE_INITIATED when invoice is created
+        if ( workOrder.getStatus ( ) != WorkOrderStatus.INVOICE_INITIATED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.INVOICED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PENDING_PAYMENT &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
+            workOrder.updateStatus ( WorkOrderStatus.INVOICE_INITIATED );
+            workOrderRepository.save ( workOrder );
+        }
 
 //		double totalCost = lineItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
 //		int pointsValue = pointsToRedeem; // 1 point = $1 for example
@@ -138,38 +152,278 @@ public class InvoiceService {
 //		invoice.setLoyaltyPointsUsed(pointsToRedeem);
 //		invoice.setTotalAmount(total);
 
-		return invoiceRepository.save(invoice);
-	}
+        return invoiceRepository.save ( invoice );
+    }
 
-	/**
-	 * Retrieves all invoices for a specific garage.
-	 *
-	 * @param garageId the ID of the garage
-	 * @return a list of AppointmentInvoices for the specified garage
-	 */
-	@Transactional
-	public Invoice getInvoiceById(Integer id) {
-		return invoiceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Invoice not found"));
-	}
+    /**
+     * Retrieves all invoices for a specific garage.
+     *
+     * @param garageId the ID of the garage
+     * @return a list of AppointmentInvoices for the specified garage
+     */
+    @Transactional
+    public Invoice getInvoiceById(Integer id) {
+        return invoiceRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException ( "Invoice not found" ) );
+    }
 
-	/**
-	 * Retrieves all invoices for a specific garage.
-	 *
-	 * @param garageId the ID of the garage
-	 * @return a list of AppointmentInvoices for the specified garage
-	 */
+    /**
+     * Retrieves all invoices for a specific garage.
+     *
+     * @param garageId the ID of the garage
+     * @return a list of AppointmentInvoices for the specified garage
+     */
 //	@Transactional
 //	public List<Invoice> getInvoicesForGarage(Integer garageId) {
 //		return invoiceRepository.findByWorkOrderJobCardGarageId(garageId);
 //	}
 
-	/**
-	 * Retrieves all invoices created within a specific date range.
-	 *
-	 * @param startDate the start date of the range
-	 * @param endDate   the end date of the range
-	 * @return a list of invoices created within the specified date range
-	 */
+    /**
+     * Retrieves all invoices for a specific garage (through WorkOrder).
+     *
+     * @param garageId the ID of the garage
+     * @return a list of Invoices for the specified garage
+     */
+    @Transactional
+    public List<Invoice> getInvoicesForGarage(Integer garageId) {
+        return invoiceRepository.findAllByGarageId ( garageId );
+    }
+
+    /**
+     * Updates the payment status of a WorkOrder-based invoice.
+     *
+     * @param invoiceId     the ID of the invoice
+     * @param paymentStatus the new payment status
+     * @return the updated Invoice
+     */
+    @Transactional
+    public Invoice updateInvoicePaymentStatus(Integer invoiceId, com.autoadda.apis.garage.util.Status paymentStatus) {
+        Invoice invoice = getInvoiceById ( invoiceId );
+        invoice.setPaymentStatus ( paymentStatus );
+        invoice.setIsPaid ( "PAID".equalsIgnoreCase ( paymentStatus.toString ( ) ) );
+
+        WorkOrder workOrder = invoice.getWorkOrder ( );
+
+        if ( invoice.getIsPaid ( ) ) {
+            // Update WorkOrder status when payment is received
+            if ( workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
+                workOrder.updateStatus ( WorkOrderStatus.PAYMENT_RECEIVED );
+                workOrderRepository.save ( workOrder );
+            }
+        } else {
+            // If not paid, update to appropriate pending status based on current state
+            if ( workOrder.getStatus ( ) == WorkOrderStatus.INVOICE_INITIATED ) {
+                workOrder.updateStatus ( WorkOrderStatus.PENDING_PAYMENT );
+                workOrderRepository.save ( workOrder );
+            }
+        }
+
+        return invoiceRepository.save ( invoice );
+    }
+
+    /**
+     * Finds invoice by WorkOrder ID.
+     *
+     * @param workOrderId the ID of the work order
+     * @return the Invoice if found
+     */
+    @Transactional
+    public InvoiceResponse getInvoiceByWorkOrderId(Integer workOrderId) {
+        return invoiceResponseMapper.toResponse ( invoiceRepository.findByWorkOrderId ( workOrderId )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Invoice not found for WorkOrder ID: " + workOrderId ) ) );
+    }
+
+    // New DTO-based methods
+
+    /**
+     * Generates an invoice from InvoiceRequest DTO with automatic calculations
+     */
+    @Transactional
+    public InvoiceResponse generateInvoiceFromRequest(InvoiceRequest request) {
+        WorkOrder workOrder = workOrderRepository.findById ( request.getWorkOrderId ( ) )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Work order not found" ) );
+
+        // Convert DTOs to entities
+        List<InvoiceLineItem> lineItems = lineItemMapper.toEntityList ( request.getLineItems ( ) );
+
+        Invoice invoice = new Invoice ( );
+        invoice.setWorkOrder ( workOrder );
+        invoice.setCreatedAt ( LocalDateTime.now ( ) );
+        invoice.setTaxRate ( request.getTaxRate ( ) );
+        invoice.setPaymentMethod ( request.getPaymentMethod ( ) );
+        invoice.setNotes ( request.getNotes ( ) );
+
+        // Calculate totals
+        double subtotal = lineItems.stream ( )
+                .mapToDouble ( item -> item.getPrice ( ) * item.getQuantity ( ) )
+                .sum ( );
+
+        double taxAmount = subtotal * (request.getTaxRate ( ) != null ? request.getTaxRate ( ) / 100.0 : 0.0);
+        double totalAmount = subtotal + taxAmount;
+
+        invoice.setTotalAmount ( totalAmount );
+        invoice.setTaxAmount ( taxAmount );
+
+        // Set line items with invoice reference
+        lineItems.forEach ( item -> item.setInvoice ( invoice ) );
+        invoice.setLineItems ( lineItems );
+
+        // Handle loyalty points if specified
+        if ( request.getLoyaltyPointsToUse ( ) != null && request.getLoyaltyPointsToUse ( ) > 0 ) {
+            invoice.setLoyaltyPointsUsed ( request.getLoyaltyPointsToUse ( ) );
+            // TODO: Integrate with loyalty service
+        }
+
+        // Update WorkOrder status to INVOICE_INITIATED when invoice is created
+        if ( workOrder.getStatus ( ) != WorkOrderStatus.INVOICE_INITIATED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.INVOICED &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PENDING_PAYMENT &&
+                workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
+            workOrder.updateStatus ( WorkOrderStatus.INVOICE_INITIATED );
+            workOrderRepository.save ( workOrder );
+        }
+
+        Invoice savedInvoice = invoiceRepository.save ( invoice );
+        return invoiceResponseMapper.toResponse ( savedInvoice );
+    }
+
+    /**
+     * Auto-generates line items from WorkOrder and creates invoice
+     */
+    @Transactional
+    public InvoiceResponse generateInvoiceFromWorkOrder(Integer workOrderId, Double taxRate, String notes) {
+        WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Work order not found" ) );
+
+        // Auto-generate line items from WorkOrder
+        var generatedLineItems = lineItemGenerator.generateLineItemsFromWorkOrder ( workOrder );
+
+        InvoiceRequest request = InvoiceRequest.builder ( )
+                .workOrderId ( workOrderId )
+                .lineItems ( generatedLineItems )
+                .taxRate ( taxRate )
+                .notes ( notes )
+                .build ( );
+
+        return generateInvoiceFromRequest ( request );
+    }
+
+    /**
+     * Get invoice as DTO response
+     */
+    @Transactional
+    public InvoiceResponse getInvoiceResponse(Integer invoiceId) {
+        Invoice invoice = getInvoiceById ( invoiceId );
+        return invoiceResponseMapper.toResponse ( invoice );
+    }
+
+    /**
+     * Sends invoice details to customer via SMS
+     *
+     * @param invoiceId the ID of the invoice to send
+     * @return GenericResponse indicating SMS status
+     */
+    @Transactional
+    public GenericResponse sendInvoiceToCustomer(Integer invoiceId) {
+        try {
+            // Get invoice details
+            Invoice invoice = getInvoiceById ( invoiceId );
+            WorkOrder workOrder = invoice.getWorkOrder ( );
+            AppointmentDetails appointment = workOrder.getAppointment ( );
+
+            if ( appointment == null ) {
+                return GenericResponse.failed ( "No appointment found for this invoice", null );
+            }
+
+            // Get vehicle details to extract customer phone number
+            Integer vehicleId = appointment.getVehicleId ( );
+            VehicleDetailResponse vehicleDetails = vehicleClient.getVehicleDetailsByIdResponse ( vehicleId );
+
+            if ( vehicleDetails == null || vehicleDetails.getOwner ( ) == null ||
+                    vehicleDetails.getOwner ( ).getMobileNumber ( ) == null ) {
+                return GenericResponse.failed ( "Customer mobile number not found", null );
+            }
+
+            String customerPhone = vehicleDetails.getOwner ( ).getMobileNumber ( );
+
+            // Create SMS message with invoice details
+            String message = buildInvoiceMessage ( invoice, workOrder, appointment, vehicleDetails );
+
+            // Send SMS
+            SmsRequest smsRequest = new SmsRequest ( customerPhone, message );
+            GenericResponse smsResponse = authClient.sendSms ( smsRequest );
+
+            if ( "SUCCESS".equalsIgnoreCase ( smsResponse.getStatus ( ) ) ) {
+                return GenericResponse.success ( "Invoice sent to customer successfully", smsResponse );
+            } else {
+                return GenericResponse.failed ( "Failed to send invoice to customer", smsResponse );
+            }
+
+        }
+        catch ( Exception e ) {
+            return GenericResponse.failed ( "Error sending invoice to customer: " + e.getMessage ( ), null );
+        }
+    }
+
+    /**
+     * Builds the SMS message for invoice notification
+     */
+    private String buildInvoiceMessage(Invoice invoice, WorkOrder workOrder, AppointmentDetails appointment, VehicleDetailResponse vehicleDetails) {
+        StringBuilder message = new StringBuilder ( );
+
+        // Header
+        message.append ( "🧾 INVOICE READY - AutoAdda\n\n" );
+
+        // Vehicle info
+        message.append ( "Vehicle: " ).append ( vehicleDetails.getBrand ( ) )
+                .append ( " " ).append ( vehicleDetails.getModel ( ) ).append ( "\n" );
+        message.append ( "Reg. No: " ).append ( vehicleDetails.getNumber ( ) ).append ( "\n\n" );
+
+        // Invoice details
+        message.append ( "Invoice ID: " ).append ( invoice.getId ( ) ).append ( "\n" );
+        message.append ( "Work Order: " ).append ( workOrder.getId ( ) ).append ( "\n" );
+
+        // Amount details
+        if ( invoice.getTotalAmount ( ) != null ) {
+            message.append ( "Total Amount: ₹" ).append ( String.format ( "%.2f", invoice.getTotalAmount ( ) ) ).append ( "\n" );
+        }
+
+        if ( invoice.getTaxAmount ( ) != null && invoice.getTaxAmount ( ) > 0 ) {
+            message.append ( "Tax: ₹" ).append ( String.format ( "%.2f", invoice.getTaxAmount ( ) ) ).append ( "\n" );
+        }
+
+        // Payment status
+        if ( invoice.getIsPaid ( ) != null && invoice.getIsPaid ( ) ) {
+            message.append ( "Status: ✅ PAID\n" );
+        } else {
+            message.append ( "Status: ⏳ PENDING PAYMENT\n" );
+        }
+
+        // Service summary
+        if ( invoice.getLineItems ( ) != null && ! invoice.getLineItems ( ).isEmpty ( ) ) {
+            message.append ( "\nServices:\n" );
+            invoice.getLineItems ( ).stream ( )
+                    .limit ( 3 ) // Show max 3 services
+                    .forEach ( item -> message.append ( "• " ).append ( item.getDescription ( ) ).append ( "\n" ) );
+
+            if ( invoice.getLineItems ( ).size ( ) > 3 ) {
+                message.append ( "• ... and " ).append ( invoice.getLineItems ( ).size ( ) - 3 ).append ( " more\n" );
+            }
+        }
+
+        // Footer
+        message.append ( "\nView full details in your AutoAdda app." );
+        message.append ( "\nFor queries: Contact your garage" );
+
+        return message.toString ( );
+    }
+
+    /**
+     * Retrieves all invoices created within a specific date range.
+     *
+     * @param startDate the start date of the range
+     * @param endDate   the end date of the range
+     * @return a list of invoices created within the specified date range
+     */
 //	@Transactional
 //	public List<Invoice> getInvoicesByDateRange(LocalDate startDate, LocalDate endDate) {
 //		return invoiceRepository.findByCreatedDateBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));

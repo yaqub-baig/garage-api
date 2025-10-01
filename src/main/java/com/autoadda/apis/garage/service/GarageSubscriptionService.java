@@ -1,6 +1,9 @@
 package com.autoadda.apis.garage.service;
 
-import com.autoadda.apis.garage.entity.*;
+import com.autoadda.apis.garage.entity.AvailableService;
+import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.entity.GarageSubscription;
+import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.GarageSubscriptionRepository;
@@ -51,7 +54,6 @@ public class GarageSubscriptionService {
                 .toList ( );
 
 
-
         // ✅ Use Optional to handle null safely
         return Optional.ofNullable ( plan.getGarageIds ( ) )
                 .filter ( ids -> ! ids.isEmpty ( ) )
@@ -61,7 +63,7 @@ public class GarageSubscriptionService {
                 .toList ( );
     }
 
-    private GarageSubscription createSubscriptionForGarage(GarageSubscriptionRequest plan, Integer garageId,List<AvailableService> services ) {
+    private GarageSubscription createSubscriptionForGarage(GarageSubscriptionRequest plan, Integer garageId, List<AvailableService> services) {
         Garage garage = garageRepository.findById ( garageId )
                 .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found with ID: " + garageId ) );
 
@@ -76,7 +78,7 @@ public class GarageSubscriptionService {
         newPlan.setBrands ( plan.getBrands ( ) );
         newPlan.setBenefits ( plan.getBenefits ( ) );
         newPlan.setServicesIncluded ( services ); // Set all at once
-        newPlan.setServiceQuantity ( plan.getServices () );
+        newPlan.setServiceQuantity ( plan.getServices ( ) );
         System.out.println ( "About to save subscription with " + services.size ( ) + " services" );
 
         return subscriptionRepository.save ( newPlan );
@@ -160,7 +162,7 @@ public class GarageSubscriptionService {
             log.info ( " 2  enabledGarages -> " + subscriptionPlans.size ( ) );
             log.info ( "   currentGarage -> " + plan.getName ( ) );
 
-            Location address = plan.getGarage ().getGarageLocation ( );
+            Location address = plan.getGarage ( ).getGarageLocation ( );
             log.info ( " 4 enabledGarages -> " );
             if ( StringUtils.isNotEmpty ( city ) ) {
                 log.info ( " 5 enabledGarages -> " );
@@ -171,7 +173,7 @@ public class GarageSubscriptionService {
 
 
             if ( StringUtils.isNotEmpty ( garageName ) ) {
-                if ( ! plan.getGarage ( ).getName ().toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
+                if ( ! plan.getGarage ( ).getName ( ).toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
                     nameCheck = false;
                 }
             }
@@ -183,7 +185,7 @@ public class GarageSubscriptionService {
             }
 
 
-            if ( cityCheck && nameCheck  && brandCheck ) {
+            if ( cityCheck && nameCheck && brandCheck ) {
                 searchResults.add ( plan );
             }
         }

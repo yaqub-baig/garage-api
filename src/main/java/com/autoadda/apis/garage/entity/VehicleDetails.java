@@ -1,23 +1,10 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDate;
-
 import com.autoadda.apis.garage.util.Status;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -25,74 +12,74 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class  VehicleDetails {
+public class VehicleDetails {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Integer id;
 
-	@Column(name = "vin")
-	private String vin;
+    @Column(name = "vin")
+    private String vin;
 
-	@Column(name = "year")
-	private Integer year;
+    @Column(name = "year")
+    private Integer year;
 
-	@Column(name = "name")
-	private String name;
+    @Column(name = "name")
+    private String name;
 
-	@Column(name = "odometer")
-	private Integer odometer;
+    @Column(name = "odometer")
+    private Integer odometer;
 
-	@Column(name = "color")
-	private String color;
+    @Column(name = "color")
+    private String color;
 
-	@Column(name = "engine_size")
-	private String engineSize;
+    @Column(name = "engine_size")
+    private String engineSize;
 
-	@Column(name = "no_of_doors")
-	private Integer noOfDoors;
+    @Column(name = "no_of_doors")
+    private Integer noOfDoors;
 
-	@Column(name = "no_of_seats")
-	private Integer noOfSeats;
+    @Column(name = "no_of_seats")
+    private Integer noOfSeats;
 
-	@Column(name = "no_of_cylinders")
-	private Integer noOfCylinders;
+    @Column(name = "no_of_cylinders")
+    private Integer noOfCylinders;
 
-	@Column(name = "no_of_speeds")
-	private Integer noOfSpeeds;
+    @Column(name = "no_of_speeds")
+    private Integer noOfSpeeds;
 
-	@Column(name = "fuel_type")
-	private String fuelType;
+    @Column(name = "fuel_type")
+    private String fuelType;
 
-	@Column(name = "current_mileage")
-	private Integer currentMileage;
+    @Column(name = "current_mileage")
+    private Integer currentMileage;
 
-	@Column(name = "last_service_mileage")
-	private Integer lastServiceMileage;
+    @Column(name = "last_service_mileage")
+    private Integer lastServiceMileage;
 
-	@Column(name = "last_service_date")
-	private LocalDate lastServiceDate;
+    @Column(name = "last_service_date")
+    private LocalDate lastServiceDate;
 
-	@Column(name = "make")
-	private String make;
+    @Column(name = "make")
+    private String make;
 
-	@Column(name = "model")
-	private String model;
+    @Column(name = "model")
+    private String model;
 
-	@Column(name = "status")
-	private Status status;
+    @Column(name = "status")
+    private Status status;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "insurance_id", referencedColumnName = "id")
-	private InsuranceDetails insurance;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "insurance_id", referencedColumnName = "id")
+    private InsuranceDetails insurance;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "registration_id", referencedColumnName = "id")
-	private VehicleRegistration registration;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "registration_id", referencedColumnName = "id")
+    private VehicleRegistration registration;
 
-	@ManyToOne
-	@JoinColumn(name = "vehicle_owner_id", referencedColumnName = "id")
-	private VehicleOwner vehicleOwner;
+    @ManyToOne
+    @JoinColumn(name = "vehicle_owner_id", referencedColumnName = "id")
+    private VehicleOwner vehicleOwner;
 
 }

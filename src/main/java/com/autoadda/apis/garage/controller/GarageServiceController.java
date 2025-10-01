@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import com.autoadda.apis.garage.response.GarageServiceResponse;
 import com.autoadda.apis.garage.service.GarageServiceManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class GarageServiceController {
     }
 
     @GetMapping("/garage/{garageId}")
-    public ResponseEntity<List<GarageService>> getByGarage(@PathVariable Integer garageId) {
+    public ResponseEntity<List<GarageServiceResponse>> getByGarage(@PathVariable Integer garageId) {
         return ResponseEntity.ok ( garageServiceService.getByGarageId ( garageId ) );
     }
 }

@@ -59,8 +59,8 @@ public class VehicleSubscriptionController {
     }
 
     @GetMapping("/search")
-    public List<GarageSubscription> searchPlans(@RequestParam(required = false) String brand, @RequestParam(required = false) String city,  @RequestParam(required = false) String garageName) {
-        return garageSubscriptionService.searchPlans ( brand, city,  garageName);
+    public List<GarageSubscription> searchPlans(@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String garageName) {
+        return garageSubscriptionService.searchPlans ( brand, city, garageName );
     }
 
     @GetMapping("/active")
@@ -70,7 +70,7 @@ public class VehicleSubscriptionController {
 
     @GetMapping("/by-date-range/{ownerId}/{startDate}/{endDate}")
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByDateRange(@PathVariable Integer ownerId,
-                                                                      @PathVariable LocalDate startDate, @PathVariable LocalDate endDate) {
+                                                                              @PathVariable LocalDate startDate, @PathVariable LocalDate endDate) {
         return ownerSubscriptionService.getSubscriptionsByDateRange ( ownerId, startDate, endDate );
     }
 
@@ -81,19 +81,19 @@ public class VehicleSubscriptionController {
 
     @GetMapping("/by-owner-and-plan/{ownerId}/{planId}")
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwnerAndPlan(@PathVariable Integer ownerId,
-                                                                         @PathVariable Integer planId) {
+                                                                                 @PathVariable Integer planId) {
         return ownerSubscriptionService.getSubscriptionsByOwnerAndPlan ( ownerId, planId );
     }
 
     @GetMapping("/by-owner-and-status/{ownerId}/{status}")
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwnerAndStatus(@PathVariable Integer ownerId,
-                                                                           @PathVariable String status) {
+                                                                                   @PathVariable String status) {
         return ownerSubscriptionService.getSubscriptionsByOwnerAndStatus ( ownerId, status );
     }
 
     @GetMapping("/by-plan-and-status/{planId}/{status}")
     public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByPlanAndStatus(@PathVariable Integer planId,
-                                                                          @PathVariable String status) {
+                                                                                  @PathVariable String status) {
         return ownerSubscriptionService.getSubscriptionsByPlanAndStatus ( planId, status );
     }
 }

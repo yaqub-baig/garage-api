@@ -1,21 +1,11 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDateTime;
-
 import com.autoadda.apis.garage.util.ReferredEntityType;
 import com.autoadda.apis.garage.util.ReferrerType;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -25,23 +15,23 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Referral {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	private String referralCode;
+    private String referralCode;
 
-	@Enumerated(EnumType.STRING)
-	private ReferrerType referrerType; // VEHICLE_OWNER, GARAGE
+    @Enumerated(EnumType.STRING)
+    private ReferrerType referrerType; // VEHICLE_OWNER, GARAGE
 
-	private Integer referrerId; // VehicleOwner.id or Garage.id
+    private Integer referrerId; // VehicleOwner.id or Garage.id
 
-	private Integer referredEntityId; // new customer or garage
+    private Integer referredEntityId; // new customer or garage
 
-	@Enumerated(EnumType.STRING)
-	private ReferredEntityType referredEntityType; // VEHICLE_OWNER, GARAGE
+    @Enumerated(EnumType.STRING)
+    private ReferredEntityType referredEntityType; // VEHICLE_OWNER, GARAGE
 
-	private boolean rewardIssued;
+    private boolean rewardIssued;
 
-	private LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 }

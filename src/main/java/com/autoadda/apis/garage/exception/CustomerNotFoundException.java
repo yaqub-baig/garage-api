@@ -5,18 +5,18 @@ package com.autoadda.apis.garage.exception;
  */
 public class CustomerNotFoundException extends RuntimeException {
 
-	private String message;
+    private String message;
 
-	public CustomerNotFoundException() {
-		super();
-	}
+    public CustomerNotFoundException() {
+        super ( );
+    }
 
-	public CustomerNotFoundException(String message) {
-		super(message);
-		this.message = message;
-	}
+    public CustomerNotFoundException(String message) {
+        super ( message );
+        this.message = message;
+    }
 
-	public CustomerNotFoundException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CustomerNotFoundException(String message, Throwable cause) {
+        super ( message, cause );
+    }
 }

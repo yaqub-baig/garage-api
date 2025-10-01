@@ -1,11 +1,6 @@
 package com.autoadda.apis.garage.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Data
 @Builder
@@ -20,20 +15,29 @@ public class GenericResponse {
     private Object body;
 
     public static GenericResponse success(Object body) {
-        return GenericResponse.builder()
-                .status("success")
-                .code("200")
-                .message("success")
-                .body(body)
-                .build();
+        return GenericResponse.builder ( )
+                .status ( "success" )
+                .code ( "200" )
+                .message ( "success" )
+                .body ( body )
+                .build ( );
     }
 
     public static GenericResponse success(String message, Object body) {
-        return GenericResponse.builder()
-                .status("success")
-                .code("200")
-                .message(message)
-                .body(body)
-                .build();
+        return GenericResponse.builder ( )
+                .status ( "success" )
+                .code ( "200" )
+                .message ( message )
+                .body ( body )
+                .build ( );
+    }
+
+    public static GenericResponse failed(String s, Object o) {
+        return GenericResponse.builder ( )
+                .status ( "success" )
+                .code ( "200" )
+                .message ( s )
+                .body ( o )
+                .build ( );
     }
 }

@@ -5,10 +5,10 @@ import com.autoadda.apis.garage.exception.GarageNotFoundException;
 import com.autoadda.apis.garage.request.AppointmentStatusRequest;
 import com.autoadda.apis.garage.request.CustomerAppointmentRequest;
 import com.autoadda.apis.garage.response.AppointmentDetailResponse;
-import com.autoadda.apis.garage.response.AppointmentResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.service.AppointmentService;
 import com.autoadda.apis.garage.service.AppointmentSlotService;
+import com.autoadda.apis.garage.util.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -37,6 +37,7 @@ public class AppointmentController {
         return ResponseEntity.status ( HttpStatus.CREATED ).body ( GenericResponse.success ( appointment ) );
     }
 
+    //2025-09-12T11:40:00:00
     @PostMapping("/{garageId}/book")
     public ResponseEntity<?> bookAppointment(@PathVariable Integer garageId, @RequestParam Integer vehicleId,
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
@@ -68,10 +69,16 @@ public class AppointmentController {
 
     @GetMapping("/{appointmentId}")
     public ResponseEntity<GenericResponse> getAppointmentDetails(@PathVariable Integer appointmentId) {
-        AppointmentResponse response = appointmentService.getAppointmentsDetails ( appointmentId );
+        AppointmentDetailResponse response = appointmentService.getAppointmentsDetails ( appointmentId );
         return ResponseEntity.ok ( GenericResponse.success ( response ) );
     }
-//TODO:33
+
+//    @GetMapping("/{appointmentId}")
+//    public ResponseEntity<GenericResponse> getAppointmentDetails(@PathVariable Integer appointmentId) {
+//        AppointmentResponse response = appointmentService.getAppointmentsDetails ( appointmentId );
+//        return ResponseEntity.ok ( GenericResponse.success ( response ) );
+//    }
+
     @GetMapping("/{garageId}/available-slots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@PathVariable Integer garageId,
                                                                  @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date) {
@@ -101,9 +108,10 @@ public class AppointmentController {
     public ResponseEntity<?> editAppointment(@RequestParam(required = false) Integer garageId,
                                              @RequestParam(required = false) Integer vehicleId,
                                              @RequestParam Integer appointmentId,
+                                             @RequestParam(required = false) Status status,
                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
                                              @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
-        return appointmentSlotService.editBooking ( garageId, vehicleId, appointmentId, time, autoAddaId );
+        return appointmentSlotService.editBooking ( garageId, vehicleId, appointmentId, time, autoAddaId, status );
     }
 
 }

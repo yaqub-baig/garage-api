@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -49,6 +48,7 @@ public class GarageManagementService {
     private final GarageMapper garageMapper;
     private final AuthClient authClient;
     private final TechnicianService technicianService;
+
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage ( );
         log.info ( "------>" + garageRequest.getBreakStartTime ( ).format ( DateTimeFormatter.ofPattern ( "HH:mm" ) ) );
@@ -56,11 +56,11 @@ public class GarageManagementService {
         if ( garageRequest.getGarageBrandName ( ) != null )
             garage.setGarageBrandName ( garageRequest.getGarageBrandName ( ) );
 
-        if(garageRequest.getBreakStartTime ()!=null){
-            garage.setBreakStartTime(garageRequest.getBreakStartTime().toString());
+        if ( garageRequest.getBreakStartTime ( ) != null ) {
+            garage.setBreakStartTime ( garageRequest.getBreakStartTime ( ).toString ( ) );
         }
-        if(garageRequest.getBreakEndTime ()!=null){
-            garage.setBreakEndTime(garageRequest.getBreakEndTime().toString());
+        if ( garageRequest.getBreakEndTime ( ) != null ) {
+            garage.setBreakEndTime ( garageRequest.getBreakEndTime ( ).toString ( ) );
         }
 
         if ( garageRequest.getName ( ) != null )
@@ -115,7 +115,7 @@ public class GarageManagementService {
 
     @Transactional
     public GarageResponse createGarage(GarageRequest garageRequest, String autoAddaId) {
-        validateGarageOwnerExists(Integer.parseInt ( autoAddaId ));
+        validateGarageOwnerExists ( Integer.parseInt ( autoAddaId ) );
         Garage garage = mapToEntity ( garageRequest );
         if ( garageRequest.getGarageLocation ( ) != null ) {
             Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
@@ -136,15 +136,7 @@ public class GarageManagementService {
         if ( garageRequest.getGarageImagesIds ( ) != null && ! garageRequest.getGarageImagesIds ( ).isEmpty ( ) )
             garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
         Garage save = garageRepository.save ( garage );
-        List<GarageService> garageServices = new ArrayList<> ( );
-        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
-            garageRequest.getGarageServiceIds ( ).forEach ( sId -> {
-                availableServiceRepository.findById ( sId )
-                        .map ( availableService -> garageServiceManagementService.createGarageService (
-                                new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
-            } );
-        }
+        List<GarageService> garageServices = handleGarageService ( garageRequest, save );
         handleGarageWorkingHours ( save, garageRequest.getWorkingDays ( ), garageRequest.getClosingTime ( ), garageRequest.getOpeningTime ( ) );
         handleGarageBreakHours ( save, garageRequest.getWorkingDays ( ), garageRequest.getBreakStartTime ( ), garageRequest.getBreakEndTime ( ) );
         save.setServices ( garageServices );
@@ -157,8 +149,21 @@ public class GarageManagementService {
         workingHoursRepository.flush ( );
         garageBreakTimeRepository.flush ( );
         slotGenerationService.generateSlotsForDays ( saved, 60 );
-        onboardTechnician ( saved.getId (),new Technician (),saved.getGarageOwner () );
+        onboardTechnician ( saved.getId ( ), new Technician ( ), saved.getGarageOwner ( ) );
         return garageMapper.entityToResponse ( saved );
+    }
+
+    private List<GarageService> handleGarageService(GarageRequest garageRequest, Garage save) {
+        List<GarageService> garageServices = new ArrayList<> ( );
+        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
+            garageRequest.getGarageServiceIds ( ).forEach ( sId -> {
+                availableServiceRepository.findById ( sId )
+                        .map ( availableService -> garageServiceManagementService.createGarageService (
+                                new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
+            } );
+        }
+        return garageServices;
     }
 
     private void validateGarageOwnerExists(int id) {
@@ -306,7 +311,8 @@ public class GarageManagementService {
         handleTradeLicense ( request, existing, filesToCleanup );
         handleGarageImages ( request, existing, filesToCleanup );
         handleVatCertificates ( request, existing, filesToCleanup );
-        handleGarageServices ( request, existing );
+        List<GarageService> garageServices = handleGarageService ( request, existing );
+        existing.setServices ( garageServices );
         Garage save = garageRepository.save ( existing );
 
         if ( ! filesToCleanup.isEmpty ( ) ) {
@@ -542,12 +548,15 @@ public class GarageManagementService {
     }
 
     @Transactional
-    public Technician onboardTechnician(Integer garageId, Technician technician, Integer ownerId)
-             {
+    public Technician onboardTechnician(Integer garageId, Technician technician, Integer ownerId) {
         Garage garage = garageRepository.findById ( garageId )
                 .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found" ) );
-        technician.setAutoAddaId ( ownerId );
+        UserResponse user = authClient.getUser ( ownerId );
+        technician.setAutoAddaId ( user.getId ( ) );
         // You may check for duplicate email, phone etc.
+        technician.setFirstName ( user.getName ( ) );
+        technician.setMobileNumber ( user.getMobileNumber ( ) );
+        technician.setEmailId ( user.getEmail ( ) );
         technician.setStatus ( Status.ACTIVE );
         technician.setGarage ( garage );
         technician.setEmployeeRole ( EMPLOYEE_ROLE.OWNER );

@@ -1,20 +1,13 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 
 @Entity
 @NoArgsConstructor
@@ -22,16 +15,16 @@ import lombok.Setter;
 @Setter
 @Getter
 public class GarageBreakTime {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "garage_id", referencedColumnName = "id")
-	private Garage garage;
+    @ManyToOne
+    @JoinColumn(name = "garage_id", referencedColumnName = "id")
+    private Garage garage;
 
-	@Enumerated(EnumType.STRING)
-	private DayOfWeek dayOfWeek;
-	private LocalTime breakStart;
-	private LocalTime breakEnd;
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
+    private LocalTime breakStart;
+    private LocalTime breakEnd;
 }

@@ -35,6 +35,7 @@ public class AppointmentDetails {
     private LocalTime deliveryTime;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column(name = "comments")

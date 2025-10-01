@@ -9,4 +9,6 @@ public class AppointmentServiceRequest {
     private Integer appointmentId;
     private Integer serviceId;
     private Integer technicianId;
+    private Double price;
+    private Double labourPrice;
 }

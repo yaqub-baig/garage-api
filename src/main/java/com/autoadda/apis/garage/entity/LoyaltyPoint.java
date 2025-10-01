@@ -1,18 +1,9 @@
 package com.autoadda.apis.garage.entity;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Setter
@@ -22,18 +13,18 @@ import lombok.Setter;
 @Builder
 public class LoyaltyPoint {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	private int points;
-	private int redeemedPoints;
+    private int points;
+    private int redeemedPoints;
 
-	private LocalDateTime lastUpdated;
+    private LocalDateTime lastUpdated;
 
-	@OneToOne
-	private VehicleOwner owner;
+    @OneToOne
+    private VehicleOwner owner;
 
-	@ManyToOne
-	private Garage garage;
+    @ManyToOne
+    private Garage garage;
 }

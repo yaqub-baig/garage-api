@@ -1,15 +1,19 @@
 package com.autoadda.apis.garage.repository;
 
-import java.util.List;
-
+import com.autoadda.apis.garage.entity.WorkOrder;
+import com.autoadda.apis.garage.util.WorkOrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.autoadda.apis.garage.entity.WorkOrder;
-import com.autoadda.apis.garage.util.Status;
+import java.util.List;
+import java.util.Optional;
 
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Integer> {
-	List<WorkOrder> findByStatus(Status status);
+    List<WorkOrder> findByStatus(WorkOrderStatus status);
 
-	List<WorkOrder> findByGarageId(Integer garageId);
-//	List<WorkOrder> findByJobCardGarageId(Integer garageId);
+    List<WorkOrder> findByGarageId(Integer garageId);
+
+    Optional<WorkOrder> findByAppointmentId(Integer appointmentId);
+
+    List<WorkOrder> findByAppointmentCustomerId(Integer customerId);
+
 }

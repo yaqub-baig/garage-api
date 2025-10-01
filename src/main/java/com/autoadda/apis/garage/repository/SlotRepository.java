@@ -1,14 +1,15 @@
 package com.autoadda.apis.garage.repository;
 
 import com.autoadda.apis.garage.entity.AppointmentSlot;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,8 +42,10 @@ public interface SlotRepository extends JpaRepository<AppointmentSlot, Integer> 
 
     List<AppointmentSlot> findByGarageIdAndSlotDate(Integer garageId, LocalDate date);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId AND s.slotDate= :slotDate AND s.startTime = :time AND s.currentBookings < s.maxBookings")
     Optional<AppointmentSlot> findByGarageIdAndStartTime(@Param("garageId") Integer garageId, @Param("slotDate") LocalDate date, @Param("time") LocalTime time);
+
     @Query("SELECT s FROM AppointmentSlot s WHERE s.garage.id = :garageId " +
             "AND s.slotDate >= :startDate AND s.slotDate <= :endDate " +
             "ORDER BY s.slotDate, s.startTime")
@@ -54,9 +57,10 @@ public interface SlotRepository extends JpaRepository<AppointmentSlot, Integer> 
     List<AppointmentSlot> findAvailableSlotsByGarageId(Integer garageId);
 
     Optional<AppointmentSlot> findByGarageIdAndSlotDateAndStartTime(Integer id, LocalDate date, LocalTime currentTime);
+
     @Query("SELECT s FROM AppointmentSlot s WHERE " +
             "(s.slotDate < :currentDate) OR " +
             "(s.slotDate = :currentDate AND s.endTime <= :currentTime)")
-    List<AppointmentSlot> findPastSlots(  @Param("currentDate") LocalDate currentDate,
-                                          @Param("currentTime") LocalTime currentTime);
+    List<AppointmentSlot> findPastSlots(@Param("currentDate") LocalDate currentDate,
+                                        @Param("currentTime") LocalTime currentTime);
 }

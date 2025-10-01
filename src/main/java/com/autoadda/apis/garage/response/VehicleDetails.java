@@ -1,11 +1,11 @@
 package com.autoadda.apis.garage.response;
 
-import java.time.LocalDate;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,48 +13,48 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VehicleDetails {
 
-	private Integer id;
+    private Integer id;
 
-	private String vin;
+    private String vin;
 
-	private String year;
+    private String year;
 
-	private String name;
+    private String name;
 
-	private String odometer;
+    private String odometer;
 
-	private String color;
+    private String color;
 
-	private String engineSize;
+    private String engineSize;
 
-	private String noOfDoors;
+    private String noOfDoors;
 
-	private String noOfSeats;
+    private String noOfSeats;
 
-	private String noOfCylinders;
+    private String noOfCylinders;
 
-	private String noOfSpeeds;
+    private String noOfSpeeds;
 
-	private String fuelType;
+    private String fuelType;
 
-	private Integer currentMileage;
+    private Integer currentMileage;
 
-	private Integer lastServiceMileage;
+    private Integer lastServiceMileage;
 
-	private LocalDate lastServiceDate;
+    private LocalDate lastServiceDate;
 
-	private String make;
+    private String make;
 
-	private String model;
+    private String model;
 
-	private String preferredGarageId;
+    private String preferredGarageId;
 
-	private Integer customerId;
+    private Integer customerId;
 
 //	@OneToOne(cascade = CascadeType.ALL)
 //	@JoinColumn(name = "insurance_id", referencedColumnName = "id")
 //	private InsuranceDetails insurance;
 
-	private VehicleRegistration registration;
+    private VehicleRegistration registration;
 
 }

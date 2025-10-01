@@ -1,15 +1,10 @@
 package com.autoadda.apis.garage.response;
 
+import com.autoadda.apis.garage.util.Status;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import com.autoadda.apis.garage.util.Status;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Setter
@@ -18,26 +13,26 @@ import lombok.Setter;
 @Builder
 public class AppointmentDetails {
 
-	private Integer id;
+    private Integer id;
 
-	private LocalDate scheduleDate;
+    private LocalDate scheduleDate;
 
-	private LocalTime serviceStartTime;
+    private LocalTime serviceStartTime;
 
-	private LocalTime serviceEndTime;
+    private LocalTime serviceEndTime;
 
-	private LocalTime deliveryTime;
+    private LocalTime deliveryTime;
 
-	private Status status;
+    private Status status;
 
-	private String comments;
+    private String comments;
 
-	private LocalDate insert_tms;
+    private LocalDate insert_tms;
 
-	private Garage garage;
+    private Garage garage;
 
-	private Customer customer;
+    private Customer customer;
 
-	private VehicleDetails vehicle;
+    private VehicleDetails vehicle;
 
 }

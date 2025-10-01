@@ -16,4 +16,16 @@ public class VehicleReceivedRequest {
     private Integer receiverId;
     private List<Long> vehicleImages;
     private String comment;
+    private Boolean isMainKeyReceived;
+    private Boolean isSpareKeyReceived;
+    private Boolean isToolKitReceived;
+    private Boolean isJackReceived;
+    private Boolean isWheelSpannerReceived;
+    private Boolean isSpareTyreReceived;
+    private Boolean isFireExtinguisherReceived;
+    private Boolean isFirstAidKitReceived;
+    private Boolean isCentralLockRemoteReceived;
+    private Boolean isRCBookReceived;
+    private Boolean isInsuranceCopyReceived;
+    private Boolean isPUCReceived;
 }
