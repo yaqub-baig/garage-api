@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.VehicleReceived;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
@@ -10,6 +11,7 @@ import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.repository.VehicleReceivedRepository;
 import com.autoadda.apis.garage.request.VehicleReceivedRequest;
 import com.autoadda.apis.garage.response.VehicleRecievedResponse;
+import com.autoadda.apis.garage.util.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,8 +38,11 @@ public class VehicleReceivedService {
     @Transactional
     public VehicleRecievedResponse receiveVehicle(VehicleReceivedRequest request) {
         VehicleReceived vehicleReceived = new VehicleReceived ( );
-        vehicleReceived.setAppointment ( appointmentRepository.findById ( request.getAppointmentId ( ) )
-                .orElseThrow ( () -> new ResourceNotFoundException ( "appointment not found" ) ) );
+        AppointmentDetails appointment = appointmentRepository.findById ( request.getAppointmentId ( ) )
+                .orElseThrow ( () -> new ResourceNotFoundException ( "appointment not found" ) );
+        appointment.setStatus ( Status.VEHICLE_RECEIVED );
+        appointmentRepository.save ( appointment );
+        vehicleReceived.setAppointment ( appointment );
 
         if ( request.getComment ( ) != null ) {
             vehicleReceived.setComment ( request.getComment ( ) );

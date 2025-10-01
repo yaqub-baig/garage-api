@@ -60,5 +60,6 @@ public enum Status {
     SOLD,
     REMOVED,
     AVAILABLE,
+    VEHICLE_RECEIVED,
     SUBMITTED
 }

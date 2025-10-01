@@ -225,11 +225,13 @@ public class AppointmentService {
         validator.validateAndGetGarage ( garageId );
 
         if ( StringUtils.isBlank ( statusStr ) ) {
-            return appointmentRepo.findByGarage_Id ( garageId ).stream ( ).map ( appointmentDetailMapper::entityToResponse ).toList ( );
+            return appointmentRepo.findByGarage_Id ( garageId ).stream ( ).filter ( appointment -> appointment.getStatus ( ) != Status.VEHICLE_RECEIVED ).map ( appointmentDetailMapper::entityToResponse ).toList ( );
         }
 
         Status status = Status.valueOf ( statusStr.toUpperCase ( ) );
-        return appointmentRepo.findByGarage_IdAndStatus ( garageId, status ).stream ( ).map ( appointmentDetailMapper::entityToResponse ).toList ( );
+        return appointmentRepo.findByGarage_IdAndStatus ( garageId, status ).stream ( )
+                .filter ( appointment -> appointment.getStatus ( ) != Status.VEHICLE_RECEIVED )
+                .map ( appointmentDetailMapper::entityToResponse ).toList ( );
     }
 
     public String generateAppointmentCode() {
