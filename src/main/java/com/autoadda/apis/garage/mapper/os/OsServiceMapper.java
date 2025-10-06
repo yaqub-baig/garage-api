@@ -2,7 +2,7 @@ package com.autoadda.apis.garage.mapper.os;
 
 import com.autoadda.apis.garage.entity.os.OsService;
 import com.autoadda.apis.garage.mapper.AvailableServiceMapper;
-import com.autoadda.apis.garage.response.OtherServiceResponse;
+import com.autoadda.apis.garage.response.os.OtherServiceResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

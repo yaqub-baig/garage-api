@@ -3,7 +3,6 @@ package com.autoadda.apis.garage.entity.os;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import com.autoadda.apis.garage.entity.OtherService;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

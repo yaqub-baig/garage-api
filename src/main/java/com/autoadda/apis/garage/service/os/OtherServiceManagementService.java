@@ -1,9 +1,9 @@
-package com.autoadda.apis.garage.service;
+package com.autoadda.apis.garage.service.os;
 
 
-import com.autoadda.apis.garage.entity.OtherService;
-import com.autoadda.apis.garage.request.OtherServiceRequest;
-import com.autoadda.apis.garage.response.OsResponse;
+import com.autoadda.apis.garage.entity.os.OtherService;
+import com.autoadda.apis.garage.request.os.OtherServiceRequest;
+import com.autoadda.apis.garage.response.os.OsResponse;
 import com.autoadda.apis.garage.util.Status;
 
 import java.util.List;

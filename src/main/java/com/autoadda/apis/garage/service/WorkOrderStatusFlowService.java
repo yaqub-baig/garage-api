@@ -2,10 +2,12 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.WorkOrder;
+import com.autoadda.apis.garage.repository.JobCardRepository;
 import com.autoadda.apis.garage.repository.WorkOrderRepository;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -121,7 +123,7 @@ public class WorkOrderStatusFlowService {
         if ( jobCards.isEmpty ( ) ) return;
 
         boolean allCompleted = jobCards.stream ( )
-                .allMatch ( j -> j.getStatus ( ) == JobCardStatus.WORK_COMPLETED );
+                .allMatch ( j -> j.getStatus ( ) == JobCardStatus.COMPLETED );
         boolean anyInProgress = jobCards.stream ( )
                 .anyMatch ( jc -> jobCardStatusFlowService.isActiveWorkStatus ( jc.getStatus ( ) ) );
 

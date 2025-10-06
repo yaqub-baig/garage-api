@@ -1,10 +1,10 @@
-package com.autoadda.apis.garage.controller;
+package com.autoadda.apis.garage.controller.os;
 
 
-import com.autoadda.apis.garage.entity.OtherService;
-import com.autoadda.apis.garage.request.OtherServiceRequest;
-import com.autoadda.apis.garage.response.OsResponse;
-import com.autoadda.apis.garage.service.OtherServiceManagementService;
+import com.autoadda.apis.garage.entity.os.OtherService;
+import com.autoadda.apis.garage.request.os.OtherServiceRequest;
+import com.autoadda.apis.garage.response.os.OsResponse;
+import com.autoadda.apis.garage.service.os.OtherServiceManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

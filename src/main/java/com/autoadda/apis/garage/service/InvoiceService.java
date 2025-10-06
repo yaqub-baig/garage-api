@@ -16,6 +16,7 @@ import com.autoadda.apis.garage.response.AppointmentInvoiceResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.InvoiceResponse;
 import com.autoadda.apis.garage.response.VehicleDetailResponse;
+import com.autoadda.apis.garage.util.InvoiceStatus;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.Status;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
@@ -196,10 +197,10 @@ public class InvoiceService {
      * @return the updated Invoice
      */
     @Transactional
-    public Invoice updateInvoicePaymentStatus(Integer invoiceId, com.autoadda.apis.garage.util.Status paymentStatus) {
+    public Invoice updateInvoicePaymentStatus(Integer invoiceId, InvoiceStatus paymentStatus) {
         Invoice invoice = getInvoiceById ( invoiceId );
         invoice.setPaymentStatus ( paymentStatus );
-        invoice.setIsPaid ( "PAID".equalsIgnoreCase ( paymentStatus.toString ( ) ) );
+        invoice.setIsPaid ( paymentStatus == InvoiceStatus.PAID );
 
         WorkOrder workOrder = invoice.getWorkOrder ( );
 

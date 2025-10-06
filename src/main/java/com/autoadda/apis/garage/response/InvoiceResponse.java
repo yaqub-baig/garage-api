@@ -1,5 +1,7 @@
 package com.autoadda.apis.garage.response;
 
+import com.autoadda.apis.garage.util.InvoiceStatus;
+import com.autoadda.apis.garage.util.PaymentMethod;
 import com.autoadda.apis.garage.util.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +30,8 @@ public class InvoiceResponse {
     private Integer loyaltyPointsUsed;
     private Integer loyaltyPointsEarned;
 
-    private Status paymentStatus;
-    private String paymentMethod;
+    private InvoiceStatus paymentStatus;
+    private PaymentMethod paymentMethod;
     private Boolean isPaid;
     private String notes;
 

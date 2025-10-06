@@ -1,6 +1,7 @@
-package com.autoadda.apis.garage.entity;
+package com.autoadda.apis.garage.entity.os;
 
-import com.autoadda.apis.garage.entity.os.OsAvailableService;
+import com.autoadda.apis.garage.entity.Location;
+import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.util.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;

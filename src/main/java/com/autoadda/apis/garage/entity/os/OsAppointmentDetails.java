@@ -1,7 +1,5 @@
 package com.autoadda.apis.garage.entity.os;
 
-import com.autoadda.apis.garage.entity.AppointmentSlot;
-import com.autoadda.apis.garage.entity.OtherService;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.*;
 import lombok.*;

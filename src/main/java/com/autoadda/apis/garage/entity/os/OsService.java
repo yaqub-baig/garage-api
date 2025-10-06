@@ -1,7 +1,6 @@
 package com.autoadda.apis.garage.entity.os;
 
 import com.autoadda.apis.garage.entity.AvailableService;
-import com.autoadda.apis.garage.entity.OtherService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

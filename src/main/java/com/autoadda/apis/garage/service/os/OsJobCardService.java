@@ -4,17 +4,11 @@ import java.time.LocalTime;
 import java.util.List;
 
 import com.autoadda.apis.garage.entity.*;
-import com.autoadda.apis.garage.entity.os.OsAppointmentDetails;
-import com.autoadda.apis.garage.entity.os.OsAppointmentServices;
-import com.autoadda.apis.garage.entity.os.OsJobCard;
-import com.autoadda.apis.garage.entity.os.OsJobcardStatusActivity;
+import com.autoadda.apis.garage.entity.os.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.os.OsJobCardMapper;
 import com.autoadda.apis.garage.repository.*;
-import com.autoadda.apis.garage.repository.os.OsAppointmentDetailsRepository;
-import com.autoadda.apis.garage.repository.os.OsAppointmentServiceRepository;
-import com.autoadda.apis.garage.repository.os.OsJobCardRepository;
-import com.autoadda.apis.garage.repository.os.OsJobcardStatusActivityRepository;
+import com.autoadda.apis.garage.repository.os.*;
 import com.autoadda.apis.garage.request.os.OsAssignServiceRequest;
 import com.autoadda.apis.garage.request.os.OsJobCardStatusRequest;
 import com.autoadda.apis.garage.response.os.OsJobCardResponse;
@@ -23,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.autoadda.apis.garage.exception.MemberNotFoundException;
-import com.autoadda.apis.garage.request.JobCardStatusRequest;
 import com.autoadda.apis.garage.util.BusinessValidator;
 import com.autoadda.apis.garage.util.DateHelper;
 import com.autoadda.apis.garage.util.Status;

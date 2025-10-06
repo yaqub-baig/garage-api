@@ -1,7 +1,7 @@
-package com.autoadda.apis.garage.repository;
+package com.autoadda.apis.garage.repository.os;
 
 
-import com.autoadda.apis.garage.entity.OtherServiceBridge;
+import com.autoadda.apis.garage.entity.os.OtherServiceBridge;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

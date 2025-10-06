@@ -1,6 +1,5 @@
-package com.autoadda.apis.garage.entity;
+package com.autoadda.apis.garage.entity.os;
 
-import com.autoadda.apis.garage.entity.os.OsAvailableService;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;

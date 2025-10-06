@@ -3,9 +3,10 @@ package com.autoadda.apis.garage.util;
 import com.autoadda.apis.garage.entity.AuthenticationDetails;
 import com.autoadda.apis.garage.entity.Customer;
 import com.autoadda.apis.garage.entity.Garage;
-import com.autoadda.apis.garage.entity.OtherService;
+import com.autoadda.apis.garage.entity.os.OtherService;
 import com.autoadda.apis.garage.exception.*;
 import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.repository.os.OtherServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

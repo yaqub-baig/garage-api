@@ -1,5 +1,6 @@
-package com.autoadda.apis.garage.request;
+package com.autoadda.apis.garage.request.os;
 
+import com.autoadda.apis.garage.request.LocationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

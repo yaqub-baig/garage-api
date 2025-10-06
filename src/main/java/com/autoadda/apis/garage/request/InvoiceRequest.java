@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.request;
 
+import com.autoadda.apis.garage.util.PaymentMethod;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,6 @@ public class InvoiceRequest {
     private List<InvoiceLineItemRequest> lineItems;
     private Double taxRate; // e.g., 10.0 means 10%
     private Integer loyaltyPointsToUse;
-    private String paymentMethod; // "CASH", "CREDIT_CARD", "ONLINE"
+    private PaymentMethod paymentMethod; // "CASH", "CREDIT_CARD", "ONLINE"
     private String notes;
 }

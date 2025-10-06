@@ -3,10 +3,8 @@ package com.autoadda.apis.garage.entity.os;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import com.autoadda.apis.garage.entity.OtherService;
 import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.entity.WorkOrder;
-import com.autoadda.apis.garage.service.os.OsAppointmentService;
 import com.autoadda.apis.garage.util.Status;
 
 import jakarta.persistence.*;

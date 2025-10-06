@@ -3,7 +3,6 @@ package com.autoadda.apis.garage.entity.os;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-import com.autoadda.apis.garage.entity.OtherService;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

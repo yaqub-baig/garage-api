@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -225,7 +226,10 @@ public class AppointmentService {
         validator.validateAndGetGarage ( garageId );
 
         if ( StringUtils.isBlank ( statusStr ) ) {
-            return appointmentRepo.findByGarage_Id ( garageId ).stream ( ).filter ( appointment -> appointment.getStatus ( ) != Status.VEHICLE_RECEIVED ).map ( appointmentDetailMapper::entityToResponse ).toList ( );
+            return appointmentRepo.findByGarage_Id ( garageId ).stream ( )
+                    .filter ( appointment -> appointment.getStatus ( ) != Status.VEHICLE_RECEIVED )
+                    .sorted ( Comparator.comparing ( AppointmentDetails::getInsert_tms ).reversed ( ) )
+                    .map ( appointmentDetailMapper::entityToResponse ).toList ( );
         }
 
         Status status = Status.valueOf ( statusStr.toUpperCase ( ) );

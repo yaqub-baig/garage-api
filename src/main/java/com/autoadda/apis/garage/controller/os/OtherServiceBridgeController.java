@@ -1,9 +1,9 @@
-package com.autoadda.apis.garage.controller;
+package com.autoadda.apis.garage.controller.os;
 
 
-import com.autoadda.apis.garage.entity.OtherServiceBridge;
+import com.autoadda.apis.garage.entity.os.OtherServiceBridge;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
-import com.autoadda.apis.garage.service.OtherServiceBridgeManagementService;
+import com.autoadda.apis.garage.service.os.OtherServiceBridgeManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

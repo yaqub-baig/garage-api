@@ -1,7 +1,6 @@
 package com.autoadda.apis.garage.response.os;
 
 import com.autoadda.apis.garage.response.AvailableServiceResponse;
-import com.autoadda.apis.garage.response.OsResponse;
 import com.autoadda.apis.garage.response.VehicleDetailResponse;
 import com.autoadda.apis.garage.util.Status;
 import lombok.AllArgsConstructor;

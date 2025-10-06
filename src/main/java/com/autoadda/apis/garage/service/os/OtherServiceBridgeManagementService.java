@@ -1,10 +1,10 @@
-package com.autoadda.apis.garage.service;
+package com.autoadda.apis.garage.service.os;
 
 
-import com.autoadda.apis.garage.entity.OtherServiceBridge;
+import com.autoadda.apis.garage.entity.os.OtherServiceBridge;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
-import com.autoadda.apis.garage.repository.OtherServiceBridgeRepository;
-import com.autoadda.apis.garage.repository.OtherServiceRepository;
+import com.autoadda.apis.garage.repository.os.OtherServiceBridgeRepository;
+import com.autoadda.apis.garage.repository.os.OtherServiceRepository;
 import com.autoadda.apis.garage.repository.os.OsAvailableServiceRepository;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
 import lombok.RequiredArgsConstructor;

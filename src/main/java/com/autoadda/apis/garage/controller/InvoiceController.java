@@ -8,6 +8,7 @@ import com.autoadda.apis.garage.response.AppointmentInvoiceResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.InvoiceResponse;
 import com.autoadda.apis.garage.service.InvoiceService;
+import com.autoadda.apis.garage.util.InvoiceStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +72,7 @@ public class InvoiceController {
     @PutMapping("/{invoiceId}/payment-status")
     public ResponseEntity<GenericResponse> updateInvoicePaymentStatus(
             @PathVariable Integer invoiceId,
-            @RequestParam com.autoadda.apis.garage.util.Status paymentStatus) {
+            @RequestParam InvoiceStatus paymentStatus) {
         Invoice invoice = invoiceService.updateInvoicePaymentStatus ( invoiceId, paymentStatus );
         return ResponseEntity.ok ( GenericResponse.success ( "Invoice payment status updated", invoice ) );
     }

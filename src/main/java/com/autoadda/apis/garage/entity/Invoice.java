@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.entity;
 
-import com.autoadda.apis.garage.util.Status;
+import com.autoadda.apis.garage.util.InvoiceStatus;
+import com.autoadda.apis.garage.util.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,13 +38,14 @@ public class Invoice {
     private int loyaltyPointsEarned;
 
     @Enumerated(EnumType.STRING)
-    private Status paymentStatus;
+    private InvoiceStatus paymentStatus;
 
     @ManyToOne
     @JoinColumn(name = "job_card_id")
     private JobCard jobCard;
 
-    private String paymentMethod; // e.g., "CASH", "CREDIT_CARD", "ONLINE"
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod; // e.g., "CASH", "CREDIT_CARD", "ONLINE"
 
     private Boolean isPaid;
 

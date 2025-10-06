@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -148,7 +149,10 @@ public class WorkOrderService {
     }
 
     public List<WorkOrderResponse> getWorkOrdersByGarageId(Integer garageId) {
-        return workOrderRepository.findByGarageId ( garageId ).stream ( ).map ( workOrderMapper::entityToResponse ).toList ( );
+        return workOrderRepository.findByGarageId ( garageId )
+                .stream ( )
+                .sorted ( Comparator.comparing ( WorkOrder::getCreatedDate ).reversed () )
+                .map ( workOrderMapper::entityToResponse ).toList ( );
     }
 
     public WorkOrderResponse updateWorkOrder(Integer workOrderId, WorkOrderRequest request) {
@@ -196,7 +200,11 @@ public class WorkOrderService {
     }
 
     public List<WorkOrderResponse> getWorkOrdersByCustomerId(Integer customerId) {
-        return workOrderRepository.findByAppointmentCustomerId ( customerId ).stream ( ).map ( workOrderMapper::entityToResponse ).toList ( );
+        return workOrderRepository.findByAppointmentCustomerId ( customerId )
+                .stream ( )
+                .sorted ( Comparator.comparing ( WorkOrder::getCreatedDate ).reversed () )
+                .map ( workOrderMapper::entityToResponse )
+                .toList ( );
     }
 
     public WorkOrderResponse getWorkOrderResponseById(Integer workOrderId) {

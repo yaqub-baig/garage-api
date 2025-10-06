@@ -267,7 +267,6 @@ public class JobCardService {
 
         Map<Integer, GroupedJobCardResponse.WorkOrderJobCardGroup> workOrderGroups = jobCards.stream ( )
                 .filter ( jobCard -> jobCard.getWorkOrderId ( ) != null )
-                .filter ( jobCard -> Objects.equals ( jobCard.getStatus ( ), JobCardStatus.CREATED.name ( ) ) )
                 .collect ( Collectors.groupingBy (
                         JobCardResponse::getWorkOrderId,
                         Collectors.collectingAndThen (
@@ -333,7 +332,8 @@ public class JobCardService {
 
         Map<Integer, GroupedJobCardResponse.WorkOrderJobCardGroup> workOrderGroups = jobCards.stream ( )
                 .filter ( jobCard -> jobCard.getWorkOrderId ( ) != null )
-                .collect ( Collectors.groupingBy (
+                .filter ( jobCard -> !Objects.equals ( jobCard.getStatus ( ), JobCardStatus.CREATED.name ( ) )  )
+                        .collect ( Collectors.groupingBy (
                         JobCardResponse::getWorkOrderId,
                         Collectors.collectingAndThen (
                                 Collectors.toList ( ),
@@ -347,7 +347,6 @@ public class JobCardService {
                                                 .jobCards ( jobCardList )
                                                 .jobCardCount ( jobCardList.size ( ) )
                                                 .workOrderStatus ( workOrder != null ? workOrder.getStatus ( ).toString ( ) : "UNKNOWN" )
-
                                                 .build ( );
                                     }
                                     catch ( Exception e ) {

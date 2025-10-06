@@ -1,7 +1,8 @@
-package com.autoadda.apis.garage.response;
+package com.autoadda.apis.garage.response.os;
 
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.entity.MediaFile;
+import com.autoadda.apis.garage.response.GarageServiceResponse;
 import com.autoadda.apis.garage.util.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
