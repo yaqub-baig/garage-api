@@ -169,6 +169,7 @@ public class JobCardService {
         }
         if ( JobCardStatus.COMPLETED.equals ( request ) ) {
             jobCard.setServiceEndTime ( DateHelper.dbTime ( ) );
+            jobCard.setCompletedAt ( LocalDateTime.now () );
             String message = "Your work order service has Completed for " + jobCard.getService ( ).getService ( ).getAvailableService ( ).getName ( ) + "    at : " + LocalDateTime.now ( );
             GenericResponse genericResponse = authClient.sendSms ( new SmsRequest ( vehicleOwnerNumber, message ) );
             log.info ( genericResponse.getStatus ( ) );
