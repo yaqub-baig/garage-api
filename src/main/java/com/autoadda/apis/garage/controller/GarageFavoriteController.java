@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.service.GarageFavoriteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,14 @@ public class GarageFavoriteController {
     public ResponseEntity<?> getFavoriteGarages(@PathVariable Integer ownerId) {
         return ResponseEntity.ok ( favoriteService.getFavoriteGarages ( ownerId ) );
     }
+
+    @PostMapping("/garage/unmark")
+    public  ResponseEntity<?> unmarkFavoriteGarage(@RequestParam Integer ownerId, @RequestParam Integer favGarageId){
+        favoriteService.removeFavoriteGarage(ownerId,favGarageId);
+        return  ResponseEntity.ok(HttpEntity.EMPTY);
+    }
+
+
 
 
 }
