@@ -3,13 +3,14 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.*;
+import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.AppointmentInvoiceMapper;
 import com.autoadda.apis.garage.mapper.InvoiceLineItemMapper;
 import com.autoadda.apis.garage.mapper.InvoiceMapper;
 import com.autoadda.apis.garage.mapper.InvoiceResponseMapper;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
-import com.autoadda.apis.garage.request.AppointmentPayRequest;
+import com.autoadda.apis.garage.request.InvoicePayRequest;
 import com.autoadda.apis.garage.request.InvoiceRequest;
 import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.response.AppointmentInvoiceResponse;
@@ -83,17 +84,57 @@ public class InvoiceService {
      * @return the updated AppointmentInvoice
      */
     @Transactional
-    public AppointmentInvoiceResponse updateInvoicePayment(AppointmentPayRequest request) {
-        AppointmentInvoice invoice = invoiceRepo.findByAppointmentId ( request.getAppointmentId ( ) );
-        invoice.setStatus ( request.getStatus ( ) );
+    public InvoiceResponse updateInvoicePayment(InvoicePayRequest request) {
+        Invoice invoice = invoiceRepository.findById ( request.getInvoiceId ( ) )
+                .orElseThrow ( () -> new ResourceNotFoundException ( "Invoice not found" ) );
 
-        if ( "PAID".equalsIgnoreCase ( request.getStatus ( ) ) ) {
-            AppointmentDetails appointment = invoice.getAppointment ( );
-            appointment.setStatus ( Status.READY_FOR_DELIVERY );
-            appointmentRepo.save ( appointment );
+        // Update payment status
+        invoice.setPaymentStatus ( request.getPaymentStatus ( ) );
+
+        // Update payment method if provided
+        if ( request.getPaymentMethod ( ) != null ) {
+            invoice.setPaymentMethod ( request.getPaymentMethod ( ) );
         }
 
-        return appointmentInvoiceMapper.fromEntity ( invoiceRepo.save ( invoice ) );
+        // Update amount paid if provided
+        if ( request.getAmountPaid ( ) != null ) {
+            invoice.setAmountPaid ( request.getAmountPaid ( ) );
+        }
+
+        // Update notes/comments if provided
+        if ( request.getComments ( ) != null ) {
+            invoice.setNotes ( request.getComments ( ) );
+        }
+
+        // Set isPaid flag based on payment status
+        invoice.setIsPaid ( request.getPaymentStatus ( ) == InvoiceStatus.PAID );
+
+        WorkOrder workOrder = invoice.getWorkOrder ( );
+
+        // Update WorkOrder and Appointment status based on payment
+        if ( request.getPaymentStatus ( ) == InvoiceStatus.PAID ) {
+            // Update WorkOrder status when payment is received
+            if ( workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
+                workOrder.updateStatus ( WorkOrderStatus.PAYMENT_RECEIVED );
+                workOrderRepository.save ( workOrder );
+            }
+
+            // Update appointment status to ready for delivery
+            AppointmentDetails appointment = workOrder.getAppointment ( );
+            if ( appointment != null && appointment.getStatus ( ) != Status.READY_FOR_DELIVERY ) {
+                appointment.setStatus ( Status.READY_FOR_DELIVERY );
+                appointmentRepo.save ( appointment );
+            }
+        } else if ( request.getPaymentStatus ( ) == InvoiceStatus.PENDING ) {
+            // If payment is pending, update WorkOrder status accordingly
+            if ( workOrder.getStatus ( ) == WorkOrderStatus.INVOICE_INITIATED ||
+                 workOrder.getStatus ( ) == WorkOrderStatus.INVOICED ) {
+                workOrder.updateStatus ( WorkOrderStatus.PENDING_PAYMENT );
+                workOrderRepository.save ( workOrder );
+            }
+        }
+
+        return invoiceResponseMapper.toResponse ( invoiceRepository.save ( invoice ) );
     }
 
     /**

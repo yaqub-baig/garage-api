@@ -1,10 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.Invoice;
-import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
-import com.autoadda.apis.garage.request.AppointmentPayRequest;
+import com.autoadda.apis.garage.request.InvoicePayRequest;
 import com.autoadda.apis.garage.request.InvoiceRequest;
-import com.autoadda.apis.garage.response.AppointmentInvoiceResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.InvoiceResponse;
 import com.autoadda.apis.garage.service.InvoiceService;
@@ -22,15 +20,15 @@ public class InvoiceController {
 
     private final InvoiceService invoiceService;
 
-    @PostMapping("/prepare")
-    public ResponseEntity<GenericResponse> prepareInvoice(@RequestBody AppointmentInvoiceRequest request) {
-        AppointmentInvoiceResponse invoice = invoiceService.prepareInvoice ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoice prepared", invoice ) );
-    }
+//    @PostMapping("/prepare")
+//    public ResponseEntity<GenericResponse> prepareInvoice(@RequestBody AppointmentInvoiceRequest request) {
+//        AppointmentInvoiceResponse invoice = invoiceService.prepareInvoice ( request );
+//        return ResponseEntity.ok ( GenericResponse.success ( "Invoice prepared", invoice ) );
+//    }
 
     @PutMapping("/pay")
-    public ResponseEntity<GenericResponse> payInvoice(@RequestBody AppointmentPayRequest request) {
-        AppointmentInvoiceResponse invoice = invoiceService.updateInvoicePayment ( request );
+    public ResponseEntity<GenericResponse> payInvoice(@RequestBody InvoicePayRequest request) {
+        InvoiceResponse invoice = invoiceService.updateInvoicePayment ( request );
         return ResponseEntity.ok ( GenericResponse.success ( "Invoice updated as paid", invoice ) );
     }
 
