@@ -7,6 +7,7 @@ import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.GarageServiceRepository;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import com.autoadda.apis.garage.request.GarageServiceUpdateRequest;
 import com.autoadda.apis.garage.response.GarageServiceResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -75,11 +76,9 @@ public class GarageServiceManagementService {
      * @return The updated GarageService object.
      */
     @Transactional
-    public GarageService updateGarageService(Integer id, GarageService updated) {
+    public GarageService updateGarageService(Integer id, GarageServiceUpdateRequest updated) {
         return garageServiceRepository.findById ( id ).map ( existing -> {
             existing.setIsActive ( updated.getIsActive ( ) );
-            existing.setAvailableService ( updated.getAvailableService ( ) );
-            existing.setGarage ( updated.getGarage ( ) );
             existing.setLabourPrice ( updated.getLabourPrice ( ) );
             existing.setPrice ( updated.getPrice ( ) );
             return garageServiceRepository.save ( existing );

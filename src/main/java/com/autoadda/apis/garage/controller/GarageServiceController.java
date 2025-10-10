@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import com.autoadda.apis.garage.request.GarageServiceUpdateRequest;
 import com.autoadda.apis.garage.response.GarageServiceResponse;
 import com.autoadda.apis.garage.service.GarageServiceManagementService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class GarageServiceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GarageService> update(@PathVariable Integer id, @RequestBody GarageService updated) {
+    public ResponseEntity<GarageService> update(@PathVariable Integer id, @RequestBody GarageServiceUpdateRequest updated) {
         return ResponseEntity.ok ( garageServiceService.updateGarageService ( id, updated ) );
     }
 
