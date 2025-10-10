@@ -5,9 +5,11 @@ import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
+import com.autoadda.apis.garage.mapper.GarageSubscriptionMapper;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.GarageSubscriptionRepository;
 import com.autoadda.apis.garage.request.GarageSubscriptionRequest;
+import com.autoadda.apis.garage.response.GarageSubscriptionResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class GarageSubscriptionService {
 
     private final AvailableServiceManagementService availableServiceManagementService;
     private final GarageRepository garageRepository;
+    private final GarageSubscriptionMapper garageSubscriptionMapper;
 
     /**
      * Retrieves all subscription plans available in the system.
@@ -34,8 +37,11 @@ public class GarageSubscriptionService {
      * @return a list of all subscription plans
      */
     @Transactional
-    public List<GarageSubscription> getAllPlans() {
-        return subscriptionRepository.findAll ( );
+    public List<GarageSubscriptionResponse> getAllPlans() {
+        return subscriptionRepository.findAll ( )
+                .stream()
+                .map(garageSubscriptionMapper::toResponse)
+                .toList();
     }
 
     /**
@@ -45,7 +51,7 @@ public class GarageSubscriptionService {
      * @return the created subscription plan
      */
     @Transactional
-    public List<GarageSubscription> createPlan(GarageSubscriptionRequest plan) {
+    public List<GarageSubscriptionResponse> createPlan(GarageSubscriptionRequest plan) {
         List<AvailableService> services = Optional.ofNullable ( plan.getServicesIds ( ) )
                 .orElse ( Collections.emptyList ( ) )
                 .stream ( )
@@ -60,6 +66,7 @@ public class GarageSubscriptionService {
                 .orElseThrow ( () -> new IllegalArgumentException ( "Garage IDs cannot be null or empty" ) )
                 .stream ( )
                 .map ( garageId -> createSubscriptionForGarage ( plan, garageId, services ) )
+                .map(garageSubscriptionMapper::toResponse)
                 .toList ( );
     }
 
@@ -91,10 +98,13 @@ public class GarageSubscriptionService {
      * @return a list of subscription plans for the specified garage
      */
     @Transactional
-    public List<GarageSubscription> getPlansByGarage(Integer garageId) {
+    public List<GarageSubscriptionResponse> getPlansByGarage(Integer garageId) {
 //		return subscriptionRepository.findAll().stream().filter(p -> p.getGarage().getId().equals(garageId))
 //				.collect(Collectors.toList());
-        return subscriptionRepository.findByGarageId ( garageId );
+        return subscriptionRepository.findByGarageId ( garageId )
+                .stream()
+                .map(garageSubscriptionMapper::toResponse)
+                .toList();
     }
 
     /**
@@ -104,9 +114,10 @@ public class GarageSubscriptionService {
      * @return the subscription plan with the specified ID
      */
     @Transactional
-    public GarageSubscription getPlanById(Integer id) {
-        return subscriptionRepository.findById ( id )
+    public GarageSubscriptionResponse getPlanById(Integer id) {
+        GarageSubscription subscription = subscriptionRepository.findById ( id )
                 .orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
+        return garageSubscriptionMapper.toResponse(subscription);
     }
 
     /**
@@ -117,8 +128,9 @@ public class GarageSubscriptionService {
      * @return the updated subscription plan
      */
     @Transactional
-    public GarageSubscription updatePlan(Integer id, GarageSubscription updatedPlan) {
-        GarageSubscription existingPlan = getPlanById ( id );
+    public GarageSubscriptionResponse updatePlan(Integer id, GarageSubscription updatedPlan) {
+        GarageSubscription existingPlan = subscriptionRepository.findById ( id )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
         existingPlan.setName ( updatedPlan.getName ( ) );
         existingPlan.setDescription ( updatedPlan.getDescription ( ) );
         existingPlan.setPrice ( updatedPlan.getPrice ( ) );
@@ -126,7 +138,8 @@ public class GarageSubscriptionService {
         existingPlan.setServicesIncluded ( updatedPlan.getServicesIncluded ( ) );
         existingPlan.setIsActive ( updatedPlan.getIsActive ( ) );
 
-        return subscriptionRepository.save ( existingPlan );
+        GarageSubscription saved = subscriptionRepository.save ( existingPlan );
+        return garageSubscriptionMapper.toResponse(saved);
     }
 
     /**
@@ -136,7 +149,8 @@ public class GarageSubscriptionService {
      */
     @Transactional
     public void deletePlan(Integer id) {
-        GarageSubscription existingPlan = getPlanById ( id );
+        GarageSubscription existingPlan = subscriptionRepository.findById ( id )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
         subscriptionRepository.delete ( existingPlan );
     }
 
@@ -151,7 +165,7 @@ public class GarageSubscriptionService {
      * @return a list of subscription plans matching the search query
      */
     @Transactional
-    public List<GarageSubscription> searchPlans(String brand, String city, String garageName) {
+    public List<GarageSubscriptionResponse> searchPlans(String brand, String city, String garageName) {
         Set<GarageSubscription> subscriptionPlans = subscriptionRepository.findAllWithLocationAndServices ( );
         List<GarageSubscription> searchResults = new ArrayList<> ( List.of ( ) );
         for (GarageSubscription plan : subscriptionPlans) {
@@ -189,7 +203,9 @@ public class GarageSubscriptionService {
                 searchResults.add ( plan );
             }
         }
-        return searchResults;
+        return searchResults.stream()
+                .map(garageSubscriptionMapper::toResponse)
+                .toList();
     }
 
     /**
@@ -236,13 +252,14 @@ public class GarageSubscriptionService {
         return subscriptionRepository.findByGarageIdAndIsActive ( garageId, true );
     }
 
-    public GarageSubscription changeStatus(Integer id) {
+    public GarageSubscriptionResponse changeStatus(Integer id) {
         GarageSubscription subscriptionPlan = subscriptionRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
         if ( subscriptionPlan.getIsActive ( ) )
             subscriptionPlan.setIsActive ( false );
         else
             subscriptionPlan.setIsActive ( true );
-        return subscriptionRepository.save ( subscriptionPlan );
+        GarageSubscription saved = subscriptionRepository.save ( subscriptionPlan );
+        return garageSubscriptionMapper.toResponse(saved);
 
 
     }

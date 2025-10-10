@@ -22,4 +22,5 @@ public class GarageSubscriptionResponse {
     private String brands;
     private Map<Integer, Integer> serviceQuantity;
     private List<AvailableServiceResponse> services;
+    private Boolean isActive;
 }

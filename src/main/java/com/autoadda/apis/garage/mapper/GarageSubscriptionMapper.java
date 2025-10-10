@@ -22,6 +22,7 @@ public class GarageSubscriptionMapper {
         garageSubscriptionResponse.setBrands ( garageSubscription.getBrands ( ) );
         garageSubscriptionResponse.setServiceQuantity ( garageSubscription.getServiceQuantity ( ) );
         garageSubscriptionResponse.setServices ( garageSubscription.getServicesIncluded ( ).stream ( ).map ( availableServiceMapper::toResponse ).toList ( ) );
+        garageSubscriptionResponse.setIsActive ( garageSubscription.getIsActive ( ) );
         return garageSubscriptionResponse;
     }
 }

@@ -1,8 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
-import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.entity.VehicleOwnerSubscription;
 import com.autoadda.apis.garage.request.SubscriptionRequest;
+import com.autoadda.apis.garage.response.GarageSubscriptionResponse;
 import com.autoadda.apis.garage.response.VehicleOwnerSubscriptionResponse;
 import com.autoadda.apis.garage.service.GarageSubscriptionService;
 import com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService;
@@ -49,17 +49,17 @@ public class VehicleSubscriptionController {
     }
 
     @GetMapping("/garage/{garageId}")
-    public List<GarageSubscription> getPlansByGarage(@PathVariable Integer garageId) {
+    public List<GarageSubscriptionResponse> getPlansByGarage(@PathVariable Integer garageId) {
         return garageSubscriptionService.getPlansByGarage ( garageId );
     }
 
     @GetMapping("/all")
-    public List<GarageSubscription> getAllPlans() {
+    public List<GarageSubscriptionResponse> getAllPlans() {
         return garageSubscriptionService.getAllPlans ( );
     }
 
     @GetMapping("/search")
-    public List<GarageSubscription> searchPlans(@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String garageName) {
+    public List<GarageSubscriptionResponse> searchPlans(@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String garageName) {
         return garageSubscriptionService.searchPlans ( brand, city, garageName );
     }
 
