@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.entity.VehicleOwnerSubscription;
 import com.autoadda.apis.garage.request.SubscriptionRequest;
 import com.autoadda.apis.garage.response.GarageSubscriptionResponse;
@@ -29,7 +30,7 @@ public class VehicleSubscriptionController {
     }
 
     @GetMapping("/owner")
-    public List<VehicleOwnerSubscription> getSubscriptionsByOwner(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+    public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwner(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
         return ownerSubscriptionService.getSubscriptionsByOwner ( Integer.parseInt ( autoAddaId ) );
     }
 

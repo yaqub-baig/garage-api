@@ -58,8 +58,8 @@ public class VehicleOwnerSubscriptionService {
      * @return a list of VehicleOwnerSubscription objects
      */
     @Transactional
-    public List<VehicleOwnerSubscription> getSubscriptionsByOwner(Integer ownerId) {
-        return vehicleOwnerSubscriptionRepository.findByCustomerId ( ownerId );
+    public List<VehicleOwnerSubscriptionResponse> getSubscriptionsByOwner(Integer ownerId) {
+        return vehicleOwnerSubscriptionRepository.findByCustomerId ( ownerId ).stream ().map ( vehicleOwnerSubscriptionMapper::toResponse ).toList ();
     }
 
     /**
