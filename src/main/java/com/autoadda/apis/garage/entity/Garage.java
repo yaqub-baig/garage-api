@@ -100,7 +100,7 @@ public class Garage {
     private List<MediaFile> vatCertificate = new ArrayList<> ( );
 
 
-    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL)
     private List<GarageService> services = new ArrayList<> ( );
 
     @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)

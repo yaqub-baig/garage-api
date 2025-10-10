@@ -4,6 +4,7 @@ import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.AvailableService;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.Technician;
+import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.TechnicianMapper;
 import com.autoadda.apis.garage.repository.AvailableServiceRepository;
@@ -74,7 +75,7 @@ public class TechnicianService {
         Technician garageTechnician = mapToEntity ( technician );
         Optional<Technician> existingTechnician = technicianRepository.findByMobileNumber ( technician.getMobileNumber ( ) );
         if ( existingTechnician.isPresent ( ) && ! existingTechnician.get ( ).getIsDeleted ( ) ) {
-            throw new IllegalStateException ( "Technician with this phone number already exists" );
+            throw new AlreadyExistsException ( "Technician with this phone number already exists" );
         }
         if ( existingTechnician.isPresent ( ) && existingTechnician.get ( ).getIsDeleted ( ) ) {
             existingTechnician.get ( ).setIsDeleted ( false );
