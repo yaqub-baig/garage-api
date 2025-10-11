@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,7 +30,7 @@ public class VehicleReceived {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_received_id")
-    private List<MediaFile> vehiclePhotos;
+    private List<MediaFile> vehiclePhotos = new ArrayList<> ( );
 
     @Enumerated(EnumType.STRING)
     private VehicleRecievedStatus status;
