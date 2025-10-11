@@ -74,7 +74,11 @@ public class VehicleReceivedService {
         vehicleReceived.setIsPUCReceived ( getBooleanValue ( request.getIsPUCReceived ( ) ) );
 
         VehicleReceived save = vehicleReceivedRepository.save ( vehicleReceived );
-//        log.info ( "  requested images ------->" + save.getVehiclePhotos ( ).stream ( ).map ( MediaFile::getId ).toList ( ) );
+        log.info ( "After saving - vehicleReceived ID: " + save.getId() );
+        log.info ( "After saving - images count: " + (save.getVehiclePhotos() != null ? save.getVehiclePhotos().size() : 0) );
+        if (save.getVehiclePhotos() != null && !save.getVehiclePhotos().isEmpty()) {
+            log.info ( "After saving - image IDs: " + save.getVehiclePhotos().stream().map(MediaFile::getId).toList() );
+        }
 
         return vehicleRecievedMapper.entityToResponse ( save );
     }
