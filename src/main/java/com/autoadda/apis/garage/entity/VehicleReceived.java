@@ -28,7 +28,7 @@ public class VehicleReceived {
     @ManyToOne
     private Technician technician;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_received_id")
     private List<MediaFile> vehiclePhotos = new ArrayList<> ( );
 
