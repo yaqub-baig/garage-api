@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,7 +15,7 @@ public class VehicleReceivedRequest {
     private Integer vehicleId;
     private Integer appointmentId;
     private Integer receiverId;
-    private List<Long> vehicleImages;
+    private List<Long> vehicleImages= new ArrayList<>();
     private String comment;
     private Boolean isMainKeyReceived;
     private Boolean isSpareKeyReceived;

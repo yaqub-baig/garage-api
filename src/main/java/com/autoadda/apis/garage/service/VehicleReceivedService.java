@@ -49,7 +49,7 @@ public class VehicleReceivedService {
         }
         log.info ( "  requested images ------->" + request.getVehicleImages ( ).stream ( ).toList ( ) );
         if ( request.getVehicleImages ( ) != null && ! request.getVehicleImages ( ).isEmpty ( ) ) {
-            List<MediaFile> mediaFiles = mediaFileRepository.findAllById ( request.getVehicleImages ( ) );
+            List<MediaFile> mediaFiles = new ArrayList<>( mediaFileRepository.findAllById ( request.getVehicleImages ( ) ));
             if ( mediaFiles.size ( ) != request.getVehicleImages ( ).size ( ) ) {
                 throw new ResourceNotFoundException ( "Some media files not found" );
             }
