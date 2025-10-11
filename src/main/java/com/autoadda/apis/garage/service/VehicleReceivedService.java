@@ -47,14 +47,14 @@ public class VehicleReceivedService {
         if ( request.getComment ( ) != null ) {
             vehicleReceived.setComment ( request.getComment ( ) );
         }
-//        log.info ( "  requested images ------->" + request.getVehicleImages ( ).stream ( ).toList ( ) );
+        log.info ( "  requested images ------->" + request.getVehicleImages ( ).stream ( ).toList ( ) );
         if ( request.getVehicleImages ( ) != null && ! request.getVehicleImages ( ).isEmpty ( ) ) {
             List<MediaFile> mediaFiles = mediaFileRepository.findAllById ( request.getVehicleImages ( ) );
             if ( mediaFiles.size ( ) != request.getVehicleImages ( ).size ( ) ) {
                 throw new ResourceNotFoundException ( "Some media files not found" );
             }
             vehicleReceived.setVehiclePhotos ( mediaFiles );
-//            log.info ( "  requested images ------->" + vehicleReceived.getVehiclePhotos ( ).stream ( ).map ( MediaFile::getId ).toList ( ) );
+            log.info ( "  requested images ------->" + vehicleReceived.getVehiclePhotos ( ).stream ( ).map ( MediaFile::getId ).toList ( ) );
         }
 
         vehicleReceived.setTechnician ( technicianRepository.findById ( request.getReceiverId ( ) )
