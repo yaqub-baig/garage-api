@@ -30,7 +30,7 @@ public class GarageServiceManagementService {
         garageService.setGarage ( garageRepository.findById ( service.getGarageId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
         garageService.setAvailableService ( availableServiceRepository.findById ( service.getServiceId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) ) );
         garageService.setLabourPrice ( garageService.getAvailableService ( ).getLaborPrice ( ) );
-        garageService.setPrice ( garageService.getPrice ( ) );
+        garageService.setPrice ( garageService.getAvailableService().getPrice ( ) );
         return garageService;
     }
 
