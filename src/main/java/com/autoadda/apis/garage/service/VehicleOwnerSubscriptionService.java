@@ -90,7 +90,7 @@ public class VehicleOwnerSubscriptionService {
     /**
      * Retrieves all active subscriptions.
      *
-     * @return a list of active VehicleOwnerSubscription objects
+     * @return a list of active VehicleOwnerSubscriptionResponse objects
      */
     @Transactional
     public List<VehicleOwnerSubscriptionResponse> getActiveSubscriptions() {
@@ -112,7 +112,7 @@ public class VehicleOwnerSubscriptionService {
     /**
      * Retrieves all subscriptions for a specific garage subscription plan.
      *
-     * @param planId the ID of the garage subscription plan
+     * @param subscriptionId the ID of the garage subscription plan
      * @return a list of VehicleOwnerSubscription objects
      */
     @Transactional

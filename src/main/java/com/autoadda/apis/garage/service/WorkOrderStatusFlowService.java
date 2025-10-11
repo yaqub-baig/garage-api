@@ -2,12 +2,10 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.WorkOrder;
-import com.autoadda.apis.garage.repository.JobCardRepository;
 import com.autoadda.apis.garage.repository.WorkOrderRepository;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -58,19 +56,14 @@ public class WorkOrderStatusFlowService {
             ) ),
 
             Map.entry ( WorkOrderStatus.JOB_COMPLETED, Arrays.asList (
-                    WorkOrderStatus.PENDING_REVIEW,
-                    WorkOrderStatus.READY_FOR_DELIVERY
+                    WorkOrderStatus.PENDING_REVIEW
             ) ),
 
             Map.entry ( WorkOrderStatus.PENDING_REVIEW, Arrays.asList (
-                    WorkOrderStatus.READY_FOR_DELIVERY,
+                    WorkOrderStatus.INVOICE_INITIATED,
                     WorkOrderStatus.WORK_IN_PROGRESS // If rework needed
             ) ),
 
-            Map.entry ( WorkOrderStatus.READY_FOR_DELIVERY, Arrays.asList (
-                    WorkOrderStatus.INVOICE_INITIATED,
-                    WorkOrderStatus.INVOICED
-            ) ),
 
             Map.entry ( WorkOrderStatus.INVOICE_INITIATED, Arrays.asList (
                     WorkOrderStatus.INVOICED
@@ -87,6 +80,10 @@ public class WorkOrderStatusFlowService {
             ) ),
 
             Map.entry ( WorkOrderStatus.PAYMENT_RECEIVED, Arrays.asList (
+                    WorkOrderStatus.READY_FOR_DELIVERY
+            ) ),
+
+            Map.entry ( WorkOrderStatus.READY_FOR_DELIVERY, Arrays.asList (
                     WorkOrderStatus.DELIVERED_TO_CUSTOMER
             ) ),
 
