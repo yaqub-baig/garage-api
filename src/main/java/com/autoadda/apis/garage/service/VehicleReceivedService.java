@@ -120,8 +120,10 @@ public class VehicleReceivedService {
             }
         }
 
-        vehicleReceived.setTechnician ( technicianRepository.findById ( request.getReceiverId ( ) )
-                .orElseThrow ( () -> new ResourceNotFoundException ( "technician not found" ) ) );
+        if ( request.getReceiverId ( ) != null ) {
+            vehicleReceived.setTechnician ( technicianRepository.findById ( request.getReceiverId ( ) )
+                    .orElseThrow ( () -> new ResourceNotFoundException ( "technician not found" ) ) );
+        }
 
         // Use the helper method consistently
         vehicleReceived.setIsMainKeyReceived ( getBooleanValue ( request.getIsMainKeyReceived ( ) ) );
