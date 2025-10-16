@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,8 +119,10 @@ public class VehicleReceivedService {
             }
         }
 
-        vehicleReceived.setTechnician ( technicianRepository.findById ( request.getReceiverId ( ) )
-                .orElseThrow ( () -> new ResourceNotFoundException ( "technician not found" ) ) );
+        if ( request.getReceiverId ( ) != null ) {
+            vehicleReceived.setTechnician ( technicianRepository.findById ( request.getReceiverId ( ) )
+                    .orElseThrow ( () -> new ResourceNotFoundException ( "technician not found" ) ) );
+        }
 
         // Use the helper method consistently
         vehicleReceived.setIsMainKeyReceived ( getBooleanValue ( request.getIsMainKeyReceived ( ) ) );
@@ -141,3 +142,6 @@ public class VehicleReceivedService {
         return vehicleRecievedMapper.entityToResponse ( updatedVehicle );
     }
 }
+
+
+//test push
