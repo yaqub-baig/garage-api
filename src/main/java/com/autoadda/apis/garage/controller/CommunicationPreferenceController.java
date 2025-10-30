@@ -6,7 +6,7 @@ import com.autoadda.apis.garage.service.CommunicationPreferenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/preferences")
 @RequiredArgsConstructor

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/insurance-claims")
 public class InsuranceClaimController {

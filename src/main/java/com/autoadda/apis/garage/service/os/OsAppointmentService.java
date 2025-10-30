@@ -1,32 +1,28 @@
 package com.autoadda.apis.garage.service.os;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import com.autoadda.apis.garage.entity.OsAppointmentStatusActivity;
 import com.autoadda.apis.garage.entity.os.*;
-//import com.autoadda.apis.garage.entity.os.OsAppointmentStatusActivity;
+import com.autoadda.apis.garage.exception.CustomerNotFoundException;
+import com.autoadda.apis.garage.exception.GarageNotFoundException;
 import com.autoadda.apis.garage.exception.OtherServiceNotFoundException;
 import com.autoadda.apis.garage.mapper.os.OsAppointmentDetailMapper;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.repository.os.*;
 import com.autoadda.apis.garage.request.os.OsAppointmentStatusRequest;
 import com.autoadda.apis.garage.request.os.OsCustomerAppointmentRequest;
-import com.autoadda.apis.garage.response.os.OsAppointmentDetailResponse;
 import com.autoadda.apis.garage.response.OsAppointmentResponse;
+import com.autoadda.apis.garage.response.os.OsAppointmentDetailResponse;
+import com.autoadda.apis.garage.util.BusinessValidator;
+import com.autoadda.apis.garage.util.DateHelper;
+import com.autoadda.apis.garage.util.Status;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.autoadda.apis.garage.exception.CustomerNotFoundException;
-import com.autoadda.apis.garage.exception.GarageNotFoundException;
-import com.autoadda.apis.garage.util.BusinessValidator;
-import com.autoadda.apis.garage.util.DateHelper;
-import com.autoadda.apis.garage.util.Status;
-
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -39,7 +35,7 @@ public class OsAppointmentService {
     private final OsAppointmentStatusActivityRepository osAppointmentActivityRepo;
     private final OsAppointmentServiceRepository serviceRepo;
     private final GarageRepository garageRepo;
-    private  final OtherServiceRepository otherServiceRepository;
+    private final OtherServiceRepository otherServiceRepository;
     private final CustomerRepository customerRepo;
     private final VehicleDetailsRepository vehicleRepo;
     private final GarageServiceRepository garageServiceRepo;
@@ -55,8 +51,8 @@ public class OsAppointmentService {
      * @param request the appointment request containing details like garage ID,
      *                customer ID, vehicle ID, schedule date, service IDs, etc.
      * @return the created AppointmentDetails object.
-     * @throws CustomerNotFoundException if the customer does not exist.
-     * @throws OtherServiceNotFoundException   if the garage does not exist.
+     * @throws CustomerNotFoundException     if the customer does not exist.
+     * @throws OtherServiceNotFoundException if the garage does not exist.
      */
     @Transactional
 
@@ -64,51 +60,50 @@ public class OsAppointmentService {
             throws CustomerNotFoundException, OtherServiceNotFoundException {
 
         // Garage is mandatory
-        OtherService service = otherServiceRepository.findById(request.getOtherServiceId())
-                .orElseThrow(() -> new OtherServiceNotFoundException("Other Service not found"));
+        OtherService service = otherServiceRepository.findById ( request.getOtherServiceId ( ) )
+                .orElseThrow ( () -> new OtherServiceNotFoundException ( "Other Service not found" ) );
 
         // Create appointment
-        OsAppointmentDetails osAppointmentDetails = OsAppointmentDetails.builder()
-                .otherService(service)
-                .vehicleId(request.getVehicleId())
-                .customerId(request.getCustomerId())
-                .scheduleDate(request.getScheduleDate())
-                .status(Status.CONFIRMED)
-                .insert_tms(DateHelper.dbDate())
-                .build();
-        osAppointmentDetailsRepository.save(osAppointmentDetails);
+        OsAppointmentDetails osAppointmentDetails = OsAppointmentDetails.builder ( )
+                .otherService ( service )
+                .vehicleId ( request.getVehicleId ( ) )
+                .customerId ( request.getCustomerId ( ) )
+                .scheduleDate ( request.getScheduleDate ( ) )
+                .status ( Status.CONFIRMED )
+                .insert_tms ( DateHelper.dbDate ( ) )
+                .build ( );
+        osAppointmentDetailsRepository.save ( osAppointmentDetails );
 
         // Save activity (memberId, memberType optional ho sakte hain)
-        osAppointmentActivityRepo.save(com.autoadda.apis.garage.entity.OsAppointmentStatusActivity.builder()
-                .osAppointmentId(osAppointmentDetails.getId())
-                .status(osAppointmentDetails.getStatus())
-                .memberId(request.getMemberId())
-                .memberType(request.getMemberType())
-                .insert_tms(DateHelper.dbDate())
-                .build());
+        osAppointmentActivityRepo.save ( com.autoadda.apis.garage.entity.os.OsAppointmentStatusActivity.builder ( )
+                .osAppointmentId ( osAppointmentDetails.getId ( ) )
+                .status ( osAppointmentDetails.getStatus ( ) )
+                .memberId ( request.getMemberId ( ) )
+                .memberType ( request.getMemberType ( ) )
+                .insert_tms ( DateHelper.dbDate ( ) )
+                .build ( ) );
 
         // Services optional
 
-        if (request.getServiceIds() != null && !request.getServiceIds().isEmpty()) {
-            List<OsAppointmentServices> services = request.getServiceIds().stream()
-                    .filter(Objects::nonNull) // null serviceId ignore karega
-                    .map(serviceId -> {
-                        OsService OsService = osServiceRepo.findById(serviceId)
-                                .orElseThrow(() -> new RuntimeException("Service not found"));
-                        return OsAppointmentServices.builder()
-                                .appointmentId(osAppointmentDetails.getId())
-                                .osService(OsService)
-                                .status(Status.NEW)
-                                .build();
-                    })
-                    .collect(Collectors.toList());
+        if ( request.getServiceIds ( ) != null && ! request.getServiceIds ( ).isEmpty ( ) ) {
+            List<OsAppointmentServices> services = request.getServiceIds ( ).stream ( )
+                    .filter ( Objects::nonNull ) // null serviceId ignore karega
+                    .map ( serviceId -> {
+                        OsService OsService = osServiceRepo.findById ( serviceId )
+                                .orElseThrow ( () -> new RuntimeException ( "Service not found" ) );
+                        return OsAppointmentServices.builder ( )
+                                .appointmentId ( osAppointmentDetails.getId ( ) )
+                                .osService ( OsService )
+                                .status ( Status.NEW )
+                                .build ( );
+                    } )
+                    .collect ( Collectors.toList ( ) );
 
-            serviceRepo.saveAll(services);
+            serviceRepo.saveAll ( services );
         }
 
         return osAppointmentDetails;
     }
-
 
 
     /**
@@ -136,7 +131,7 @@ public class OsAppointmentService {
      * Retrieves all appointments for a garage, optionally filtered by status.
      *
      * @param otherServiceId the ID of the garage.
-     * @param status   the status to filter appointments by, or null for all.
+     * @param status         the status to filter appointments by, or null for all.
      * @return a list of AppointmentDetails for the garage.
      * @throws GarageNotFoundException if the garage does not exist.
      */
@@ -144,12 +139,12 @@ public class OsAppointmentService {
     public List<OsAppointmentDetails> getOtherServiceAppointment(Integer otherServiceId, Status status)
             throws OtherServiceNotFoundException {
 
-        OtherService service = validator.validateAndGetOtherService(otherServiceId);
+        OtherService service = validator.validateAndGetOtherService ( otherServiceId );
 
-        if (StringUtils.isEmpty(status.toString())) {
-            return osAppointmentDetailsRepository.findByOtherServiceId(otherServiceId);
+        if ( StringUtils.isEmpty ( status.toString ( ) ) ) {
+            return osAppointmentDetailsRepository.findByOtherServiceId ( otherServiceId );
         } else {
-            return osAppointmentDetailsRepository.findByOtherServiceIdAndStatus(otherServiceId, status);
+            return osAppointmentDetailsRepository.findByOtherServiceIdAndStatus ( otherServiceId, status );
         }
     }
 
@@ -158,17 +153,17 @@ public class OsAppointmentService {
      *
      * @param osAppointmentId the ID of the appointment.
      * @return an AppointmentResponse containing appointment details, services, and
-     *         job cards.
+     * job cards.
      */
     @Transactional(readOnly = true)
     public OsAppointmentResponse getAppointmentsDetails(Integer osAppointmentId) {
-        OsAppointmentDetails appointment = osAppointmentDetailsRepository.findById(osAppointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        OsAppointmentDetails appointment = osAppointmentDetailsRepository.findById ( osAppointmentId )
+                .orElseThrow ( () -> new RuntimeException ( "Appointment not found" ) );
 
-        List<com.autoadda.apis.garage.entity.os.OsAppointmentServices> services = serviceRepo.findByAppointmentId(osAppointmentId);
-        List<OsJobCard> jobCards = jobCardService.getJobCardsByAppointmentId(osAppointmentId);
+        List<com.autoadda.apis.garage.entity.os.OsAppointmentServices> services = serviceRepo.findByAppointmentId ( osAppointmentId );
+        List<OsJobCard> jobCards = jobCardService.getJobCardsByAppointmentId ( osAppointmentId );
 
-        return OsAppointmentResponse.builder().appointment(appointment).services(services).jobcards(jobCards).build();
+        return OsAppointmentResponse.builder ( ).appointment ( appointment ).services ( services ).jobcards ( jobCards ).build ( );
     }
 
     /**
@@ -180,27 +175,27 @@ public class OsAppointmentService {
      */
     @Transactional
     public OsAppointmentDetails updateAppointmentStatus(OsAppointmentStatusRequest request) {
-        OsAppointmentDetails appointment = osAppointmentDetailsRepository.findById(request.getAppointmentId())
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        OsAppointmentDetails appointment = osAppointmentDetailsRepository.findById ( request.getAppointmentId ( ) )
+                .orElseThrow ( () -> new RuntimeException ( "Appointment not found" ) );
 
-        Status newStatus = request.getStatus();
+        Status newStatus = request.getStatus ( );
 
-        appointment.setStatus(newStatus);
-        if (newStatus.equals(Status.WORK_INPROGRESS)) {
-            appointment.setServiceStartTime(DateHelper.dbTime());
-        } else if (newStatus.equals(Status.COMPLETED)) {
-            appointment.setServiceEndTime(DateHelper.dbTime());
-        } else if (newStatus.equals(Status.DELIVERED)) {
-            appointment.setStatus(Status.DONE);
-            appointment.setDeliveryTime(DateHelper.dbTime());
+        appointment.setStatus ( newStatus );
+        if ( newStatus.equals ( Status.WORK_INPROGRESS ) ) {
+            appointment.setServiceStartTime ( DateHelper.dbTime ( ) );
+        } else if ( newStatus.equals ( Status.COMPLETED ) ) {
+            appointment.setServiceEndTime ( DateHelper.dbTime ( ) );
+        } else if ( newStatus.equals ( Status.DELIVERED ) ) {
+            appointment.setStatus ( Status.DONE );
+            appointment.setDeliveryTime ( DateHelper.dbTime ( ) );
         }
 
-        appointment.setComments(request.getComments());
-        osAppointmentDetailsRepository.save(appointment);
+        appointment.setComments ( request.getComments ( ) );
+        osAppointmentDetailsRepository.save ( appointment );
 
-        osAppointmentActivityRepo.save(OsAppointmentStatusActivity.builder().osAppointmentId(appointment.getId())
-                .status(appointment.getStatus()).memberId(request.getMemberId()).memberType(request.getMemberType())
-                .comments(request.getComments()).insert_tms(DateHelper.dbDate()).build());
+        osAppointmentActivityRepo.save ( OsAppointmentStatusActivity.builder ( ).osAppointmentId ( appointment.getId ( ) )
+                .status ( appointment.getStatus ( ) ).memberId ( request.getMemberId ( ) ).memberType ( request.getMemberType ( ) )
+                .comments ( request.getComments ( ) ).insert_tms ( DateHelper.dbDate ( ) ).build ( ) );
 
         return appointment;
     }
@@ -227,22 +222,22 @@ public class OsAppointmentService {
     /**
      * Retrieves all appointments for a garage, optionally filtered by status.
      *
-     * @param otherServiceId  the ID of the garage.
-     * @param statusStr the status to filter appointments by, or null for all.
+     * @param otherServiceId the ID of the garage.
+     * @param statusStr      the status to filter appointments by, or null for all.
      * @return a list of AppointmentDetails for the garage.
      * @throws GarageNotFoundException if the garage does not exist.
      */
     @Transactional(readOnly = true)
     public List<OsAppointmentDetailResponse> getAppointmentsByGarage(Integer otherServiceId, String statusStr)
             throws GarageNotFoundException {
-        validator.validateAndGetOtherService(otherServiceId);
+        validator.validateAndGetOtherService ( otherServiceId );
 
-        if (StringUtils.isBlank(statusStr)) {
-            return osAppointmentDetailsRepository.findByOtherServiceId(otherServiceId).stream().map(appointmentDetailMapper::entityToResponse).toList();
+        if ( StringUtils.isBlank ( statusStr ) ) {
+            return osAppointmentDetailsRepository.findByOtherServiceId ( otherServiceId ).stream ( ).map ( appointmentDetailMapper::entityToResponse ).toList ( );
         }
 
-        Status status = Status.valueOf(statusStr.toUpperCase());
-        return osAppointmentDetailsRepository.findByOtherServiceIdAndStatus(otherServiceId, status).stream().map(appointmentDetailMapper::entityToResponse).toList();
+        Status status = Status.valueOf ( statusStr.toUpperCase ( ) );
+        return osAppointmentDetailsRepository.findByOtherServiceIdAndStatus ( otherServiceId, status ).stream ( ).map ( appointmentDetailMapper::entityToResponse ).toList ( );
     }
 
     public String generateAppointmentCode() {
@@ -273,7 +268,6 @@ public class OsAppointmentService {
         // Format the final code with the sequence padded to 4 digits
         return String.format ( "%s%06d", codePrefix, nextSequence );
     }
-
 
 
 }

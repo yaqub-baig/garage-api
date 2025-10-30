@@ -1,4 +1,4 @@
-package com.autoadda.apis.garage.entity;
+package com.autoadda.apis.garage.entity.os;
 
 import java.time.LocalDate;
 
