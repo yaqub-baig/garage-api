@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import com.autoadda.apis.garage.request.GarageServiceUpdateRequest;
 import com.autoadda.apis.garage.response.GarageServiceResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,8 +81,9 @@ class GarageServiceManagementServiceTest {
 
 	@Test
 	void testUpdateGarageServiceSuccess() {
-		GarageService updated = GarageService.builder().isActive(false).garage(garage)
-				.availableService(availableService).build();
+		GarageServiceUpdateRequest updated = new GarageServiceUpdateRequest();
+		updated.setIsActive(false);
+
 
 		when(garageServiceRepository.findById(1)).thenReturn(Optional.of(garageService));
 		when(garageServiceRepository.save(any())).thenReturn(updated);
@@ -103,9 +105,10 @@ class GarageServiceManagementServiceTest {
 	void testUpdateGarageServiceNotFound() {
 		when(garageServiceRepository.findById(999)).thenReturn(Optional.empty());
 
-		GarageService updated = GarageService.builder().isActive(false).build();
+		GarageServiceUpdateRequest updated = new GarageServiceUpdateRequest();
+		updated.setIsActive(false);
 
-		assertThrows(RuntimeException.class, () -> garageServiceManagementService.updateGarageService(999, updated));
+		assertThrows(RuntimeException.class, () -> garageServiceManagementService.updateGarageService( 999,updated));
 	}
 
 	@Test

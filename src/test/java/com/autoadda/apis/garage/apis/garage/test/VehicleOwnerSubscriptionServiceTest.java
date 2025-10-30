@@ -154,7 +154,7 @@ class VehicleOwnerSubscriptionServiceTest {
 	void testGetSubscriptionsByOwner() {
 		when(vehicleOwnerSubscriptionRepository.findByCustomerId (12)).thenReturn(List.of(subscription));
 
-		List<VehicleOwnerSubscription> subscriptions = vehicleOwnerSubscriptionService.getSubscriptionsByOwner(12);
+		List<VehicleOwnerSubscriptionResponse> subscriptions = vehicleOwnerSubscriptionService.getSubscriptionsByOwner(12);
 		assertEquals(1, subscriptions.size());
 		assertEquals(1001, subscriptions.get(0).getId());
 

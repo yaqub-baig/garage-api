@@ -6,6 +6,7 @@ import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.GarageSubscriptionRepository;
 import com.autoadda.apis.garage.request.GarageSubscriptionRequest;
+import com.autoadda.apis.garage.response.GarageSubscriptionResponse;
 import com.autoadda.apis.garage.service.GarageSubscriptionService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,8 +50,8 @@ class GarageSubscriptionServiceTest {
         garage.setId ( 1 );
         garage.setName ( "Test Garage" );
         services = List.of (
-                new AvailableService ( 1, "Oil Change", "skdjfsdf", 20.0, 100.0, null,null ),
-                new AvailableService ( 2, "Oil Change", "skdjfsdf", 20.0, 100.0, null ,null) );
+                new AvailableService ( 1, "Oil Change", "skdjfsdf", 20.0, 100.0, null ),
+                new AvailableService ( 2, "Oil Change", "skdjfsdf", 20.0, 100.0, null ) );
         plan = new GarageSubscription ( );
         plan.setId ( 1 );
         plan.setName ( "Basic Plan" );
@@ -66,7 +67,7 @@ class GarageSubscriptionServiceTest {
     void testGetAllPlans() {
         when ( subscriptionRepository.findAll ( ) ).thenReturn ( List.of ( plan ) );
 
-        List<GarageSubscription> plans = subscriptionService.getAllPlans ( );
+        List<GarageSubscriptionResponse> plans = subscriptionService.getAllPlans ( );
 
         assertEquals ( 1, plans.size ( ) );
         assertEquals ( "Basic Plan", plans.get ( 0 ).getName ( ) );
@@ -77,7 +78,7 @@ class GarageSubscriptionServiceTest {
         when ( garageRepository.findById ( 1 ) ).thenReturn ( Optional.of ( garage ) );
         when ( subscriptionRepository.save ( plan ) ).thenReturn ( plan );
 
-        List<GarageSubscription> created = subscriptionService.createPlan ( subscriptionRequest );
+        List<GarageSubscriptionResponse> created = subscriptionService.createPlan ( subscriptionRequest );
 
         assertEquals ( plan, created );
         verify ( subscriptionRepository ).save ( plan );
@@ -95,7 +96,7 @@ class GarageSubscriptionServiceTest {
         List<GarageSubscription> plans = List.of ( plan );
         when ( subscriptionRepository.findByGarageId ( 1 ) ).thenReturn ( plans );
 
-        List<GarageSubscription> result = subscriptionService.getPlansByGarage ( 1 );
+        List<GarageSubscriptionResponse> result = subscriptionService.getPlansByGarage ( 1 );
 
         assertEquals ( 1, result.size ( ) );
         assertEquals ( "Basic Plan", result.get ( 0 ).getName ( ) );
@@ -105,7 +106,7 @@ class GarageSubscriptionServiceTest {
     void testGetPlanById_Success() {
         when ( subscriptionRepository.findById ( 1 ) ).thenReturn ( Optional.of ( plan ) );
 
-        GarageSubscription result = subscriptionService.getPlanById ( 1 );
+        GarageSubscriptionResponse result = subscriptionService.getPlanById ( 1 );
 
         assertEquals ( "Basic Plan", result.getName ( ) );
     }
@@ -130,7 +131,7 @@ class GarageSubscriptionServiceTest {
         when ( subscriptionRepository.findById ( 1 ) ).thenReturn ( Optional.of ( plan ) );
         when ( subscriptionRepository.save ( any ( ) ) ).thenAnswer ( inv -> inv.getArgument ( 0 ) );
 
-        GarageSubscription result = subscriptionService.updatePlan ( 1, updated );
+        GarageSubscriptionResponse result = subscriptionService.updatePlan ( 1, updated );
 
         assertEquals ( "Premium", result.getName ( ) );
         assertEquals ( 150.0, result.getPrice ( ) );
@@ -150,7 +151,7 @@ class GarageSubscriptionServiceTest {
     void testSearchPlans() {
         when ( subscriptionRepository.findByNameContainingIgnoreCase ( "basic" ) ).thenReturn ( List.of ( plan ) );
 
-        List<GarageSubscription> result = subscriptionService.searchPlans ( "basic", "city",  "garageName" );
+        List<GarageSubscriptionResponse> result = subscriptionService.searchPlans ( "basic", "city",  "garageName" );
 
         assertEquals ( 1, result.size ( ) );
         assertEquals ( "Basic Plan", result.get ( 0 ).getName ( ) );
