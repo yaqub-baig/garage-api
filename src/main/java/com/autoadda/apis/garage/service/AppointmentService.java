@@ -11,6 +11,7 @@ import com.autoadda.apis.garage.response.AppointmentDetailResponse;
 import com.autoadda.apis.garage.util.BusinessValidator;
 import com.autoadda.apis.garage.util.DateHelper;
 import com.autoadda.apis.garage.util.Status;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
