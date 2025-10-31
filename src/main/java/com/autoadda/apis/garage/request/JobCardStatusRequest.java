@@ -3,6 +3,8 @@ package com.autoadda.apis.garage.request;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import lombok.*;
 
+import java.util.List;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,6 +14,8 @@ public class JobCardStatusRequest {
     private Integer jobcardId;
     private JobCardStatus status;
     private Integer memberId;
-    private String memberType;
-    private String comments;
+
+    // Part request details (required when status is WAITING_FOR_PARTS)
+    private List<PartRequestItemDto> partRequestItems;
+    private String partRequestNotes;
 }

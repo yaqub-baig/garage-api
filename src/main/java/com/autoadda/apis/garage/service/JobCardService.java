@@ -8,8 +8,11 @@ import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.JobCardMapper;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
+import com.autoadda.apis.garage.request.CreatePartRequestRequest;
+import com.autoadda.apis.garage.request.JobCardStatusRequest;
 import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
+import com.autoadda.apis.garage.response.PartRequestResponse;
 import com.autoadda.apis.garage.response.GroupedJobCardResponse;
 import com.autoadda.apis.garage.response.JobCardResponse;
 import com.autoadda.apis.garage.response.VehicleDetailResponse;
@@ -47,6 +50,7 @@ public class JobCardService {
     private final VehicleClient vehicleClient;
     private final WorkOrderRepository workOrderRepository;
     private final WorkOrderStatusFlowService workOrderStatusFlowService;
+    private final PartRequestService partRequestService;
 
 
     @Transactional
@@ -184,6 +188,58 @@ public class JobCardService {
         }
 
         return jobCardMapper.entityToResponse ( jobCardRepo.save ( jobCard ) );
+    }
+
+    /**
+     * Updates the status of a job card with part request details.
+     * When status is WAITING_FOR_PARTS, part details must be provided.
+     *
+     * @param request the request containing job card ID, new status, and optional part details
+     * @return the updated JobCard
+     */
+    @Transactional
+    public JobCardResponse updateJobCardStatusWithPartRequest(JobCardStatusRequest request) {
+        log.info("Updating job card status for jobCardId: {} to status: {}",
+                request.getJobcardId(), request.getStatus());
+
+        // Auto-set status to WAITING_FOR_PARTS if part items are provided but status is null
+        if (request.getPartRequestItems() != null && !request.getPartRequestItems().isEmpty()) {
+            if (request.getStatus() == null) {
+                request.setStatus(JobCardStatus.WAITING_FOR_PARTS);
+                log.info("Auto-setting status to WAITING_FOR_PARTS since part items are provided");
+            }
+        }
+
+        // If status is WAITING_FOR_PARTS, validate that part details are provided
+        if (request.getStatus() == JobCardStatus.WAITING_FOR_PARTS) {
+            if (request.getPartRequestItems() == null || request.getPartRequestItems().isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Part request items are required when status is WAITING_FOR_PARTS");
+            }
+
+            // Update the job card status first
+            JobCardResponse jobCardResponse = updateJobCardStatus(request.getJobcardId(), request.getStatus());
+
+            // Create or update part request
+            CreatePartRequestRequest partRequest = CreatePartRequestRequest.builder()
+                    .jobCardId(request.getJobcardId())
+                    .technicianId(request.getMemberId())
+                    .items(request.getPartRequestItems())
+                    .notes(request.getPartRequestNotes())
+                    .build();
+
+            PartRequestResponse partRequestResponse = partRequestService.createPartRequest(partRequest);
+            log.info("Part request created/updated with ID: {}", partRequestResponse.getId());
+
+            return jobCardResponse;
+        } else {
+            // Validate status is not null for other cases
+            if (request.getStatus() == null) {
+                throw new IllegalArgumentException("Status must be provided");
+            }
+            // For other statuses, use the existing method
+            return updateJobCardStatus(request.getJobcardId(), request.getStatus());
+        }
     }
 
     /**
