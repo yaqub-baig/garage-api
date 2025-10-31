@@ -7,7 +7,7 @@ import com.autoadda.apis.garage.service.AdditionalRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/additional-requests")
 @RequiredArgsConstructor

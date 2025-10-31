@@ -1,6 +1,5 @@
 package com.autoadda.apis.garage.controller;
 
-import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.entity.VehicleOwnerSubscription;
 import com.autoadda.apis.garage.request.SubscriptionRequest;
 import com.autoadda.apis.garage.response.GarageSubscriptionResponse;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/vehicle-subscriptions")
 @RequiredArgsConstructor
