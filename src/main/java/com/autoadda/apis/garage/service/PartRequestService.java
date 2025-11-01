@@ -459,6 +459,7 @@ public class PartRequestService {
                     .invoice(invoice)
                     .description(item.getPartName() + " - " + item.getDescription())
                     .quantity(item.getQuantity())
+                    .price(procurement.getPurchasePrice())
                     .category("PART")
                     .notes("Part Number: " + (item.getPartNumber() != null ? item.getPartNumber() : "N/A") +
                             ", Condition: " + procurement.getPartCondition() +
