@@ -23,11 +23,11 @@ public class AppointmentServices {
     @Column(name = "appointment_id")
     private Integer appointmentId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     private GarageService service;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "technician_id", referencedColumnName = "id")
     private Technician technician;
 

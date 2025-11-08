@@ -79,6 +79,7 @@ public class WorkOrderService {
         list.forEach ( jobCard -> jobCard.setWorkOrder ( finalWorkOrder ) );
         String vehicleOwnerNumber = workOrderResponse.getAppointmentDetail (
         ).getVehicle ( ).getOwner ( ).getMobileNumber ( );
+        log.info("--------------------------------------> sms {}",vehicleOwnerNumber);
         String message = "Your work order has been created with ID: " + workOrderResponse.getId ( ) + ". Please visit your auto adda dashboard to proceed with the services.";
         GenericResponse genericResponse = authClient.sendSms ( new SmsRequest ( vehicleOwnerNumber, message ) );
         log.info ( genericResponse.getStatus ( ) );
