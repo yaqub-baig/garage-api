@@ -36,7 +36,9 @@ public class OsAvailableServiceSeeder {
 
                     new OsAvailableService(null,"Fuel Services","","https://cdn3d.iconscout.com/3d/premium/thumb/petrol-station-3d-icon-download-in-png-blend-fbx-gltf-file-formats--gas-fuel-pump-mechanical-car-repair-tool-pack-service-icons-8317514.png?f=webp"),
                     new OsAvailableService(null,"EV Services","","https://corkautoservices.com/wp-content/uploads/2019/04/Electric-Car-Servicing-Cork-Auto-Services.png"),
-                    new OsAvailableService(null,"Tools","","https://cdn3d.iconscout.com/3d/premium/thumb/tool-box-3d-icon-download-in-png-blend-fbx-gltf-file-formats--kit-tools-repair-labor-day-pack-industry-icons-6740546.png")
+                    new OsAvailableService(null,"Tools","","https://cdn3d.iconscout.com/3d/premium/thumb/tool-box-3d-icon-download-in-png-blend-fbx-gltf-file-formats--kit-tools-repair-labor-day-pack-industry-icons-6740546.png"),
+
+                    new OsAvailableService(null, "Delivery", "", "https://5.imimg.com/data5/SELLER/Default/2022/7/WQ/BQ/DF/5673687/home-delivery-service.jpg")
 
 
 
