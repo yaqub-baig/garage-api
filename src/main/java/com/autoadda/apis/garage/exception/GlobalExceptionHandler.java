@@ -111,7 +111,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<GenericResponse> handleIllegalArgument(IllegalArgumentException ex) {
         log.warn ( "Illegal argument", ex );
-        return buildResponse ( ex, HttpStatus.BAD_REQUEST, ErrorMessage.ERROR_BAD_REQUEST );
+        return buildResponse ( ex, HttpStatus.BAD_REQUEST, ex.getMessage() != null ? ex.getMessage() : ErrorMessage.ERROR_BAD_REQUEST );
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<GenericResponse> handleIllegalState(IllegalStateException ex) {
+        log.warn ( "Illegal state", ex );
+        return buildResponse ( ex, HttpStatus.BAD_REQUEST, ex.getMessage() != null ? ex.getMessage() : "Invalid operation state" );
     }
 
     @ExceptionHandler(UnauthorizedAccessException.class)
