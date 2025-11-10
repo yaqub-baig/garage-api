@@ -81,7 +81,7 @@ public class Garage {
     @Column(name = "brands")
     private String brands;
 
-    @Column(name = "models")
+    @Column(name = "models",length = 2000)
     private String models;
 
     @Column(name = "garage_owner_id")
