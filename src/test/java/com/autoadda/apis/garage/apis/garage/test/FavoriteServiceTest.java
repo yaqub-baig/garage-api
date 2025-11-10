@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import com.autoadda.apis.garage.response.GarageFavoriteResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -52,7 +53,7 @@ class FavoriteServiceTest {
 		when(garageFavoriteRepository.save(any(GarageFavorite.class)))
 				.thenAnswer(invocation -> invocation.getArgument(0));
 
-		GarageFavorite result = garagefavoriteService.addFavoriteGarage(garageOwnerId, favGarageId);
+		GarageFavoriteResponse result = garagefavoriteService.addFavoriteGarage(garageOwnerId, favGarageId);
 
 		assertEquals(garageOwnerId, result.getVehicleOwnerId ());
 
@@ -97,7 +98,7 @@ class FavoriteServiceTest {
 		List<GarageFavorite> mockList = List.of(new GarageFavorite(), new GarageFavorite());
 		when(garageFavoriteRepository.findByVehicleOwnerId (garageOwnerId)).thenReturn(mockList);
 
-		List<GarageFavorite> result = garagefavoriteService.getFavoriteGarages(garageOwnerId);
+		List<GarageFavoriteResponse> result = garagefavoriteService.getFavoriteGarages(garageOwnerId);
 
 		assertEquals(2, result.size());
 	}
