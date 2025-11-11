@@ -165,7 +165,37 @@ public class GarageManagementService {
         }
         return garageServices;
     }
+    private List<GarageService> handleUpdateGarageService(GarageRequest garageRequest, Garage save) {
+        List<GarageService> garageServices = new ArrayList<> ( );
 
+        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
+            // Get existing garage services for this garage
+            List<GarageService> existingGarageServices = garageServiceManagementService.getByGarageIdAndActive ( save.getId ( ), TRUE );
+
+            // Extract existing available service IDs
+            List<Integer> existingAvailableServiceIds = existingGarageServices.stream ( )
+                    .map ( gs -> gs.getAvailableService ( ).getId ( ) )
+                    .toList ( );
+
+            // Add existing services to the result list
+            garageServices.addAll ( existingGarageServices );
+
+            // Filter incoming IDs to only get NEW ones (not already existing)
+            List<Integer> newServiceIds = garageRequest.getGarageServiceIds ( ).stream ( )
+                    .filter ( sId -> ! existingAvailableServiceIds.contains ( sId ) )
+                    .toList ( );
+
+            // Create only NEW garage services
+            newServiceIds.forEach ( sId -> {
+                availableServiceRepository.findById ( sId )
+                        .map ( availableService -> garageServiceManagementService.createGarageService (
+                                new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) )
+                        .map ( garageServices::add )
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
+            } );
+        }
+        return garageServices;
+    }
     private void validateGarageOwnerExists(int id) {
         UserResponse user = authClient.getUser ( id );
         if ( user == null ) {
@@ -311,7 +341,7 @@ public class GarageManagementService {
         handleTradeLicense ( request, existing, filesToCleanup );
         handleGarageImages ( request, existing, filesToCleanup );
         handleVatCertificates ( request, existing, filesToCleanup );
-        List<GarageService> garageServices = handleGarageService ( request, existing );
+        List<GarageService> garageServices = handleUpdateGarageService ( request, existing );
         existing.setServices ( garageServices );
         Garage save = garageRepository.save ( existing );
 
