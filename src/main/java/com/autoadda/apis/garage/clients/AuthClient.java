@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "identity-api", url = "http://localhost:8010/api/v1")
+@FeignClient(name = "identity-api", url = "https://identity-api-wbad.onrender.com/api/v1")
 public interface AuthClient {
 
     @GetMapping("/auth/{id}")
