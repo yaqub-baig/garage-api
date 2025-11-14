@@ -150,13 +150,25 @@ public class PartRequestController {
     }
 
     /**
-     * Mark part as received when customer delivers it
+     * Mark all parts as received when customer delivers them
      */
     @PutMapping("/{id}/mark-received")
     public ResponseEntity<GenericResponse> markPartReceived(@PathVariable Integer id) {
-        log.info("Marking part as received for part request: {}", id);
+        log.info("Marking all parts as received for part request: {}", id);
         PartRequestResponse response = partRequestService.markPartReceived(id);
         return ResponseEntity.ok(GenericResponse.success(
-                "Part marked as received successfully", response));
+                "All parts marked as received successfully", response));
+    }
+
+    /**
+     * Mark individual part request item as received when customer delivers it
+     * Allows for partial deliveries
+     */
+    @PutMapping("/item/{itemId}/mark-received")
+    public ResponseEntity<GenericResponse> markPartItemReceived(@PathVariable Integer itemId) {
+        log.info("Marking individual part item as received: {}", itemId);
+        PartRequestResponse response = partRequestService.markPartItemReceived(itemId);
+        return ResponseEntity.ok(GenericResponse.success(
+                "Part item marked as received successfully", response));
     }
 }

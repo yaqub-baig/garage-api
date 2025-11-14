@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.response;
 
+import com.autoadda.apis.garage.util.ItemProcurementStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,7 @@ public class PartRequestItemResponse {
     private Integer quantity;
     private String description;
     private Double estimatedPrice;
+    private ItemProcurementStatus procurementStatus;
+    private Boolean addedToInvoice;
     private GarageProcurementResponse procurement;
 }

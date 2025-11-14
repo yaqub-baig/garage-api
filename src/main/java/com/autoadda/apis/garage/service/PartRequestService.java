@@ -104,6 +104,7 @@ public class PartRequestService {
                     .quantity(itemDto.getQuantity())
                     .description(itemDto.getDescription())
                     .estimatedPrice(itemDto.getEstimatedPrice())
+                    .procurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.PENDING_PROCUREMENT)
                     .build();
             items.add(partRequestItemRepo.save(item));
         }
@@ -162,6 +163,7 @@ public class PartRequestService {
                         .quantity(itemDto.getQuantity())
                         .description(itemDto.getDescription())
                         .estimatedPrice(itemDto.getEstimatedPrice())
+                        .procurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.PENDING_PROCUREMENT)
                         .build();
                 newItems.add(partRequestItemRepo.save(item));
             }
@@ -210,16 +212,29 @@ public class PartRequestService {
 
         customerPartResponseRepo.save(customerResponse);
 
-        // Update part request status based on customer choice
+        // Initialize procurement status for all items based on customer choice
+        List<PartRequestItem> items = partRequestItemRepo.findByPartRequestId(partRequestId);
         if (request.getChoice() == CustomerChoice.SELF_PROVIDE) {
+            // Customer will provide all items
+            for (PartRequestItem item : items) {
+                item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_WILL_PROVIDE);
+                partRequestItemRepo.save(item);
+            }
             partRequest.setStatus(PartRequestStatus.WAITING_FOR_CUSTOMER_DELIVERY);
         } else {
+            // Garage will procure all items
+            for (PartRequestItem item : items) {
+                item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.PENDING_PROCUREMENT);
+                partRequestItemRepo.save(item);
+            }
             partRequest.setStatus(PartRequestStatus.GARAGE_WILL_PROCURE);
         }
+
         partRequest.setCustomerResponseDate(LocalDateTime.now());
         partRequestRepo.save(partRequest);
 
-        log.info("Customer response submitted successfully. Choice: {}", request.getChoice());
+        log.info("Customer response submitted successfully. Choice: {}. Updated {} items procurement status",
+                request.getChoice(), items.size());
 
         // Send confirmation SMS to customer
         sendCustomerResponseConfirmation(partRequest, request.getChoice());
@@ -266,11 +281,36 @@ public class PartRequestService {
 
         garageProcurementRepo.save(procurement);
 
-        // Update part request status
-        partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
-        partRequestRepo.save(partRequest);
+        // Update this item's procurement status
+        item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.PROCURED);
+        partRequestItemRepo.save(item);
 
-        log.info("Garage procurement added successfully");
+        log.info("Garage procurement added successfully for item: {}", item.getId());
+
+        // Check if all items have been procured
+        List<PartRequestItem> allItems = partRequestItemRepo.findByPartRequestId(partRequest.getId());
+        boolean allItemsProcured = allItems.stream()
+                .allMatch(i -> i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.PROCURED ||
+                               i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED);
+
+        // Update parent part request status only if all items are procured
+        if (allItemsProcured) {
+            partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
+            partRequestRepo.save(partRequest);
+            log.info("All items procured/provided. Updated part request {} status to PART_RECEIVED", partRequest.getId());
+        } else {
+            // Update to GARAGE_PROCURING if not already
+            if (partRequest.getStatus() != PartRequestStatus.GARAGE_PROCURING) {
+                partRequest.setStatus(PartRequestStatus.GARAGE_PROCURING);
+                partRequestRepo.save(partRequest);
+            }
+            long procuredCount = allItems.stream()
+                    .filter(i -> i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.PROCURED ||
+                                 i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED)
+                    .count();
+            log.info("Partial procurement: {}/{} items procured for part request {}",
+                    procuredCount, allItems.size(), partRequest.getId());
+        }
 
         // Automatically add to invoice
         addProcuredPartToInvoice(partRequest, item, procurement);
@@ -280,10 +320,11 @@ public class PartRequestService {
 
     /**
      * Mark part as received when customer delivers it
+     * This marks ALL items as customer-provided
      */
     @Transactional
     public PartRequestResponse markPartReceived(Integer partRequestId) {
-        log.info("Marking part as received for part request: {}", partRequestId);
+        log.info("Marking parts as received for part request: {}", partRequestId);
 
         PartRequest partRequest = partRequestRepo.findById(partRequestId)
                 .orElseThrow(() -> new ResourceNotFoundException("Part request not found"));
@@ -293,10 +334,62 @@ public class PartRequestService {
             throw new IllegalStateException("Part request is not waiting for customer delivery");
         }
 
+        // Mark all items as customer provided
+        List<PartRequestItem> items = partRequestItemRepo.findByPartRequestId(partRequestId);
+        for (PartRequestItem item : items) {
+            item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED);
+            partRequestItemRepo.save(item);
+        }
+
         partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
         partRequestRepo.save(partRequest);
 
-        log.info("Part marked as received successfully");
+        log.info("All {} parts marked as customer-provided successfully", items.size());
+
+        return convertToResponse(partRequest);
+    }
+
+    /**
+     * Mark individual part request item as received when customer delivers it
+     * This allows for partial deliveries
+     */
+    @Transactional
+    public PartRequestResponse markPartItemReceived(Integer partRequestItemId) {
+        log.info("Marking individual part item as received: {}", partRequestItemId);
+
+        PartRequestItem item = partRequestItemRepo.findById(partRequestItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Part request item not found"));
+
+        PartRequest partRequest = item.getPartRequest();
+
+        // Validate status
+        if (partRequest.getStatus() != PartRequestStatus.WAITING_FOR_CUSTOMER_DELIVERY) {
+            throw new IllegalStateException("Part request is not waiting for customer delivery");
+        }
+
+        // Mark this specific item as customer provided
+        item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED);
+        partRequestItemRepo.save(item);
+
+        log.info("Part item {} marked as customer-provided", partRequestItemId);
+
+        // Check if all items have been provided by customer
+        List<PartRequestItem> allItems = partRequestItemRepo.findByPartRequestId(partRequest.getId());
+        boolean allItemsProvided = allItems.stream()
+                .allMatch(i -> i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED);
+
+        // Update parent part request status only if all items are provided
+        if (allItemsProvided) {
+            partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
+            partRequestRepo.save(partRequest);
+            log.info("All items customer-provided. Updated part request {} status to PART_RECEIVED", partRequest.getId());
+        } else {
+            long providedCount = allItems.stream()
+                    .filter(i -> i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED)
+                    .count();
+            log.info("Partial delivery: {}/{} items provided for part request {}",
+                    providedCount, allItems.size(), partRequest.getId());
+        }
 
         return convertToResponse(partRequest);
     }
@@ -449,8 +542,7 @@ public class PartRequestService {
             if (invoice == null) {
                 log.warn("No invoice found for work order: {}. Part will be added when invoice is generated.",
                         workOrderId);
-                // Update status to indicate it's ready to be added
-                partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
+                // Don't update parent status here - invoice doesn't exist yet
                 return;
             }
 
@@ -469,6 +561,10 @@ public class PartRequestService {
             // Save the line item
             invoiceLineItemRepo.save(lineItem);
 
+            // Mark this item as added to invoice
+            item.setAddedToInvoice(true);
+            partRequestItemRepo.save(item);
+
             // Recalculate invoice totals
             double subtotal = invoice.getLineItems().stream()
                     .mapToDouble(li -> li.getPrice() * li.getQuantity())
@@ -480,16 +576,39 @@ public class PartRequestService {
             // Save updated invoice
             invoiceRepo.save(invoice);
 
-            // Update status
-            partRequest.setStatus(PartRequestStatus.ADDED_TO_INVOICE);
-            partRequestRepo.save(partRequest);
+            log.info("Part item {} added to invoice successfully. Invoice ID: {}, Amount: {}",
+                    item.getId(), invoice.getId(), procurement.getPurchasePrice());
 
-            log.info("Part added to invoice successfully. Invoice ID: {}, Amount: {}",
-                    invoice.getId(), procurement.getPurchasePrice());
+            // Check if all procured items have been added to invoice
+            List<PartRequestItem> allItems = partRequestItemRepo.findByPartRequestId(partRequest.getId());
+
+            // Only items that were procured by garage need to be added to invoice
+            List<PartRequestItem> garageProcuredItems = allItems.stream()
+                    .filter(i -> i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.PROCURED)
+                    .collect(Collectors.toList());
+
+            if (!garageProcuredItems.isEmpty()) {
+                boolean allAddedToInvoice = garageProcuredItems.stream()
+                        .allMatch(i -> Boolean.TRUE.equals(i.getAddedToInvoice()));
+
+                // Only update parent status if all garage-procured items are added to invoice
+                if (allAddedToInvoice) {
+                    partRequest.setStatus(PartRequestStatus.ADDED_TO_INVOICE);
+                    partRequestRepo.save(partRequest);
+                    log.info("All procured items added to invoice. Updated part request {} status to ADDED_TO_INVOICE",
+                            partRequest.getId());
+                } else {
+                    long addedCount = garageProcuredItems.stream()
+                            .filter(i -> Boolean.TRUE.equals(i.getAddedToInvoice()))
+                            .count();
+                    log.info("Partial invoice addition: {}/{} procured items added to invoice for part request {}",
+                            addedCount, garageProcuredItems.size(), partRequest.getId());
+                }
+            }
 
         } catch (Exception e) {
             log.error("Failed to add part to invoice", e);
-            // Keep status as PART_RECEIVED so it can be manually added later
+            // Keep current status so it can be manually added later
         }
     }
 
@@ -554,6 +673,8 @@ public class PartRequestService {
                 .quantity(item.getQuantity())
                 .description(item.getDescription())
                 .estimatedPrice(item.getEstimatedPrice())
+                .procurementStatus(item.getProcurementStatus())
+                .addedToInvoice(item.getAddedToInvoice())
                 .procurement(procurementResponse)
                 .build();
     }
