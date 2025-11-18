@@ -31,8 +31,9 @@ public class WorkOrder {
     @Builder.Default
     private List<JobCard> jobCards = new ArrayList<> ( );
 
-    @OneToOne(mappedBy = "workOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-    private VehicleDelivery vehicleDelivery;
+    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = false)
+    @Builder.Default
+    private List<VehicleDelivery> vehicleDeliveries = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private WorkOrderStatus status;
@@ -80,6 +81,42 @@ public class WorkOrder {
             this.statusTimestamps.put ( newStatus, LocalDateTime.now ( ) );
         }
 
+    }
+
+    /**
+     * Get the most recent active delivery (non-terminal status)
+     * @return VehicleDelivery or null if no active delivery exists
+     */
+    public VehicleDelivery getActiveDelivery() {
+        if (vehicleDeliveries == null || vehicleDeliveries.isEmpty()) {
+            return null;
+        }
+
+        return vehicleDeliveries.stream()
+                .filter(delivery -> delivery.getStatus() != null)
+                .filter(delivery ->
+                    delivery.getStatus() != com.autoadda.apis.garage.util.DeliveryStatus.APPROVED &&
+                    delivery.getStatus() != com.autoadda.apis.garage.util.DeliveryStatus.REJECTED
+                )
+                .max((d1, d2) -> d1.getCreatedDate().compareTo(d2.getCreatedDate()))
+                .orElse(null);
+    }
+
+    /**
+     * Check if a new delivery can be initiated
+     * @return true if no active delivery exists, false otherwise
+     */
+    public boolean canInitiateDelivery() {
+        return getActiveDelivery() == null;
+    }
+
+    /**
+     * Get the current delivery status for frontend display
+     * @return DeliveryStatus or null if no active delivery
+     */
+    public com.autoadda.apis.garage.util.DeliveryStatus getCurrentDeliveryStatus() {
+        VehicleDelivery activeDelivery = getActiveDelivery();
+        return activeDelivery != null ? activeDelivery.getStatus() : null;
     }
 
 

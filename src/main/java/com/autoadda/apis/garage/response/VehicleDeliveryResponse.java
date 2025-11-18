@@ -20,6 +20,7 @@ public class VehicleDeliveryResponse {
     private Integer deliveredByTechnicianId;
     private String deliveredByTechnicianName;
     private DeliveryStatus status;
+    private Integer attemptNumber;
     private LocalDateTime deliveryDate;
     private Boolean customerApproved;
     private String customerComments;

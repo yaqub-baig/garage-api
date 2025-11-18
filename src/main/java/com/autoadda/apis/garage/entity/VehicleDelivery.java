@@ -20,8 +20,8 @@ public class VehicleDelivery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
-    @JoinColumn(name = "work_order_id", nullable = false, unique = true)
+    @ManyToOne
+    @JoinColumn(name = "work_order_id", nullable = false)
     private WorkOrder workOrder;
 
     @ManyToOne
@@ -49,6 +49,10 @@ public class VehicleDelivery {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private DeliveryStatus status = DeliveryStatus.PENDING_VERIFICATION;
+
+    @Column(name = "attempt_number", nullable = false)
+    @Builder.Default
+    private Integer attemptNumber = 1;
 
     // Re-verification of 12 items from VehicleReceived
     @Column(name = "is_main_key_returned")
@@ -111,5 +115,9 @@ public class VehicleDelivery {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdAt;
     }
 }

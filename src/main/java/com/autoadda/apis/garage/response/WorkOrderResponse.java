@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.response;
 
+import com.autoadda.apis.garage.util.DeliveryStatus;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,4 +30,8 @@ public class WorkOrderResponse {
     private String garageNegotiatedComment;
     private List<StatusTimelineEntry> statusTimeline;
     private Map<WorkOrderStatus, LocalDateTime> statusTimestamps;
+
+    // Delivery status fields for frontend
+    private DeliveryStatus currentDeliveryStatus;
+    private Boolean canInitiateDelivery;
 }

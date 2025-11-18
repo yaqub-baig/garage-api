@@ -13,6 +13,10 @@ public interface VehicleDeliveryRepository extends JpaRepository<VehicleDelivery
 
     Optional<VehicleDelivery> findByWorkOrderId(Integer workOrderId);
 
+    List<VehicleDelivery> findAllByWorkOrderId(Integer workOrderId);
+
+    Optional<VehicleDelivery> findTopByWorkOrderIdOrderByCreatedAtDesc(Integer workOrderId);
+
     List<VehicleDelivery> findByStatus(DeliveryStatus status);
 
     List<VehicleDelivery> findByDeliveredById(Integer technicianId);

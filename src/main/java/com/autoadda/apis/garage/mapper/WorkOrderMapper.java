@@ -63,6 +63,10 @@ public class WorkOrderMapper {
         // Generate status timeline
         workOrderResponse.setStatusTimeline ( generateStatusTimeline ( save.getStatusTimestamps ( ) ) );
 
+        // Set delivery status fields for frontend
+        workOrderResponse.setCurrentDeliveryStatus ( save.getCurrentDeliveryStatus ( ) );
+        workOrderResponse.setCanInitiateDelivery ( save.canInitiateDelivery ( ) );
+
         return workOrderResponse;
     }
 

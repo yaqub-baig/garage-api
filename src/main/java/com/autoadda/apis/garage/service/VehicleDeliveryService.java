@@ -47,14 +47,18 @@ public class VehicleDeliveryService {
                     "Work order must be in READY_FOR_DELIVERY status. Current status: " + workOrder.getStatus());
         }
 
-        // Check if delivery already exists
-        if (vehicleDeliveryRepo.findByWorkOrderId(workOrderId).isPresent()) {
-            throw new IllegalStateException("Delivery already initiated for this work order");
+        // Check if there's an active delivery (non-terminal status)
+        if (!workOrder.canInitiateDelivery()) {
+            throw new IllegalStateException("Delivery already in progress for this work order");
         }
 
         // Get technician
         Technician technician = technicianRepo.findById(technicianId)
                 .orElseThrow(() -> new ResourceNotFoundException("Technician not found"));
+
+        // Calculate attempt number based on previous deliveries
+        List<VehicleDelivery> previousDeliveries = vehicleDeliveryRepo.findAllByWorkOrderId(workOrderId);
+        int attemptNumber = previousDeliveries.size() + 1;
 
         // Create delivery record
         VehicleDelivery delivery = VehicleDelivery.builder()
@@ -63,11 +67,12 @@ public class VehicleDeliveryService {
                 .status(DeliveryStatus.PENDING_VERIFICATION)
                 .customerApproved(false)
                 .deliveryDate(LocalDateTime.now())
+                .attemptNumber(attemptNumber)
                 .build();
 
         delivery = vehicleDeliveryRepo.save(delivery);
 
-        log.info("Delivery initiated successfully. Delivery ID: {}", delivery.getId());
+        log.info("Delivery initiated successfully. Delivery ID: {}, Attempt: {}", delivery.getId(), attemptNumber);
 
         return convertToResponse(delivery);
     }
@@ -146,8 +151,8 @@ public class VehicleDeliveryService {
             throw new ResourceNotFoundException("Vehicle receiving record not found");
         }
 
-        // Get delivery record
-        VehicleDelivery delivery = vehicleDeliveryRepo.findByWorkOrderId(workOrderId)
+        // Get latest delivery record
+        VehicleDelivery delivery = vehicleDeliveryRepo.findTopByWorkOrderIdOrderByCreatedAtDesc(workOrderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle delivery not found"));
 
         // Build receiving checklist
@@ -270,12 +275,12 @@ public class VehicleDeliveryService {
     }
 
     /**
-     * Get delivery details by work order ID
+     * Get delivery details by work order ID (returns the latest delivery)
      */
     public VehicleDeliveryResponse getDeliveryByWorkOrderId(Integer workOrderId) {
         log.info("Fetching delivery details for work order: {}", workOrderId);
 
-        VehicleDelivery delivery = vehicleDeliveryRepo.findByWorkOrderId(workOrderId)
+        VehicleDelivery delivery = vehicleDeliveryRepo.findTopByWorkOrderIdOrderByCreatedAtDesc(workOrderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle delivery not found for this work order"));
 
         return convertToResponse(delivery);
@@ -457,6 +462,7 @@ public class VehicleDeliveryService {
                 .deliveredByTechnicianId(delivery.getDeliveredBy() != null ? delivery.getDeliveredBy().getId() : null)
                 .deliveredByTechnicianName(technicianName)
                 .status(delivery.getStatus())
+                .attemptNumber(delivery.getAttemptNumber())
                 .deliveryDate(delivery.getDeliveryDate())
                 .customerApproved(delivery.getCustomerApproved())
                 .customerComments(delivery.getCustomerComments())
