@@ -31,6 +31,9 @@ public class WorkOrder {
     @Builder.Default
     private List<JobCard> jobCards = new ArrayList<> ( );
 
+    @OneToOne(mappedBy = "workOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private VehicleDelivery vehicleDelivery;
+
     @Enumerated(EnumType.STRING)
     private WorkOrderStatus status;
 
