@@ -50,7 +50,7 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
     Optional<Garage> findByGarageBrandName(String legalName);
 
-    Optional<Garage> findByWebSite(String webSite);
+    Optional<Garage> findByWebsite(String website);
 
     Optional<Garage> findByName(String garageName);
 
@@ -62,7 +62,7 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
     Optional<Garage> findByIdAndGarageBrandName(Integer id, String legalName);
 
-    Optional<Garage> findByIdAndWebSite(Integer id, String webSite);
+    Optional<Garage> findByIdAndWebsite(Integer id, String webSite);
 
     Optional<Garage> findByIdAndEmail(Integer id, String emailId);
 

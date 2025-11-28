@@ -13,8 +13,11 @@ import com.autoadda.apis.garage.repository.WorkOrderRepository;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
 import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.request.WorkOrderRequest;
-import com.autoadda.apis.garage.response.GenericResponse;
-import com.autoadda.apis.garage.response.WorkOrderResponse;
+import com.autoadda.apis.garage.entity.Invoice;
+import com.autoadda.apis.garage.entity.VehicleDelivery;
+import com.autoadda.apis.garage.repository.InvoiceRepository;
+import com.autoadda.apis.garage.repository.VehicleDeliveryRepository;
+import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.VehicleRecievedStatus;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
@@ -41,6 +44,8 @@ public class WorkOrderService {
     private final VehicleReceivedRepository vehicleReceivedRepository;
     private final JobCardStatusFlowService statusFlowService;
     private final WorkOrderStatusFlowService workOrderStatusFlowService;
+    private final InvoiceRepository invoiceRepository;
+    private final VehicleDeliveryRepository vehicleDeliveryRepository;
 
 
     /**
@@ -207,7 +212,95 @@ public class WorkOrderService {
                 .map ( workOrderMapper::entityToResponse )
                 .toList ( );
     }
+    public List<VehicleServiceHistoryResponse> getWorkOrdersByVehicleId(Integer vehicleId) {
+        return workOrderRepository.findByAppointmentVehicleId ( vehicleId )
+                .stream ( )
+                .filter ( workOrder -> workOrder.getStatus ( ) == WorkOrderStatus.DELIVERED_TO_CUSTOMER
+                        || workOrder.getStatus ( ) == WorkOrderStatus.COMPLETED )
+                .sorted ( Comparator.comparing ( WorkOrder::getCreatedDate ).reversed () )
+                .map ( this::convertToServiceHistoryResponse )
+                .toList ( );
+    }
 
+    /**
+     * Convert WorkOrder entity to VehicleServiceHistoryResponse
+     */
+    private VehicleServiceHistoryResponse convertToServiceHistoryResponse(WorkOrder workOrder) {
+        // Extract service names from job cards
+        List<String> servicesPerformed = workOrder.getJobCards ( ).stream ( )
+                .map ( jobCard -> jobCard.getService ( ) )
+                .filter ( appointmentService -> appointmentService != null
+                        && appointmentService.getService ( ) != null
+                        && appointmentService.getService ( ).getAvailableService ( ) != null )
+                .map ( appointmentService -> appointmentService.getService ( ).getAvailableService ( ).getName ( ) )
+                .toList ( );
+
+        // Build garage basic info
+        GarageBasicInfo garageInfo = null;
+        if ( workOrder.getGarage ( ) != null ) {
+            garageInfo = GarageBasicInfo.builder ( )
+                    .id ( workOrder.getGarage ( ).getId ( ) )
+                    .garageBrandName ( workOrder.getGarage ( ).getGarageBrandName ( ) )
+                    .name ( workOrder.getGarage ( ).getName ( ) )
+                    .phoneNumber ( workOrder.getGarage ( ).getPhoneNumber ( ) )
+                    .mobileNumber ( workOrder.getGarage ( ).getMobileNumber ( ) )
+                    .location ( workOrder.getGarage ( ).getGarageLocation ( ) )
+                    .build ( );
+        }
+
+        // Get invoice if exists
+        InvoiceResponse invoiceResponse = null;
+        Invoice invoice = invoiceRepository.findByWorkOrderId ( workOrder.getId ( ) ).orElse ( null );
+        if ( invoice != null ) {
+            invoiceResponse = InvoiceResponse.builder ( )
+                    .id ( invoice.getId ( ) )
+                    .workOrderId ( invoice.getWorkOrder ( ).getId ( ) )
+                    .totalAmount ( invoice.getTotalAmount ( ) )
+                    .taxRate ( invoice.getTaxRate ( ) )
+                    .taxAmount ( invoice.getTaxAmount ( ) )
+                    .amountPaid ( invoice.getAmountPaid ( ) )
+                    .loyaltyPointsUsed ( invoice.getLoyaltyPointsUsed ( ) )
+                    .loyaltyPointsEarned ( invoice.getLoyaltyPointsEarned ( ) )
+                    .paymentStatus ( invoice.getPaymentStatus ( ) )
+                    .paymentMethod ( invoice.getPaymentMethod ( ) )
+                    .isPaid ( invoice.getIsPaid ( ) )
+                    .notes ( invoice.getNotes ( ) )
+                    .createdAt ( invoice.getCreatedAt ( ) )
+                    .build ( );
+        }
+
+        // Get latest delivery if exists
+        LatestDeliveryInfo latestDelivery = null;
+        VehicleDelivery delivery = vehicleDeliveryRepository.findTopByWorkOrderIdOrderByCreatedAtDesc ( workOrder.getId ( ) )
+                .orElse ( null );
+        if ( delivery != null ) {
+            List<String> photoUrls = delivery.getDeliveryPhotos ( ).stream ( )
+                    .map ( photo -> photo.getFilePath ( ) )
+                    .toList ( );
+
+            latestDelivery = LatestDeliveryInfo.builder ( )
+                    .id ( delivery.getId ( ) )
+                    .status ( delivery.getStatus ( ) )
+                    .deliveryDate ( delivery.getDeliveryDate ( ) )
+                    .customerApproved ( delivery.getCustomerApproved ( ) )
+                    .customerComments ( delivery.getCustomerComments ( ) )
+                    .rejectionReason ( delivery.getRejectionReason ( ) )
+                    .attemptNumber ( delivery.getAttemptNumber ( ) )
+                    .deliveryPhotos ( photoUrls )
+                    .build ( );
+        }
+
+        // Build and return the service history response
+        return VehicleServiceHistoryResponse.builder ( )
+                .workOrderId ( workOrder.getId ( ) )
+                .serviceDate ( workOrder.getCreatedDate ( ) )
+                .status ( workOrder.getStatus ( ) )
+                .garage ( garageInfo )
+                .servicesPerformed ( servicesPerformed )
+                .invoice ( invoiceResponse )
+                .latestDelivery ( latestDelivery )
+                .build ( );
+    }
     public WorkOrderResponse getWorkOrderResponseById(Integer workOrderId) {
         WorkOrder workOrder = getWorkOrderById ( workOrderId );
         return workOrderMapper.entityToResponse ( workOrder );
@@ -267,4 +360,6 @@ public class WorkOrderService {
         updateJobCardStatus ( jobCard, passed ?
                 JobCardStatus.QUALITY_CHECK_PASSED : JobCardStatus.QUALITY_CHECK_FAILED );
     }
+
+
 }

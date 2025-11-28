@@ -47,7 +47,7 @@ class GarageServiceTest {
         sampleGarageRequest.setGarageBrandName ( "QuickFix LLC" );
         sampleGarageRequest.setEmail ( "info@quickfix.com" );
         sampleGarageRequest.setPhoneNumber ( "1234567890" );
-        sampleGarageRequest.setWebSite ( "http://quickfix.com" );
+        sampleGarageRequest.setWebsite( "http://quickfix.com" );
 
 
         sampleGarageEntity = new Garage ( );
@@ -56,7 +56,7 @@ class GarageServiceTest {
         sampleGarageEntity.setGarageBrandName ( "QuickFix LLC" );
         sampleGarageEntity.setEmail ( "info@quickfix.com" );
         sampleGarageEntity.setPhoneNumber ( "1234567890" );
-        sampleGarageEntity.setWebSite ( "http://quickfix.com" );
+        sampleGarageEntity.setWebsite( "http://quickfix.com" );
         sampleGarageEntity.setAccountStatus ( Status.ACTIVE );
 
     }

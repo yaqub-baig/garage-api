@@ -5,6 +5,7 @@ import com.autoadda.apis.garage.request.VehicleDeliveryRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.VehicleDeliveryComparisonResponse;
 import com.autoadda.apis.garage.response.VehicleDeliveryResponse;
+import com.autoadda.apis.garage.response.VehicleDeliveryWithReceivedChecklistResponse;
 import com.autoadda.apis.garage.service.VehicleDeliveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +78,7 @@ public class VehicleDeliveryController {
     @GetMapping("/workorder/{workOrderId}")
     public ResponseEntity<GenericResponse> getDeliveryByWorkOrderId(@PathVariable Integer workOrderId) {
         log.info("API: Get delivery details for work order: {}", workOrderId);
-        VehicleDeliveryResponse response = vehicleDeliveryService.getDeliveryByWorkOrderId(workOrderId);
+        VehicleDeliveryWithReceivedChecklistResponse response = vehicleDeliveryService.getDeliveryByWorkOrderId(workOrderId);
         return ResponseEntity.ok(GenericResponse.success("Delivery details retrieved successfully", response));
     }
 

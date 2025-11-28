@@ -2,8 +2,16 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.WorkOrderRequest;
 import com.autoadda.apis.garage.response.StatusTimelineEntry;
+import com.autoadda.apis.garage.response.VehicleServiceHistoryResponse;
 import com.autoadda.apis.garage.response.WorkOrderResponse;
 import com.autoadda.apis.garage.service.WorkOrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/work-orders")
 @RequiredArgsConstructor
+@Tag(name = "Work Order Management", description = "APIs for managing work orders and service history")
 public class WorkOrderController {
     private final WorkOrderService workOrderService;
 
@@ -41,7 +50,31 @@ public class WorkOrderController {
         List<WorkOrderResponse> workOrder = workOrderService.getWorkOrdersByGarageId ( garageId );
         return ResponseEntity.ok ( workOrder );
     }
-
+    @Operation(
+            summary = "Get vehicle service history",
+            description = "Retrieves the complete service history for a specific vehicle, including all delivered/completed work orders with services performed, garage information, invoice details, and delivery information."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved vehicle service history",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VehicleServiceHistoryResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Vehicle not found"
+            )
+    })
+    @GetMapping("/vehicle/{vehicleId}")
+    public ResponseEntity<List<VehicleServiceHistoryResponse>> getWorkOrdersByVehicleId(
+            @Parameter(description = "ID of the vehicle to retrieve service history for", required = true)
+            @PathVariable Integer vehicleId) {
+        List<VehicleServiceHistoryResponse> workOrders = workOrderService.getWorkOrdersByVehicleId ( vehicleId );
+        return ResponseEntity.ok ( workOrders );
+    }
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<WorkOrderResponse>> getWorkOrdersByCustomerId(@PathVariable Integer customerId) {
         List<WorkOrderResponse> workOrders = workOrderService.getWorkOrdersByCustomerId ( customerId );

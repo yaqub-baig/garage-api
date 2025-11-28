@@ -53,7 +53,7 @@ public class Garage {
     private String trnNumber;
 
     @Column(name = "website")
-    private String webSite;
+    private String website;
 
     @Column(name = "email_id")
     private String email;

@@ -81,8 +81,8 @@ public class GarageManagementService {
         if ( garageRequest.getWorkingDays ( ) != null )
             garage.setWorkingDays ( garageRequest.getWorkingDays ( ).toString ( ) );
 
-        if ( garageRequest.getWebSite ( ) != null )
-            garage.setWebSite ( garageRequest.getWebSite ( ) );
+        if ( garageRequest.getWebsite( ) != null )
+            garage.setWebsite( garageRequest.getWebsite( ) );
 
         if ( garageRequest.getPhoneNumber ( ) != null )
             garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
@@ -96,8 +96,8 @@ public class GarageManagementService {
         if ( garageRequest.getTrnNumber ( ) != null )
             garage.setTrnNumber ( garageRequest.getTrnNumber ( ) );
 
-        if ( garageRequest.getWebSite ( ) != null )
-            garage.setWebSite ( garageRequest.getWebSite ( ) );
+        if ( garageRequest.getWebsite( ) != null )
+            garage.setWebsite( garageRequest.getWebsite( ) );
 
         garage.setAccountStatus ( Status.PENDING ); // Default status
 
@@ -324,8 +324,8 @@ public class GarageManagementService {
         if ( request.getPhoneNumber ( ) != null ) {
             existing.setPhoneNumber ( request.getPhoneNumber ( ) );
         }
-        if ( request.getWebSite ( ) != null ) {
-            existing.setWebSite ( request.getWebSite ( ) );
+        if ( request.getWebsite( ) != null ) {
+            existing.setWebsite( request.getWebsite( ) );
         }
         if ( request.getName ( ) != null ) {
             existing.setName ( request.getName ( ) );
@@ -527,7 +527,7 @@ public class GarageManagementService {
 
     @Transactional
     public Optional<Garage> findGarageByWebsite(String website) {
-        return garageRepository.findByWebSite ( website );
+        return garageRepository.findByWebsite( website );
     }
 
     @Transactional
@@ -553,7 +553,7 @@ public class GarageManagementService {
 
     @Transactional
     public Optional<Garage> findGarageByIdAndWebsite(Integer id, String website) {
-        return garageRepository.findByIdAndWebSite ( id, website );
+        return garageRepository.findByIdAndWebsite( id, website );
     }
 
     @Transactional
@@ -748,4 +748,10 @@ public class GarageManagementService {
                 .anyMatch ( serviceIds::contains );
     }
 
+    public void updateGarageVerification(Integer id) {
+        Garage garage = garageRepository.findById ( id )
+                .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found" ) );
+        garage.setActive ( true );
+        garageRepository.save ( garage );
+    }
 }

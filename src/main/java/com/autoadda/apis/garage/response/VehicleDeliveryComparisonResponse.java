@@ -15,13 +15,11 @@ import java.util.Map;
 public class VehicleDeliveryComparisonResponse {
 
     private Integer workOrderId;
-
+    private Integer deliveryId;
     // Receiving checklist (from VehicleReceived)
     private ItemsChecklist receivingChecklist;
-
     // Delivery checklist (from VehicleDelivery)
     private ItemsChecklist deliveryChecklist;
-
     // List of mismatched items
     private List<String> mismatches;
 

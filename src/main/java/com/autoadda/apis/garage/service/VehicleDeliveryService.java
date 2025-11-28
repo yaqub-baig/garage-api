@@ -6,7 +6,9 @@ import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.CustomerDeliveryApprovalRequest;
 import com.autoadda.apis.garage.request.VehicleDeliveryRequest;
 import com.autoadda.apis.garage.response.VehicleDeliveryComparisonResponse;
+import com.autoadda.apis.garage.response.VehicleDeliveryWithReceivedChecklistResponse;
 import com.autoadda.apis.garage.response.VehicleDeliveryResponse;
+import com.autoadda.apis.garage.response.VehicleReceivedChecklistResponse;
 import com.autoadda.apis.garage.util.DeliveryStatus;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
 import lombok.RequiredArgsConstructor;
@@ -202,6 +204,7 @@ public class VehicleDeliveryService {
                 .collect(Collectors.toList());
 
         return VehicleDeliveryComparisonResponse.builder()
+                .deliveryId(delivery.getId())
                 .workOrderId(workOrderId)
                 .receivingChecklist(receivingChecklist)
                 .deliveryChecklist(deliveryChecklist)
@@ -243,7 +246,7 @@ public class VehicleDeliveryService {
             delivery.setCustomerComments(request.getCustomerComments());
 
             // Update work order status
-            workOrder.setStatus(WorkOrderStatus.DELIVERED_TO_CUSTOMER);
+            workOrder.updateStatus(WorkOrderStatus.DELIVERED_TO_CUSTOMER);
             workOrder.setWorkCompletedDate(LocalDateTime.now());
             workOrderRepo.save(workOrder);
 
@@ -259,7 +262,7 @@ public class VehicleDeliveryService {
             delivery.setCustomerComments(request.getCustomerComments());
 
             // Revert work order status back to READY_FOR_DELIVERY
-            workOrder.setStatus(WorkOrderStatus.READY_FOR_DELIVERY);
+            workOrder.updateStatus(WorkOrderStatus.READY_FOR_DELIVERY);
             workOrderRepo.save(workOrder);
 
             log.warn("Customer REJECTED delivery for work order {}. Reason: {}",
@@ -277,13 +280,13 @@ public class VehicleDeliveryService {
     /**
      * Get delivery details by work order ID (returns the latest delivery)
      */
-    public VehicleDeliveryResponse getDeliveryByWorkOrderId(Integer workOrderId) {
+    public VehicleDeliveryWithReceivedChecklistResponse getDeliveryByWorkOrderId(Integer workOrderId) {
         log.info("Fetching delivery details for work order: {}", workOrderId);
 
         VehicleDelivery delivery = vehicleDeliveryRepo.findTopByWorkOrderIdOrderByCreatedAtDesc(workOrderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle delivery not found for this work order"));
-
-        return convertToResponse(delivery);
+        VehicleReceived vehicleReceived = vehicleReceivedRepo.findByAppointmentId(delivery.getWorkOrder().getAppointment().getId());
+        return convertToDeliveryAndReceivedChecklistResponse(delivery, vehicleReceived);
     }
 
     /**
@@ -334,111 +337,111 @@ public class VehicleDeliveryService {
         List<String> mismatches = new ArrayList<>();
 
         if (!Boolean.TRUE.equals(received.getIsMainKeyReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsMainKeyReturned())) {
+                Boolean.TRUE.equals(delivery.getIsMainKeyReturned())) {
             mismatches.add("Main Key: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsMainKeyReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsMainKeyReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsMainKeyReturned())) {
             mismatches.add("Main Key: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsSpareKeyReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsSpareKeyReturned())) {
+                Boolean.TRUE.equals(delivery.getIsSpareKeyReturned())) {
             mismatches.add("Spare Key: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsSpareKeyReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsSpareKeyReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsSpareKeyReturned())) {
             mismatches.add("Spare Key: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsToolKitReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsToolKitReturned())) {
+                Boolean.TRUE.equals(delivery.getIsToolKitReturned())) {
             mismatches.add("Tool Kit: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsToolKitReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsToolKitReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsToolKitReturned())) {
             mismatches.add("Tool Kit: Received but not being returned");
         }
 
         // Continue for all 12 items...
         if (!Boolean.TRUE.equals(received.getIsJackReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsJackReturned())) {
+                Boolean.TRUE.equals(delivery.getIsJackReturned())) {
             mismatches.add("Jack: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsJackReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsJackReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsJackReturned())) {
             mismatches.add("Jack: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsWheelSpannerReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsWheelSpannerReturned())) {
+                Boolean.TRUE.equals(delivery.getIsWheelSpannerReturned())) {
             mismatches.add("Wheel Spanner: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsWheelSpannerReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsWheelSpannerReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsWheelSpannerReturned())) {
             mismatches.add("Wheel Spanner: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsSpareTyreReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsSpareTyreReturned())) {
+                Boolean.TRUE.equals(delivery.getIsSpareTyreReturned())) {
             mismatches.add("Spare Tyre: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsSpareTyreReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsSpareTyreReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsSpareTyreReturned())) {
             mismatches.add("Spare Tyre: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsFireExtinguisherReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsFireExtinguisherReturned())) {
+                Boolean.TRUE.equals(delivery.getIsFireExtinguisherReturned())) {
             mismatches.add("Fire Extinguisher: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsFireExtinguisherReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsFireExtinguisherReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsFireExtinguisherReturned())) {
             mismatches.add("Fire Extinguisher: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsFirstAidKitReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsFirstAidKitReturned())) {
+                Boolean.TRUE.equals(delivery.getIsFirstAidKitReturned())) {
             mismatches.add("First Aid Kit: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsFirstAidKitReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsFirstAidKitReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsFirstAidKitReturned())) {
             mismatches.add("First Aid Kit: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsCentralLockRemoteReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsCentralLockRemoteReturned())) {
+                Boolean.TRUE.equals(delivery.getIsCentralLockRemoteReturned())) {
             mismatches.add("Central Lock Remote: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsCentralLockRemoteReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsCentralLockRemoteReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsCentralLockRemoteReturned())) {
             mismatches.add("Central Lock Remote: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsRCBookReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsRCBookReturned())) {
+                Boolean.TRUE.equals(delivery.getIsRCBookReturned())) {
             mismatches.add("RC Book: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsRCBookReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsRCBookReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsRCBookReturned())) {
             mismatches.add("RC Book: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsInsuranceCopyReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsInsuranceCopyReturned())) {
+                Boolean.TRUE.equals(delivery.getIsInsuranceCopyReturned())) {
             mismatches.add("Insurance Copy: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsInsuranceCopyReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsInsuranceCopyReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsInsuranceCopyReturned())) {
             mismatches.add("Insurance Copy: Received but not being returned");
         }
 
         if (!Boolean.TRUE.equals(received.getIsPUCReceived()) &&
-            Boolean.TRUE.equals(delivery.getIsPUCReturned())) {
+                Boolean.TRUE.equals(delivery.getIsPUCReturned())) {
             mismatches.add("PUC: Not received but being returned");
         }
         if (Boolean.TRUE.equals(received.getIsPUCReceived()) &&
-            !Boolean.TRUE.equals(delivery.getIsPUCReturned())) {
+                !Boolean.TRUE.equals(delivery.getIsPUCReturned())) {
             mismatches.add("PUC: Received but not being returned");
         }
 
@@ -480,6 +483,62 @@ public class VehicleDeliveryService {
                 .isRCBookReturned(delivery.getIsRCBookReturned())
                 .isInsuranceCopyReturned(delivery.getIsInsuranceCopyReturned())
                 .isPUCReturned(delivery.getIsPUCReturned())
+                .build();
+    }
+
+    /**
+     * Convert entity to initiation response DTO with vehicle received checklist
+     */
+    private VehicleDeliveryWithReceivedChecklistResponse convertToDeliveryAndReceivedChecklistResponse(VehicleDelivery delivery,
+                                                                                                       VehicleReceived vehicleReceived) {
+        List<String> photoUrls = delivery.getDeliveryPhotos().stream()
+                .map(MediaFile::getFilePath)
+                .collect(Collectors.toList());
+
+        String technicianName = delivery.getDeliveredBy() != null ?
+                delivery.getDeliveredBy().getFirstName() : null;
+
+        // Build vehicle received checklist
+        VehicleReceivedChecklistResponse receivedChecklist = VehicleReceivedChecklistResponse.builder()
+                .isMainKeyReceived(vehicleReceived.getIsMainKeyReceived())
+                .isSpareKeyReceived(vehicleReceived.getIsSpareKeyReceived())
+                .isToolKitReceived(vehicleReceived.getIsToolKitReceived())
+                .isJackReceived(vehicleReceived.getIsJackReceived())
+                .isWheelSpannerReceived(vehicleReceived.getIsWheelSpannerReceived())
+                .isSpareTyreReceived(vehicleReceived.getIsSpareTyreReceived())
+                .isFireExtinguisherReceived(vehicleReceived.getIsFireExtinguisherReceived())
+                .isFirstAidKitReceived(vehicleReceived.getIsFirstAidKitReceived())
+                .isCentralLockRemoteReceived(vehicleReceived.getIsCentralLockRemoteReceived())
+                .isRCBookReceived(vehicleReceived.getIsRCBookReceived())
+                .isInsuranceCopyReceived(vehicleReceived.getIsInsuranceCopyReceived())
+                .isPUCReceived(vehicleReceived.getIsPUCReceived())
+                .build();
+
+        return VehicleDeliveryWithReceivedChecklistResponse.builder()
+                .id(delivery.getId())
+                .workOrderId(delivery.getWorkOrder().getId())
+                .deliveredByTechnicianId(delivery.getDeliveredBy() != null ? delivery.getDeliveredBy().getId() : null)
+                .deliveredByTechnicianName(technicianName)
+                .status(delivery.getStatus())
+                .attemptNumber(delivery.getAttemptNumber())
+                .deliveryDate(delivery.getDeliveryDate())
+                .customerApproved(delivery.getCustomerApproved())
+                .customerComments(delivery.getCustomerComments())
+                .rejectionReason(delivery.getRejectionReason())
+                .deliveryPhotos(photoUrls)
+                .isMainKeyReturned(delivery.getIsMainKeyReturned())
+                .isSpareKeyReturned(delivery.getIsSpareKeyReturned())
+                .isToolKitReturned(delivery.getIsToolKitReturned())
+                .isJackReturned(delivery.getIsJackReturned())
+                .isWheelSpannerReturned(delivery.getIsWheelSpannerReturned())
+                .isSpareTyreReturned(delivery.getIsSpareTyreReturned())
+                .isFireExtinguisherReturned(delivery.getIsFireExtinguisherReturned())
+                .isFirstAidKitReturned(delivery.getIsFirstAidKitReturned())
+                .isCentralLockRemoteReturned(delivery.getIsCentralLockRemoteReturned())
+                .isRCBookReturned(delivery.getIsRCBookReturned())
+                .isInsuranceCopyReturned(delivery.getIsInsuranceCopyReturned())
+                .isPUCReturned(delivery.getIsPUCReturned())
+                .vehicleReceivedChecklist(receivedChecklist)
                 .build();
     }
 }

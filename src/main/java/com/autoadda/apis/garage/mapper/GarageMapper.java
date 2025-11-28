@@ -22,7 +22,7 @@ public class GarageMapper {
         garageResponse.setClosingTime ( garage.getClosingTime ( ) != null ? garage.getClosingTime ( ) : null );
         garageResponse.setWorkingDays ( garage.getWorkingDays ( ) != null ? garage.getWorkingDays ( ) : null );
         garageResponse.setTrnNumber ( garage.getTrnNumber ( ) != null ? garage.getTrnNumber ( ) : null );
-        garageResponse.setWebSite ( garage.getWebSite ( ) != null ? garage.getWebSite ( ) : null );
+        garageResponse.setWebsite( garage.getWebsite( ) != null ? garage.getWebsite( ) : null );
         garageResponse.setEmail ( garage.getEmail ( ) != null ? garage.getEmail ( ) : null );
         garageResponse.setPhoneNumber ( garage.getPhoneNumber ( ) != null ? garage.getPhoneNumber ( ) : null );
         garageResponse.setMobileNumber ( garage.getMobileNumber ( ) != null ? garage.getMobileNumber ( ) : null );

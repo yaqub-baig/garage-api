@@ -25,7 +25,7 @@ public class GarageResponse {
     private String breakEndTime;
     private String workingDays;
     private String trnNumber;
-    private String webSite;
+    private String website;
     private String email;
     private String phoneNumber;
     private String mobileNumber;

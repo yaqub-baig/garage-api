@@ -19,7 +19,7 @@ public class GarageRequest {
     private String garageArabicName;
     private String name;
     private String trnNumber;
-    private String webSite;
+    private String website;
     private String email;
     private String phoneNumber;
     @DateTimeFormat(pattern = "HH:mm:ss")

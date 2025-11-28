@@ -59,6 +59,12 @@ public class GarageController {
         return ResponseEntity.ok ( garageService.updateGarage ( id, garage ) );
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateGarageVerification(@PathVariable Integer id) {
+        garageService.updateGarageVerification ( id );
+        return ResponseEntity.noContent ( ).build ( );
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGarage(@PathVariable Integer id) {
         garageService.deleteGarage ( id );

@@ -29,7 +29,9 @@ public class OpenAPIConfig {
         Server prodServer = new Server ( );
         prodServer.setUrl ( prodUrl );
         prodServer.setDescription ( "Server URL in Production environment" );
-
+        Server qaServer = new Server ( );
+        qaServer.setUrl ( "http://192.168.1.100:8020/api/v1" );
+        qaServer.setDescription ( "Server URL in QA environment" );
         Contact contact = new Contact ( );
         contact.setEmail ( "yakub@yzsquare.com" );
         contact.setName ( "Yakub Mohammad" );
