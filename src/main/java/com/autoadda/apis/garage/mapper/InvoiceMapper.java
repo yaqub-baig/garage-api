@@ -20,7 +20,7 @@ public interface InvoiceMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "appointment", source = "appointment")
     @Mapping(target = "garage", source = "garage")
-    @Mapping(target = "insert_tms", expression = "java(DateHelper.dbDate())")
+    @Mapping(target = "insertTms", expression = "java(DateHelper.dbDate())")
     @Mapping(target = "status", constant = "GENERATED")
     @Mapping(target = "netAmount", expression = "java(calculateNetAmount(request))")
     @Mapping(target = "totalAmount", expression = "java(calculateNetAmount(request) + request.getTaxAmount())")
@@ -35,7 +35,7 @@ public interface InvoiceMapper {
 
     // ✅ Convert individual ServiceInvoice to AppointmentInvoiceBreakDown
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "insert_tms", expression = "java(DateHelper.dbDate())")
+    @Mapping(target = "insertTms", expression = "java(DateHelper.dbDate())")
     @Mapping(target = "invoiceId", source = "invoice.id")
     @Mapping(target = "appointmentId", source = "appointment.id")
     @Mapping(target = "garageId", source = "garage.id")
