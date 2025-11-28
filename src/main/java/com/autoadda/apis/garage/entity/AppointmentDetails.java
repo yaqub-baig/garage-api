@@ -42,7 +42,7 @@ public class AppointmentDetails {
     private String comments;
 
     @Column(name = "insert_tms")
-    private LocalDate insert_tms;
+    private LocalDate insertTms;
 
     @ManyToOne
     @JoinColumn(name = "garage_id")

@@ -22,7 +22,7 @@ public class AppointmentInvoiceBreakDown {
     private String comments;
 
     @Column(name = "insert_tms")
-    private LocalDate insert_tms;
+    private LocalDate insertTms;
 
     @Column(name = "net_amount")
     private Double netAmount;

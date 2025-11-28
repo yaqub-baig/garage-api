@@ -20,7 +20,7 @@ public class AppointmentDetailsRequest {
     private Date deliveryTime;
     private Status status;
     private String comments;
-    private LocalDate insert_tms;
+    private LocalDate insertTms;
     private Integer garageId;
 
 }

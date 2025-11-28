@@ -20,7 +20,7 @@ public class AppointmentInvoiceMapper {
                 .id ( invoice.getId ( ) )
                 .status ( invoice.getStatus ( ) )
                 .comments ( invoice.getComments ( ) )
-                .insertTms ( invoice.getInsert_tms ( ) )
+                .insertTms ( invoice.getInsertTms( ) )
                 .netAmount ( invoice.getNetAmount ( ) )
                 .taxAmount ( invoice.getTaxAmount ( ) )
                 .totalAmount ( invoice.getTotalAmount ( ) )

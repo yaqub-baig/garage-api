@@ -31,7 +31,7 @@ public class CommunicationPreferenceServiceTest {
 	private CommunicationPreferenceRepository repository;
 
 	@Test
-	public void testSaveNewPreference() {
+	 void testSaveNewPreference() {
 		CommunicationPreferenceRequest pref = new CommunicationPreferenceRequest();
 		pref.setCustomerId(1);
 		pref.setEmailOnServiceUpdates(true);
@@ -61,7 +61,7 @@ public class CommunicationPreferenceServiceTest {
 	}
 
 	@Test
-	public void testGetPreference() {
+	 void testGetPreference() {
 		CommunicationPreference pref = new CommunicationPreference();
 		pref.setCustomerId(1);
 		when(repository.findByCustomerId(1)).thenReturn(Optional.of(pref));
@@ -71,7 +71,7 @@ public class CommunicationPreferenceServiceTest {
 	}
 
 	@Test
-	public void testWithinAllowedTime() {
+	 void testWithinAllowedTime() {
 		CommunicationPreference pref = new CommunicationPreference();
 		pref.setDoNotDisturbStart(LocalTime.of(21, 0));
 		pref.setDoNotDisturbEnd(LocalTime.of(7, 0));
@@ -81,7 +81,7 @@ public class CommunicationPreferenceServiceTest {
 	}
 
 	@Test
-	public void testDeletePreference() {
+	 void testDeletePreference() {
 //		CommunicationPreference pref = new CommunicationPreference();
 //		pref.setId(1);
 //		when(repository.findById(1)).thenReturn(Optional.of(pref));
@@ -90,7 +90,7 @@ public class CommunicationPreferenceServiceTest {
 	}
 
 	@Test
-	public void testUpdatePreference() {
+	 void testUpdatePreference() {
 		CommunicationPreferenceRequest prefRequest = new CommunicationPreferenceRequest();
 		prefRequest.setId(1);
 		prefRequest.setCustomerId(1);
@@ -117,7 +117,7 @@ public class CommunicationPreferenceServiceTest {
 	}
 
 	@Test
-	public void testGetPreferenceByIdAndCustomerId() {
+	 void testGetPreferenceByIdAndCustomerId() {
 		CommunicationPreference pref = new CommunicationPreference();
 		pref.setId(1);
 		pref.setCustomerId(1);

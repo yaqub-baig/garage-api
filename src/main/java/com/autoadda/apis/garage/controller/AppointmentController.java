@@ -21,6 +21,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/appointments")
@@ -33,85 +34,77 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<GenericResponse> createCustomerAppointment(@RequestBody CustomerAppointmentRequest request) {
-        AppointmentDetails appointment = appointmentService.createCustomerAppointment ( request );
-        return ResponseEntity.status ( HttpStatus.CREATED ).body ( GenericResponse.success ( appointment ) );
+        AppointmentDetails appointment = appointmentService.createCustomerAppointment(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.success(appointment));
     }
 
     //2025-09-12T11:40:00:00
     @PostMapping("/{garageId}/book")
-    public ResponseEntity<?> bookAppointment(@PathVariable Integer garageId, @RequestParam Integer vehicleId,
+    public ResponseEntity<AppointmentDetailResponse> bookAppointment(@PathVariable Integer garageId, @RequestParam Integer vehicleId,
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
                                              @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
                                              @RequestParam(required = false) String selectedGarageServiceIds) {
-        try {
-            LocalDate date = time.toLocalDate ( );
-            LocalTime timestamp = time.toLocalTime ( );
-            AppointmentDetailResponse booking = appointmentSlotService.bookSlot ( garageId, vehicleId, date, timestamp, autoAddaId, selectedGarageServiceIds );
-            return ResponseEntity.ok ( booking );
-        }
-        catch ( IllegalStateException e ) {
-            return ResponseEntity.status ( HttpStatus.CONFLICT ).body ( e.getMessage ( ) );
-        }
+
+            LocalDate date = time.toLocalDate();
+            LocalTime timestamp = time.toLocalTime();
+            AppointmentDetailResponse booking = appointmentSlotService.bookSlot(garageId, vehicleId, date, timestamp, autoAddaId, selectedGarageServiceIds);
+            return ResponseEntity.ok(booking);
+
     }
 
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<GenericResponse> getGarageAppointments(@PathVariable Integer garageId,
                                                                  @RequestParam(required = false) String status) throws GarageNotFoundException {
-        List<AppointmentDetailResponse> appointments = appointmentService.getAppointmentsByGarage ( garageId, status );
-        return ResponseEntity.ok ( GenericResponse.success ( appointments ) );
+        List<AppointmentDetailResponse> appointments = appointmentService.getAppointmentsByGarage(garageId, status);
+        return ResponseEntity.ok(GenericResponse.success(appointments));
     }
 
     @PutMapping("/status")
     public ResponseEntity<GenericResponse> updateAppointmentStatus(@RequestBody AppointmentStatusRequest request) {
-        AppointmentDetails updated = appointmentService.updateAppointmentStatus ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( updated ) );
+        AppointmentDetails updated = appointmentService.updateAppointmentStatus(request);
+        return ResponseEntity.ok(GenericResponse.success(updated));
     }
 
     @GetMapping("/{appointmentId}")
     public ResponseEntity<GenericResponse> getAppointmentDetails(@PathVariable Integer appointmentId) {
-        AppointmentDetailResponse response = appointmentService.getAppointmentsDetails ( appointmentId );
-        return ResponseEntity.ok ( GenericResponse.success ( response ) );
+        AppointmentDetailResponse response = appointmentService.getAppointmentsDetails(appointmentId);
+        return ResponseEntity.ok(GenericResponse.success(response));
     }
 
-//    @GetMapping("/{appointmentId}")
-//    public ResponseEntity<GenericResponse> getAppointmentDetails(@PathVariable Integer appointmentId) {
-//        AppointmentResponse response = appointmentService.getAppointmentsDetails ( appointmentId );
-//        return ResponseEntity.ok ( GenericResponse.success ( response ) );
-//    }
 
     @GetMapping("/{garageId}/available-slots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@PathVariable Integer garageId,
                                                                  @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date) {
 
         // Use the new method that returns detailed slot information
-        List<Map<String, Object>> slots = appointmentSlotService.getAvailableSlotsWithDetails ( garageId, date );
+        List<Map<String, Object>> slots = appointmentSlotService.getAvailableSlotsWithDetails(garageId, date);
 
-        Map<String, Object> res = new HashMap<> ( );
-        res.put ( "garageId", garageId );
-        res.put ( "date", date );
-        res.put ( "availableSlots", slots );
-        return ResponseEntity.ok ( res );
+        Map<String, Object> res = new HashMap<>();
+        res.put("garageId", garageId);
+        res.put("date", date);
+        res.put("availableSlots", slots);
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping("/user/bookings")
     public ResponseEntity<List<AppointmentDetailResponse>> getUserBookings(@RequestHeader(value = "X-Auto-Adda-Id") String userId) {
-        return ResponseEntity.ok ( appointmentSlotService.getBookingsByUser ( userId ) );
+        return ResponseEntity.ok(appointmentSlotService.getBookingsByUser(userId));
     }
 
     @DeleteMapping("/{appointmentId}/cancel")
-    public ResponseEntity<?> cancelAppointment(@PathVariable Integer appointmentId, @RequestHeader(value = "X-Auto-Adda-Id") String userId) {
-        appointmentSlotService.cancelBooking ( appointmentId );
-        return ResponseEntity.ok ( "Booking cancelled successfully." );
+    public ResponseEntity<String> cancelAppointment(@PathVariable Integer appointmentId, @RequestHeader(value = "X-Auto-Adda-Id") String userId) {
+        appointmentSlotService.cancelBooking(appointmentId);
+        return ResponseEntity.ok("Booking cancelled successfully.");
     }
 
     @PutMapping("/edit/appointment")
-    public ResponseEntity<?> editAppointment(@RequestParam(required = false) Integer garageId,
-                                             @RequestParam(required = false) Integer vehicleId,
-                                             @RequestParam Integer appointmentId,
-                                             @RequestParam(required = false) Status status,
-                                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
-                                             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
-        return appointmentSlotService.editBooking ( garageId, vehicleId, appointmentId, time, autoAddaId, status );
+    public ResponseEntity<AppointmentDetailResponse> editAppointment(@RequestParam(required = false) Integer garageId,
+                                                                     @RequestParam(required = false) Integer vehicleId,
+                                                                     @RequestParam Integer appointmentId,
+                                                                     @RequestParam(required = false) Status status,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
+                                                                     @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+        return appointmentSlotService.editBooking(garageId, vehicleId, appointmentId, time, autoAddaId, status);
     }
 
 }

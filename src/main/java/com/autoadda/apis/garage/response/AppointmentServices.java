@@ -18,7 +18,7 @@ public class AppointmentServices {
 
     private Integer appointmentId;
 
-    private LocalDate insert_tms;
+    private LocalDate insertTms;
 
     private GarageService service;
 

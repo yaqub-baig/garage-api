@@ -27,7 +27,7 @@ public class AppointmentDetails {
 
     private String comments;
 
-    private LocalDate insert_tms;
+    private LocalDate insertTms;
 
     private Garage garage;
 

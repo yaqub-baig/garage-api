@@ -5,18 +5,17 @@ package com.autoadda.apis.garage.exception;
  */
 public class AlreadyExistException extends RuntimeException {
 
-    private String message;
 
     public AlreadyExistException() {
-        super ( );
+        super();
     }
 
     public AlreadyExistException(String message) {
-        super ( message );
-        this.message = message;
+        super(message);
+
     }
 
     public AlreadyExistException(String message, Throwable cause) {
-        super ( message, cause );
+        super(message, cause);
     }
 }
