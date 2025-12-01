@@ -28,6 +28,14 @@ public class GarageMapper {
         garageResponse.setMobileNumber ( garage.getMobileNumber ( ) != null ? garage.getMobileNumber ( ) : null );
         garageResponse.setGarageLogo ( garage.getGarageLogo ( ) != null ? garage.getGarageLogo ( ) : null );
         garageResponse.setAccountStatus ( garage.getAccountStatus ( ) != null ? garage.getAccountStatus ( ) : null );
+        garageResponse.setApprovedBy ( garage.getApprovedBy ( ) != null ? garage.getApprovedBy ( ) : null );
+        garageResponse.setApprovedAt ( garage.getApprovedAt ( ) != null ? garage.getApprovedAt ( ) : null );
+        garageResponse.setRejectedBy ( garage.getRejectedBy ( ) != null ? garage.getRejectedBy ( ) : null );
+        garageResponse.setRejectedAt ( garage.getRejectedAt ( ) != null ? garage.getRejectedAt ( ) : null );
+        garageResponse.setRejectionReason ( garage.getRejectionReason ( ) != null ? garage.getRejectionReason ( ) : null );
+        garageResponse.setResubmissionCount ( garage.getResubmissionCount ( ) != null ? garage.getResubmissionCount ( ) : 0 );
+        garageResponse.setLastReviewedBy ( garage.getLastReviewedBy ( ) != null ? garage.getLastReviewedBy ( ) : null );
+        garageResponse.setLastReviewedAt ( garage.getLastReviewedAt ( ) != null ? garage.getLastReviewedAt ( ) : null );
         garageResponse.setCreatedAt ( garage.getCreatedAt ( ) != null ? garage.getCreatedAt ( ) : null );
         garageResponse.setBrands ( garage.getBrands ( ) != null ? garage.getBrands ( ) : null );
         garageResponse.setModels ( garage.getModels ( ) != null ? garage.getModels ( ) : null );

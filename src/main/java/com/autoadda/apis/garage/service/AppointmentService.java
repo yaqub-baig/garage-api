@@ -71,7 +71,7 @@ public class AppointmentService {
                 .status(appointment.getStatus())
                 .memberId(request.getMemberId())
                 .memberType(request.getMemberType())
-                .insert_tms(DateHelper.dbDate())
+                .insertTms(DateHelper.dbDate())
                 .build());
 
         // Services optional
@@ -161,7 +161,7 @@ public class AppointmentService {
 
         appointmentActivityRepo.save(AppointmentStatusActivity.builder().appointmentId(appointment.getId())
                 .status(appointment.getStatus()).memberId(request.getMemberId()).memberType(request.getMemberType())
-                .comments(request.getComments()).insert_tms(DateHelper.dbDate()).build());
+                .comments(request.getComments()).insertTms(DateHelper.dbDate()).build());
 
         return appointment;
     }

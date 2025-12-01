@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.response;
 
 import com.autoadda.apis.garage.entity.Location;
 import com.autoadda.apis.garage.entity.MediaFile;
+import com.autoadda.apis.garage.util.GarageVerificationStatus;
 import com.autoadda.apis.garage.util.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +32,15 @@ public class GarageResponse {
     private String mobileNumber;
     private Location location;
     private MediaFile garageLogo;  // Directly using MediaFile entity
-    private Status accountStatus;
+    private GarageVerificationStatus accountStatus;
+    private Integer approvedBy;
+    private LocalDateTime approvedAt;
+    private Integer rejectedBy;
+    private LocalDateTime rejectedAt;
+    private String rejectionReason;
+    private Integer resubmissionCount;
+    private Integer lastReviewedBy;
+    private LocalDateTime lastReviewedAt;
     private LocalDateTime createdAt;
     private String brands;
     private String models;

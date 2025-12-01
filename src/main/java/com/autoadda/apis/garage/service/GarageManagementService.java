@@ -4,6 +4,7 @@ import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
+import com.autoadda.apis.garage.exception.UnauthorizedAccessException;
 import com.autoadda.apis.garage.mapper.GarageMapper;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.GarageRequest;
@@ -13,6 +14,7 @@ import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.UserResponse;
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.ERole;
+import com.autoadda.apis.garage.util.GarageVerificationStatus;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -99,7 +101,7 @@ public class GarageManagementService {
         if ( garageRequest.getWebsite( ) != null )
             garage.setWebsite( garageRequest.getWebsite( ) );
 
-        garage.setAccountStatus ( Status.PENDING ); // Default status
+        garage.setAccountStatus ( GarageVerificationStatus.PENDING ); // Default status
 
         if ( garageRequest.getBrands ( ) != null )
             garage.setBrands ( garageRequest.getBrands ( ) );
@@ -490,7 +492,7 @@ public class GarageManagementService {
     // Search/filter methods
     @Transactional
     public List<GarageResponse> findGaragesByLegalName(String legalName) {
-        return garageRepository.findByGarageBrandNameContainingIgnoreCase ( legalName )
+        return garageRepository.findByGarageBrandNameContainingIgnoreCaseAndApproved ( legalName )
                 .stream ( ).map ( garageMapper::entityToResponse )
                 .toList ( );
     }
@@ -753,5 +755,247 @@ public class GarageManagementService {
                 .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found" ) );
         garage.setActive ( true );
         garageRepository.save ( garage );
+    }
+
+    // ====================================================================================
+    // FUTURE METHODS: Admin Garage Approval Workflow
+    // These methods will be used when admin endpoints are implemented
+    // ====================================================================================
+
+    /**
+     * FUTURE: Approve a garage (to be called from admin endpoint)
+     * @param garageId The garage ID to approve
+     * @param adminUserId The admin user performing the approval
+     * @return Updated garage response
+     */
+    @Transactional
+    public GarageResponse approveGarage(Integer garageId, Integer adminUserId) {
+        Garage garage = garageRepository.findById(garageId)
+                .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
+
+        if (garage.getAccountStatus() != GarageVerificationStatus.PENDING) {
+            throw new IllegalStateException("Can only approve PENDING garages");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        garage.setAccountStatus(GarageVerificationStatus.APPROVED);
+        garage.setApprovedBy(adminUserId);
+        garage.setApprovedAt(now);
+        garage.setLastReviewedBy(adminUserId);
+        garage.setLastReviewedAt(now);
+
+        // Clear rejection metadata
+        garage.setRejectedBy(null);
+        garage.setRejectedAt(null);
+        garage.setRejectionReason(null);
+
+        Garage saved = garageRepository.save(garage);
+        log.info("Garage {} approved by admin {}", garageId, adminUserId);
+
+        return garageMapper.entityToResponse(saved);
+    }
+
+    /**
+     * FUTURE: Reject a garage (to be called from admin endpoint)
+     * @param garageId The garage ID to reject
+     * @param adminUserId The admin user performing the rejection
+     * @param rejectionReason The reason for rejection (required)
+     * @return Updated garage response
+     */
+    @Transactional
+    public GarageResponse rejectGarage(Integer garageId, Integer adminUserId, String rejectionReason) {
+        if (rejectionReason == null || rejectionReason.trim().isEmpty()) {
+            throw new IllegalArgumentException("Rejection reason is required");
+        }
+
+        if (rejectionReason.length() > 1000) {
+            throw new IllegalArgumentException("Rejection reason cannot exceed 1000 characters");
+        }
+
+        Garage garage = garageRepository.findById(garageId)
+                .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
+
+        if (garage.getAccountStatus() != GarageVerificationStatus.PENDING) {
+            throw new IllegalStateException("Can only reject PENDING garages");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        garage.setAccountStatus(GarageVerificationStatus.REJECTED);
+        garage.setRejectedBy(adminUserId);
+        garage.setRejectedAt(now);
+        garage.setRejectionReason(rejectionReason.trim());
+        garage.setLastReviewedBy(adminUserId);
+        garage.setLastReviewedAt(now);
+
+        // Clear approval metadata
+        garage.setApprovedBy(null);
+        garage.setApprovedAt(null);
+
+        Garage saved = garageRepository.save(garage);
+        log.info("Garage {} rejected by admin {}", garageId, adminUserId);
+
+        return garageMapper.entityToResponse(saved);
+    }
+
+    /**
+     * FUTURE: Resubmit a rejected garage (called by garage owner after fixing issues)
+     * @param garageId The garage ID to resubmit
+     * @return Updated garage response
+     */
+    @Transactional
+    public GarageResponse resubmitGarage(Integer garageId) {
+        Garage garage = garageRepository.findById(garageId)
+                .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
+
+        if (garage.getAccountStatus() != GarageVerificationStatus.REJECTED) {
+            throw new IllegalStateException("Can only resubmit REJECTED garages");
+        }
+
+        garage.setResubmissionCount(garage.getResubmissionCount() + 1);
+        garage.setAccountStatus(GarageVerificationStatus.PENDING);
+        garage.setRejectionReason(null);
+
+        Garage saved = garageRepository.save(garage);
+        log.info("Garage {} resubmitted (attempt #{})", garageId, garage.getResubmissionCount());
+
+        return garageMapper.entityToResponse(saved);
+    }
+
+    /**
+     * Resubmit a rejected garage (owner-facing with authorization)
+     *
+     * @param garageId The garage ID to resubmit
+     * @param ownerId The owner's user ID from authentication
+     * @return Updated garage response
+     * @throws EntityNotFoundException if garage not found
+     * @throws UnauthorizedAccessException if user is not the garage owner
+     * @throws IllegalStateException if garage is not in REJECTED status
+     */
+    @Transactional
+    public GarageResponse resubmitGarageByOwner(Integer garageId, Integer ownerId) {
+        log.info("Processing resubmission request for garage {} by owner {}", garageId, ownerId);
+
+        // Fetch garage and validate existence
+        Garage garage = garageRepository.findById(garageId)
+                .orElseThrow(() -> new EntityNotFoundException("Garage not found with id: " + garageId));
+
+        // Authorization: Verify the requester is the garage owner
+        if (!garage.getGarageOwner().equals(ownerId)) {
+            log.warn("Unauthorized resubmission attempt: User {} tried to resubmit garage {} owned by {}",
+                     ownerId, garageId, garage.getGarageOwner());
+            throw new UnauthorizedAccessException(
+                "You are not authorized to resubmit this garage. Only the garage owner can resubmit.");
+        }
+
+        // Delegate to existing business logic
+        return resubmitGarage(garageId);
+    }
+
+    // ====================================================================================
+    // ADMIN QUERY METHODS: Support for admin controller endpoints
+    // ====================================================================================
+
+    /**
+     * Get all pending garages
+     */
+    public List<GarageResponse> getPendingGarages() {
+        List<Garage> garages = garageRepository.findAllPendingGarages();
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get all rejected garages
+     */
+    public List<GarageResponse> getRejectedGarages() {
+        List<Garage> garages = garageRepository.findAllRejectedGarages();
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get all approved garages
+     */
+    public List<GarageResponse> getApprovedGarages() {
+        List<Garage> garages = garageRepository.findByAccountStatus(GarageVerificationStatus.APPROVED);
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get garages by verification status
+     */
+    public List<GarageResponse> getGaragesByVerificationStatus(GarageVerificationStatus status) {
+        List<Garage> garages = garageRepository.findByAccountStatus(status);
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get total garages count
+     */
+    public long getTotalGaragesCount() {
+        return garageRepository.count();
+    }
+
+    /**
+     * Get garage count by status
+     */
+    public long getGarageCountByStatus(GarageVerificationStatus status) {
+        return garageRepository.countByAccountStatus(status);
+    }
+
+    /**
+     * Get pending garages older than a specific date
+     */
+    public List<GarageResponse> getPendingGaragesOlderThan(LocalDateTime cutoffDate) {
+        List<Garage> garages = garageRepository.findPendingGaragesOlderThan(cutoffDate);
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get garages with multiple resubmissions
+     */
+    public List<GarageResponse> getGaragesWithMultipleResubmissions(int minCount) {
+        List<Garage> garages = garageRepository.findGaragesWithMultipleResubmissions(minCount);
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get garages reviewed by specific admin
+     */
+    public List<GarageResponse> getGaragesReviewedBy(Integer adminId) {
+        List<Garage> garages = garageRepository.findByLastReviewedBy(adminId);
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get garages approved by specific admin
+     */
+    public List<GarageResponse> getGaragesApprovedBy(Integer adminId) {
+        List<Garage> garages = garageRepository.findByApprovedBy(adminId);
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get garages rejected by specific admin
+     */
+    public List<GarageResponse> getGaragesRejectedBy(Integer adminId) {
+        List<Garage> garages = garageRepository.findByRejectedBy(adminId);
+        return garages.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
     }
 }

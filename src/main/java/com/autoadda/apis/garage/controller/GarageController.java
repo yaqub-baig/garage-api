@@ -71,6 +71,20 @@ public class GarageController {
         return ResponseEntity.noContent ( ).build ( );
     }
 
+    /**
+     * Resubmit a rejected garage for admin review
+     * POST /garages/{id}/resubmit
+     */
+    @PostMapping("/{id}/resubmit")
+    public ResponseEntity<GarageResponse> resubmitGarage(
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
+
+        log.info("Garage owner {} requesting resubmission for garage {}", autoAddaId, id);
+        GarageResponse response = garageService.resubmitGarageByOwner(id, Integer.parseInt(autoAddaId));
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/brandname/{name}")
     public ResponseEntity<List<GarageResponse>> searchByLegalName(@RequestParam String name) {
         return ResponseEntity.ok ( garageService.findGaragesByLegalName ( name ) );

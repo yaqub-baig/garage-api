@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.entity;
 
+import com.autoadda.apis.garage.util.GarageVerificationStatus;
 import com.autoadda.apis.garage.util.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -71,9 +72,34 @@ public class Garage {
     @ManyToOne
     private Location garageLocation;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "account_status")
-    private Status accountStatus;
+    private GarageVerificationStatus accountStatus;
 
+    @Column(name = "approved_by")
+    private Integer approvedBy;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
+
+    @Column(name = "rejected_by")
+    private Integer rejectedBy;
+
+    @Column(name = "rejected_at")
+    private LocalDateTime rejectedAt;
+
+    @Column(name = "rejection_reason", length = 1000)
+    private String rejectionReason;
+
+    @Column(name = "resubmission_count")
+    @Builder.Default
+    private Integer resubmissionCount = 0;
+
+    @Column(name = "last_reviewed_by")
+    private Integer lastReviewedBy;
+
+    @Column(name = "last_reviewed_at")
+    private LocalDateTime lastReviewedAt;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -115,6 +141,9 @@ public class Garage {
     public void prePersist() {
         isActive = true;
         createdAt = LocalDateTime.now ( );
+        if (resubmissionCount == null) {
+            resubmissionCount = 0;
+        }
     }
 
     @Override

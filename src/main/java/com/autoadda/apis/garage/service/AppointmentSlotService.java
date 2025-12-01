@@ -142,11 +142,11 @@ public class AppointmentSlotService {
                 .insertTms ( DateHelper.dbDate ( ) ).build ( );
 
         AppointmentDetails save = bookingRepo.save ( appointment );
-        generateAppointmentServices ( save, selectedGarageServiceIds, garageId );
+        generateAppointmentServices ( save, selectedGarageServiceIds );
         return appointmentDetailMapper.entityToResponse ( save );
     }
 
-    private void generateAppointmentServices(AppointmentDetails appointment, String selectedGarageServiceIds, Integer garageId) {
+    private void generateAppointmentServices(AppointmentDetails appointment, String selectedGarageServiceIds) {
         List<Integer> serviceIds = Arrays.stream ( selectedGarageServiceIds.split ( "," ) )
                 .map ( Integer::parseInt )
                 .toList ( );

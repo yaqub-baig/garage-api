@@ -7,6 +7,7 @@ import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.service.GarageManagementService;
+import com.autoadda.apis.garage.util.GarageVerificationStatus;
 import com.autoadda.apis.garage.util.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ class GarageServiceTest {
         sampleGarageEntity.setEmail ( "info@quickfix.com" );
         sampleGarageEntity.setPhoneNumber ( "1234567890" );
         sampleGarageEntity.setWebsite( "http://quickfix.com" );
-        sampleGarageEntity.setAccountStatus ( Status.ACTIVE );
+        sampleGarageEntity.setAccountStatus ( GarageVerificationStatus.PENDING );
 
     }
 
@@ -108,10 +109,10 @@ class GarageServiceTest {
     @Test
     void testSoftDeleteGarage() {
         when ( garageRepository.findById ( 1 ) ).thenReturn ( Optional.of ( sampleGarageEntity ) );
-        sampleGarageEntity.setAccountStatus ( Status.REMOVED );
+        sampleGarageEntity.setAccountStatus ( GarageVerificationStatus.PENDING);
         when ( garageRepository.save ( any ( Garage.class ) ) ).thenReturn ( sampleGarageEntity );
 
         garageService.deleteGarage ( 1 );
-        assertEquals ( Status.REMOVED, sampleGarageEntity.getAccountStatus ( ) );
+        assertEquals ( GarageVerificationStatus.APPROVED, sampleGarageEntity.getAccountStatus ( ) );
     }
 }

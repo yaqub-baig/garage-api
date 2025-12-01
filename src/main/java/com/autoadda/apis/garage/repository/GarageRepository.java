@@ -1,12 +1,14 @@
 package com.autoadda.apis.garage.repository;
 
 import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.util.GarageVerificationStatus;
 import com.autoadda.apis.garage.util.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -23,7 +25,7 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
     List<Garage> findAllWithServices();
 
     // Optional: Find all garages that offer a specific available service
-    @Query("SELECT DISTINCT g FROM Garage g JOIN g.services gs WHERE gs.availableService.id = :serviceId")
+    @Query("SELECT DISTINCT g FROM Garage g JOIN g.services gs WHERE gs.availableService.id = :serviceId AND g.accountStatus = 'APPROVED'")
     List<Garage> findGaragesByAvailableServiceId(@Param("serviceId") Integer serviceId);
 
     // Optional: Find garages by legal name, ignoring case
@@ -33,6 +35,9 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
     List<Garage> findByGarageBrandNameContaining(String legalName);
 
     List<Garage> findByGarageBrandNameContainingIgnoreCase(String legalName);
+
+    @Query("SELECT g FROM Garage g WHERE LOWER(g.garageBrandName) LIKE LOWER(CONCAT('%', :legalName, '%')) AND g.accountStatus = 'APPROVED'")
+    List<Garage> findByGarageBrandNameContainingIgnoreCaseAndApproved(@Param("legalName") String legalName);
 
     List<Garage> findByNameContainingIgnoreCase(String garageName);
 
@@ -98,6 +103,61 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
     @Query("SELECT DISTINCT g FROM Garage g " +
             "LEFT JOIN FETCH g.garageLocation " +
             "LEFT JOIN FETCH g.services s " +
-            "LEFT JOIN FETCH s.availableService")
+            "LEFT JOIN FETCH s.availableService " +
+            "WHERE g.accountStatus = 'APPROVED'")
     Set<Garage> findAllWithLocationAndServices();
+
+    // ====================================================================================
+    // GARAGE VERIFICATION QUERY METHODS (for future admin features)
+    // ====================================================================================
+
+    /**
+     * Find all pending garages ordered by creation date (oldest first)
+     */
+    @Query("SELECT g FROM Garage g WHERE g.accountStatus = 'PENDING' ORDER BY g.createdAt ASC")
+    List<Garage> findAllPendingGarages();
+
+    /**
+     * Find all rejected garages ordered by rejection date (newest first)
+     */
+    @Query("SELECT g FROM Garage g WHERE g.accountStatus = 'REJECTED' ORDER BY g.rejectedAt DESC")
+    List<Garage> findAllRejectedGarages();
+
+    /**
+     * Find garages by approver admin user ID
+     */
+    List<Garage> findByApprovedBy(Integer adminUserId);
+
+    /**
+     * Find garages by rejecter admin user ID
+     */
+    List<Garage> findByRejectedBy(Integer adminUserId);
+
+    /**
+     * Find garages by last reviewer (approved or rejected)
+     */
+    List<Garage> findByLastReviewedBy(Integer adminUserId);
+
+    /**
+     * Count garages by verification status
+     */
+    long countByAccountStatus(GarageVerificationStatus status);
+
+    /**
+     * Find pending garages older than a specific date (for monitoring stale reviews)
+     */
+    @Query("SELECT g FROM Garage g WHERE g.accountStatus = 'PENDING' " +
+           "AND g.createdAt < :cutoffDate ORDER BY g.createdAt ASC")
+    List<Garage> findPendingGaragesOlderThan(@Param("cutoffDate") LocalDateTime cutoffDate);
+
+    /**
+     * Find garages with multiple resubmissions (potential problem cases)
+     */
+    @Query("SELECT g FROM Garage g WHERE g.resubmissionCount >= :minCount ORDER BY g.resubmissionCount DESC")
+    List<Garage> findGaragesWithMultipleResubmissions(@Param("minCount") int minCount);
+
+    /**
+     * Find garages by verification status (using new enum)
+     */
+    List<Garage> findByAccountStatus(GarageVerificationStatus status);
 }
