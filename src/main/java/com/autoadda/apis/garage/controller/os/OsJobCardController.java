@@ -1,26 +1,18 @@
 package com.autoadda.apis.garage.controller.os;
 
-import java.util.List;
-
 import com.autoadda.apis.garage.entity.os.OsJobCard;
+import com.autoadda.apis.garage.exception.MemberNotFoundException;
 import com.autoadda.apis.garage.request.os.OsAssignServiceRequest;
 import com.autoadda.apis.garage.request.os.OsJobCardStatusRequest;
-import com.autoadda.apis.garage.response.JobCardResponse;
 import com.autoadda.apis.garage.response.os.OsGenericResponse;
 import com.autoadda.apis.garage.response.os.OsJobCardResponse;
 import com.autoadda.apis.garage.service.os.OsJobCardService;
+import com.autoadda.apis.garage.util.Status;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.autoadda.apis.garage.entity.JobCard;
-import com.autoadda.apis.garage.exception.MemberNotFoundException;
-import com.autoadda.apis.garage.request.AssignServiceRequest;
-import com.autoadda.apis.garage.request.JobCardStatusRequest;
-import com.autoadda.apis.garage.response.GenericResponse;
-import com.autoadda.apis.garage.service.JobCardService;
-import com.autoadda.apis.garage.util.Status;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @RestController
 @RequestMapping("/os-jobcards")

@@ -4,30 +4,31 @@ import com.autoadda.apis.garage.entity.CommunicationPreference;
 import com.autoadda.apis.garage.repository.CommunicationPreferenceRepository;
 import com.autoadda.apis.garage.request.CommunicationPreferenceRequest;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CommunicationPreferenceService {
 
-    @Autowired
-    private CommunicationPreferenceRepository repository;
+    private final CommunicationPreferenceRepository repository;
 
     CommunicationPreference mapToEntity(CommunicationPreferenceRequest preferenceRequest) {
-        return CommunicationPreference.builder ( ).customerId ( preferenceRequest.getCustomerId ( ) )
-                .emailOnServiceUpdates ( preferenceRequest.getEmailOnServiceUpdates ( ) )
-                .smsOnServiceUpdates ( preferenceRequest.getSmsOnServiceUpdates ( ) )
-                .emailOnAppointments ( preferenceRequest.getEmailOnAppointments ( ) )
-                .smsOnAppointments ( preferenceRequest.getSmsOnAppointments ( ) )
-                .emailOnReminders ( preferenceRequest.getEmailOnReminders ( ) )
-                .smsOnReminders ( preferenceRequest.getSmsOnReminders ( ) )
-                .emailOnOffers ( preferenceRequest.getEmailOnOffers ( ) ).smsOnOffers ( preferenceRequest.getSmsOnOffers ( ) )
-                .emailOnQuotationRequests ( preferenceRequest.getEmailOnQuotationRequests ( ) )
-                .smsOnQuotationRequests ( preferenceRequest.getSmsOnQuotationRequests ( ) )
-                .status ( preferenceRequest.getStatus ( ) ).build ( );
+        return CommunicationPreference.builder().customerId(preferenceRequest.getCustomerId())
+                .emailOnServiceUpdates(preferenceRequest.getEmailOnServiceUpdates())
+                .smsOnServiceUpdates(preferenceRequest.getSmsOnServiceUpdates())
+                .emailOnAppointments(preferenceRequest.getEmailOnAppointments())
+                .smsOnAppointments(preferenceRequest.getSmsOnAppointments())
+                .emailOnReminders(preferenceRequest.getEmailOnReminders())
+                .smsOnReminders(preferenceRequest.getSmsOnReminders())
+                .emailOnOffers(preferenceRequest.getEmailOnOffers()).smsOnOffers(preferenceRequest.getSmsOnOffers())
+                .emailOnQuotationRequests(preferenceRequest.getEmailOnQuotationRequests())
+                .smsOnQuotationRequests(preferenceRequest.getSmsOnQuotationRequests())
+                .status(preferenceRequest.getStatus()).build();
     }
 
     /**
@@ -41,12 +42,12 @@ public class CommunicationPreferenceService {
      */
     @Transactional
     public CommunicationPreference saveOrUpdatePreference(CommunicationPreferenceRequest preference) {
-        Optional<CommunicationPreference> existing = repository.findByCustomerId ( preference.getCustomerId ( ) );
-        if ( existing.isPresent ( ) ) {
-            CommunicationPreference old = existing.get ( );
-            preference.setId ( old.getId ( ) ); // Update
+        Optional<CommunicationPreference> existing = repository.findByCustomerId(preference.getCustomerId());
+        if (existing.isPresent()) {
+            CommunicationPreference old = existing.get();
+            preference.setId(old.getId()); // Update
         }
-        return repository.save ( mapToEntity ( preference ) );
+        return repository.save(mapToEntity(preference));
     }
 
     /**
@@ -58,7 +59,7 @@ public class CommunicationPreferenceService {
      */
     @Transactional
     public Optional<CommunicationPreference> getPreference(Integer customerId) {
-        return repository.findByCustomerId ( customerId );
+        return repository.findByCustomerId(customerId);
     }
 
     /**
@@ -71,7 +72,7 @@ public class CommunicationPreferenceService {
      */
     @Transactional
     public Optional<CommunicationPreference> getPreferenceByIdAndCustomerId(Integer id, Integer customerId) {
-        return repository.findByIdAndCustomerId ( id, customerId );
+        return repository.findByIdAndCustomerId(id, customerId);
     }
 
     /**
@@ -84,7 +85,7 @@ public class CommunicationPreferenceService {
      */
     @Transactional
     public Optional<CommunicationPreference> getPreferenceByCustomerIdAndStatus(Integer customerId, String status) {
-        return repository.findByCustomerIdAndStatus ( customerId, status );
+        return repository.findByCustomerIdAndStatus(customerId, status);
     }
 
     /**
@@ -94,7 +95,7 @@ public class CommunicationPreferenceService {
      */
     @Transactional
     public void deletePreference(Integer id) {
-        repository.deleteById ( id );
+        repository.deleteById(id);
     }
 
     /**
@@ -106,10 +107,10 @@ public class CommunicationPreferenceService {
      */
     @Transactional
     public CommunicationPreference updatePreference(CommunicationPreference preference) {
-        Optional<CommunicationPreference> existing = repository.findByIdAndCustomerId ( preference.getId ( ),
-                preference.getCustomerId ( ) );
-        if ( existing.isPresent ( ) ) {
-            return repository.save ( preference );
+        Optional<CommunicationPreference> existing = repository.findByIdAndCustomerId(preference.getId(),
+                preference.getCustomerId());
+        if (existing.isPresent()) {
+            return repository.save(preference);
         }
         return null; // or throw an exception
     }
@@ -123,23 +124,23 @@ public class CommunicationPreferenceService {
      * @return true if communication is allowed, false if within DND period.
      */
     public boolean isWithinAllowedTime(CommunicationPreference pref, LocalTime now) {
-        if ( pref.getDoNotDisturbStart ( ) == null || pref.getDoNotDisturbEnd ( ) == null ) {
+        if (pref.getDoNotDisturbStart() == null || pref.getDoNotDisturbEnd() == null) {
             return true; // No DND restriction
         }
 
-        LocalTime start = pref.getDoNotDisturbStart ( );
-        LocalTime end = pref.getDoNotDisturbEnd ( );
+        LocalTime start = pref.getDoNotDisturbStart();
+        LocalTime end = pref.getDoNotDisturbEnd();
 
-        if ( start.equals ( end ) ) {
+        if (start.equals(end)) {
             return false; // Full-day DND
         }
 
-        if ( start.isBefore ( end ) ) {
+        if (start.isBefore(end)) {
             // Same-day DND window
-            return now.isBefore ( start ) || now.isAfter ( end );
+            return now.isBefore(start) || now.isAfter(end);
         } else {
             // Cross-midnight DND window (e.g., 9PM–7AM)
-            return ! (now.isAfter ( start ) || now.isBefore ( end ));
+            return !(now.isAfter(start) || now.isBefore(end));
         }
     }
 

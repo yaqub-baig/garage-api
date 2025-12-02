@@ -1,7 +1,5 @@
 package com.autoadda.apis.garage.response;
 
-import com.autoadda.apis.garage.entity.Garage;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

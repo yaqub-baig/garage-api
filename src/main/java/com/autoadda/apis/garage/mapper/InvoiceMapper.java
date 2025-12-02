@@ -11,7 +11,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", imports = {DateHelper.class})
 public interface InvoiceMapper {
@@ -49,7 +48,7 @@ public interface InvoiceMapper {
     default List<AppointmentInvoiceBreakDown> toBreakdownList(AppointmentInvoiceRequest request, AppointmentInvoice invoice, Garage garage, AppointmentDetails appointment) {
         return request.getService ( ).stream ( )
                 .map ( service -> toBreakdown ( service, invoice, garage, appointment ) )
-                .collect ( Collectors.toList ( ) );
+                .toList ( );
     }
 
     // ✅ Helper method to calculate net amount

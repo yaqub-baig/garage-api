@@ -43,9 +43,6 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
     List<Garage> findByAccountStatus(Status status);
 
-//	List<Garage> findByChainId(Integer chainId);
-
-//    List<Garage> findByGarageType(String garageType);
 
     Optional<Garage> findByEmail(String emailId);
 
@@ -61,9 +58,6 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
 
     Optional<Garage> findByIdAndAccountStatus(Integer id, Status status);
 
-//	Optional<Garage> findByIdAndChainId(Integer id, Integer chainId);
-
-//    Optional<Garage> findByIdAndGarageType(Integer id, String garageType);
 
     Optional<Garage> findByIdAndGarageBrandName(Integer id, String legalName);
 
@@ -74,10 +68,6 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
     Optional<Garage> findByIdAndPhoneNumber(Integer id, String contactNumber);
 
     Optional<Garage> findByIdAndName(Integer id, String garageName);
-
-//	Optional<Garage> findByIdAndAccountStatusAndChainId(Integer id, Status status, Integer chainId);
-
-//    Optional<Garage> findByIdAndAccountStatusAndGarageType(Integer id, Status status, String garageType);
 
     Optional<Garage> findByIdAndAccountStatusAndGarageBrandName(Integer id, Status status, String legalName);
 

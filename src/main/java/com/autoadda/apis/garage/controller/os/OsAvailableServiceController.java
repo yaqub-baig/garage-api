@@ -1,12 +1,8 @@
 package com.autoadda.apis.garage.controller.os;
 
 import com.autoadda.apis.garage.entity.os.OsAvailableService;
-import com.autoadda.apis.garage.request.os.OsAssignServiceRequest;
 import com.autoadda.apis.garage.response.os.OsGenericResponse;
-import com.autoadda.apis.garage.response.os.OsJobCardResponse;
 import com.autoadda.apis.garage.service.os.OsAvailableServiceService;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

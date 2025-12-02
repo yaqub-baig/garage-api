@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -70,7 +69,7 @@ public class OsAppointmentService {
                 .customerId ( request.getCustomerId ( ) )
                 .scheduleDate ( request.getScheduleDate ( ) )
                 .status ( Status.CONFIRMED )
-                .insert_tms ( DateHelper.dbDate ( ) )
+                .insertTms( DateHelper.dbDate ( ) )
                 .build ( );
         osAppointmentDetailsRepository.save ( osAppointmentDetails );
 
@@ -80,7 +79,7 @@ public class OsAppointmentService {
                 .status ( osAppointmentDetails.getStatus ( ) )
                 .memberId ( request.getMemberId ( ) )
                 .memberType ( request.getMemberType ( ) )
-                .insert_tms ( DateHelper.dbDate ( ) )
+                .insertTms( DateHelper.dbDate ( ) )
                 .build ( ) );
 
         // Services optional
@@ -89,15 +88,15 @@ public class OsAppointmentService {
             List<OsAppointmentServices> services = request.getServiceIds ( ).stream ( )
                     .filter ( Objects::nonNull ) // null serviceId ignore karega
                     .map ( serviceId -> {
-                        OsService OsService = osServiceRepo.findById ( serviceId )
+                        OsService osService = osServiceRepo.findById ( serviceId )
                                 .orElseThrow ( () -> new RuntimeException ( "Service not found" ) );
                         return OsAppointmentServices.builder ( )
                                 .appointmentId ( osAppointmentDetails.getId ( ) )
-                                .osService ( OsService )
+                                .osService ( osService )
                                 .status ( Status.NEW )
                                 .build ( );
                     } )
-                    .collect ( Collectors.toList ( ) );
+                    .toList ( );
 
             serviceRepo.saveAll ( services );
         }
@@ -106,26 +105,7 @@ public class OsAppointmentService {
     }
 
 
-    /**
-     * Retrieves all appointments for a customer, optionally filtered by status.
-     *
-     * @param customerId the ID of the customer.
-     * @param status     the status to filter appointments by, or null for all.
-     * @return a list of AppointmentDetails for the customer.
-     */
-//	@Transactional(readOnly = true)
-//	public List<AppointmentDetails> getCustomerServiceAppointments(Integer customerId, Status status) {
-////		validator.validateCustomer(customerId);
-//
-//		Customer customer = customerRepo.findById(customerId)
-//				.orElseThrow(() -> new RuntimeException("Customer not found"));
-//
-//		if (status == null || Status.ALL.equals(status)) {
-//			return appointmentRepo.findByCustomer_Id(customerId);
-//		} else {
-//			return appointmentRepo.findByCustomer_IdAndStatus(customerId, status);
-//		}
-//	}
+
 
     /**
      * Retrieves all appointments for a garage, optionally filtered by status.
@@ -139,7 +119,7 @@ public class OsAppointmentService {
     public List<OsAppointmentDetails> getOtherServiceAppointment(Integer otherServiceId, Status status)
             throws OtherServiceNotFoundException {
 
-        OtherService service = validator.validateAndGetOtherService ( otherServiceId );
+         validator.validateAndGetOtherService ( otherServiceId );
 
         if ( StringUtils.isEmpty ( status.toString ( ) ) ) {
             return osAppointmentDetailsRepository.findByOtherServiceId ( otherServiceId );
@@ -195,29 +175,11 @@ public class OsAppointmentService {
 
         osAppointmentActivityRepo.save ( OsAppointmentStatusActivity.builder ( ).osAppointmentId ( appointment.getId ( ) )
                 .status ( appointment.getStatus ( ) ).memberId ( request.getMemberId ( ) ).memberType ( request.getMemberType ( ) )
-                .comments ( request.getComments ( ) ).insert_tms ( DateHelper.dbDate ( ) ).build ( ) );
+                .comments ( request.getComments ( ) ).insertTms( DateHelper.dbDate ( ) ).build ( ) );
 
         return appointment;
     }
 
-    /**
-     * Retrieves all appointments for a customer, optionally filtered by status.
-     *
-     * @param customerId the ID of the customer.
-     * @param status     the status to filter appointments by, or null for all.
-     * @return a list of AppointmentDetails for the customer.
-     * @throws CustomerNotFoundException if the customer does not exist.
-     */
-//	@Transactional(readOnly = true)
-//	public List<AppointmentDetails> getAppointmentsByCustomer(Integer customerId, Status status)
-//			throws CustomerNotFoundException {
-//		validator.validateAndGetCustomer(customerId);
-//
-//		if (status == null) {
-//			return appointmentRepo.findByCustomer_Id(customerId);
-//		}
-//		return appointmentRepo.findByCustomer_IdAndStatus(customerId, status);
-//	}
 
     /**
      * Retrieves all appointments for a garage, optionally filtered by status.

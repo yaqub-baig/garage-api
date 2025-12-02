@@ -1,7 +1,6 @@
 package com.autoadda.apis.garage.entity;
 
 import com.autoadda.apis.garage.util.GarageVerificationStatus;
-import com.autoadda.apis.garage.util.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -107,7 +106,7 @@ public class Garage {
     @Column(name = "brands")
     private String brands;
 
-    @Column(name = "models",length = 2000)
+    @Column(name = "models", length = 2000)
     private String models;
 
     @Column(name = "garage_owner_id")
@@ -119,28 +118,28 @@ public class Garage {
 
     @OneToMany
     @JoinColumn(name = "garage_trade_license")
-    private List<MediaFile> tradeLicenseAttachment = new ArrayList<> ( );
+    private List<MediaFile> tradeLicenseAttachment = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "garage_vat_certificate")
-    private List<MediaFile> vatCertificate = new ArrayList<> ( );
+    private List<MediaFile> vatCertificate = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL)
-    private List<GarageService> services = new ArrayList<> ( );
+    private List<GarageService> services = new ArrayList<>();
 
     @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Technician> technicians = new ArrayList<> ( );
+    private List<Technician> technicians = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "garage_images")
-    private List<MediaFile> garageImages = new ArrayList<> ( );
+    private List<MediaFile> garageImages = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {
         isActive = true;
-        createdAt = LocalDateTime.now ( );
+        createdAt = LocalDateTime.now();
         if (resubmissionCount == null) {
             resubmissionCount = 0;
         }
@@ -148,14 +147,14 @@ public class Garage {
 
     @Override
     public boolean equals(Object o) {
-        if ( this == o ) return true;
-        if ( ! (o instanceof Garage) ) return false;
+        if (this == o) return true;
+        if (!(o instanceof Garage)) return false;
         Garage garage = (Garage) o;
-        return Objects.equals ( id, garage.id );
+        return Objects.equals(id, garage.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash ( id );
+        return Objects.hash(id);
     }
 }

@@ -6,6 +6,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public class DateHelper {
+    private DateHelper() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
 
     private static final ZoneId UAE_ZONE = ZoneId.of ( "Asia/Dubai" );
 

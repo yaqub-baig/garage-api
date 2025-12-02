@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface GarageBreakTimeRepository extends JpaRepository<GarageBreakTime, Integer> {
-//    List<GarageBreakTime> findByGarageDetailsIdAndDayOfWeek(Integer garageId, DayOfWeek dayOfWeek);
 
 
     List<GarageBreakTime> findByGarageIdAndDayOfWeek(Integer garageId, DayOfWeek dayOfWeek);

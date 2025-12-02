@@ -94,11 +94,10 @@ public class GarageInventoryService {
         }
 
         // Validate threshold levels
-        if (request.getMinimumStockLevel() != null && request.getMaximumStockLevel() != null) {
-            if (request.getMinimumStockLevel() >= request.getMaximumStockLevel()) {
+        if (request.getMinimumStockLevel() != null && request.getMaximumStockLevel() != null && request.getMinimumStockLevel() >= request.getMaximumStockLevel()) {
                 throw new IllegalArgumentException("Minimum stock level must be less than maximum stock level");
             }
-        }
+
 
         GarageInventoryItem item = GarageInventoryItem.builder()
                 .garage(garage)
@@ -168,11 +167,10 @@ public class GarageInventoryService {
         }
 
         // Validate threshold levels
-        if (item.getMinimumStockLevel() != null && item.getMaximumStockLevel() != null) {
-            if (item.getMinimumStockLevel() >= item.getMaximumStockLevel()) {
+        if (item.getMinimumStockLevel() != null && item.getMaximumStockLevel() != null && item.getMinimumStockLevel() >= item.getMaximumStockLevel()) {
                 throw new IllegalArgumentException("Minimum stock level must be less than maximum stock level");
             }
-        }
+
 
         item = inventoryItemRepo.save(item);
         log.info("Inventory item updated: {}", itemId);
@@ -365,7 +363,7 @@ public class GarageInventoryService {
 
         return items.stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -379,7 +377,7 @@ public class GarageInventoryService {
 
         return items.stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -393,7 +391,7 @@ public class GarageInventoryService {
 
         return items.stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -407,7 +405,7 @@ public class GarageInventoryService {
 
         return items.stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -421,7 +419,7 @@ public class GarageInventoryService {
 
         return transactions.stream()
                 .map(mapper::transactionToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -505,7 +503,7 @@ public class GarageInventoryService {
                     .findByGarageInventoryItemIdOrderByCreatedAtDesc(item.getId())
                     .stream()
                     .filter(alert -> alert.getAlertStatus() == AlertStatus.ACTIVE)
-                    .collect(Collectors.toList());
+                    .toList();
 
             for (InventoryAlert alert : activeAlerts) {
                 alert.resolve(technician, "Stock replenished automatically");
@@ -536,7 +534,7 @@ public class GarageInventoryService {
             throw e;
         } catch (Exception e) {
             log.error("Error calling Part API for part number: {}. Error: {}", partNumber, e.getMessage());
-            throw new RuntimeException("Failed to search Part API: " + e.getMessage());
+            throw new ResourceNotFoundException("Failed to search Part API: " + e.getMessage());
         }
     }
 }

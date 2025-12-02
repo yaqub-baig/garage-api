@@ -41,7 +41,7 @@ public class OsAppointmentDetails {
     private String comments;
 
     @Column(name = "insert_tms")
-    private LocalDate insert_tms;
+    private LocalDate insertTms;
 
     @ManyToOne
     @JoinColumn(name = "other_service_id")

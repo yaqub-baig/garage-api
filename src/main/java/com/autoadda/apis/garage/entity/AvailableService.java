@@ -36,8 +36,4 @@ public class AvailableService {
     @JsonIgnore
     private List<GarageService> garageLinks = new ArrayList<> ( );
 
-//	@OneToMany(mappedBy = "availableService", cascade = CascadeType.ALL, orphanRemoval = true)
-//	@JsonIgnore
-//	private List<OtherServiceBridge> otherGarageLinks = new ArrayList<>();
-
 }

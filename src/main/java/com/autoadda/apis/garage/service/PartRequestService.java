@@ -108,7 +108,7 @@ public class PartRequestService {
                     .build();
             items.add(partRequestItemRepo.save(item));
         }
-
+        log.info("Part saved :: {}", items.size());
         log.info("Part request created/updated successfully with ID: {}", partRequest.getId());
 
         // Send SMS notification to customer
@@ -419,7 +419,7 @@ public class PartRequestService {
         List<PartRequest> partRequests = partRequestRepo.findByCustomerId(customerId);
         return partRequests.stream()
                 .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -430,7 +430,7 @@ public class PartRequestService {
                 customerId, PartRequestStatus.PENDING_CUSTOMER_RESPONSE);
         return partRequests.stream()
                 .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -440,7 +440,7 @@ public class PartRequestService {
         List<PartRequest> partRequests = partRequestRepo.findByJobCard_WorkOrder_Garage_Id(garageId);
         return partRequests.stream()
                 .map(this::convertToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -585,7 +585,7 @@ public class PartRequestService {
             // Only items that were procured by garage need to be added to invoice
             List<PartRequestItem> garageProcuredItems = allItems.stream()
                     .filter(i -> i.getProcurementStatus() == com.autoadda.apis.garage.util.ItemProcurementStatus.PROCURED)
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (!garageProcuredItems.isEmpty()) {
                 boolean allAddedToInvoice = garageProcuredItems.stream()
@@ -634,7 +634,7 @@ public class PartRequestService {
         List<PartRequestItem> items = partRequestItemRepo.findByPartRequestId(partRequest.getId());
         List<PartRequestItemResponse> itemResponses = items.stream()
                 .map(this::convertItemToResponse)
-                .collect(Collectors.toList());
+                .toList();
 
         // Convert customer response if exists
         CustomerPartResponseResponse customerResponseResponse = null;

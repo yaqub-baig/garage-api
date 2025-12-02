@@ -20,11 +20,7 @@ public class InvoiceController {
 
     private final InvoiceService invoiceService;
 
-//    @PostMapping("/prepare")
-//    public ResponseEntity<GenericResponse> prepareInvoice(@RequestBody AppointmentInvoiceRequest request) {
-//        AppointmentInvoiceResponse invoice = invoiceService.prepareInvoice ( request );
-//        return ResponseEntity.ok ( GenericResponse.success ( "Invoice prepared", invoice ) );
-//    }
+
 
     @PutMapping("/pay")
     public ResponseEntity<GenericResponse> payInvoice(@RequestBody InvoicePayRequest request) {

@@ -8,7 +8,6 @@ import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.service.GarageManagementService;
 import com.autoadda.apis.garage.util.GarageVerificationStatus;
-import com.autoadda.apis.garage.util.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +17,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,7 +61,7 @@ class GarageServiceTest {
     }
 
     @Test
-    void testCreateGarage() throws IOException {
+    void testCreateGarage()  {
         when ( garageRepository.save ( any ( Garage.class ) ) ).thenReturn ( sampleGarageEntity );
         String autoAddaId = "101";
         GarageResponse result = garageService.createGarage ( sampleGarageRequest, autoAddaId ) ;
@@ -88,23 +86,6 @@ class GarageServiceTest {
         assertEquals ( "QuickFix", result.get ( ).getName ( ) );
     }
 
-//    @Test
-//    void testUpdateGarageSuccess() {
-//        when ( garageRepository.findById ( 1 ) ).thenReturn ( Optional.of ( sampleGarageEntity ) );
-//        when ( garageRepository.save ( any ( Garage.class ) ) ).thenReturn ( sampleGarageEntity );
-//
-//        GarageRequest updatedRequest = new GarageRequest ( );
-//        updatedRequest.setName ( "SpeedFix" );
-//        updatedRequest.setGarageBrandName ( "SpeedFix Inc" );
-//        updatedRequest.setPhoneNumber ( "9998887777" );
-//
-//        Garage updatedGarage = garageService.updateGarage ( 1, updatedRequest );
-//
-//        assertNotNull ( updatedGarage );
-//        assertEquals ( "SpeedFix", updatedGarage.getName ( ) );
-//        assertEquals ( "SpeedFix Inc", updatedGarage.getGarageBrandName ( ) );
-//        assertEquals ( "9998887777", updatedGarage.getPhoneNumber ( ) );
-//    }
 
     @Test
     void testSoftDeleteGarage() {

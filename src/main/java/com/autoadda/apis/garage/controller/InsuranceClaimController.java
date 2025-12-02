@@ -4,7 +4,7 @@ import com.autoadda.apis.garage.entity.InsuranceClaim;
 import com.autoadda.apis.garage.entity.InsuranceClaimDocument;
 import com.autoadda.apis.garage.service.InsuranceClaimService;
 import com.autoadda.apis.garage.util.Status;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +14,10 @@ import java.util.List;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/insurance-claims")
+@RequiredArgsConstructor
 public class InsuranceClaimController {
 
-    @Autowired
-    private InsuranceClaimService claimService;
+    private final InsuranceClaimService claimService;
 
     @PostMapping
     public ResponseEntity<InsuranceClaim> submitClaim(@RequestBody InsuranceClaim claim) {

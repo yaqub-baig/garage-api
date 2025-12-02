@@ -6,16 +6,16 @@ import com.autoadda.apis.garage.util.ReferralUtil;
 import com.autoadda.apis.garage.util.ReferredEntityType;
 import com.autoadda.apis.garage.util.ReferrerType;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class ReferralService {
 
-    @Autowired
-    private ReferralRepository referralRepository;
+    private  final ReferralRepository referralRepository;
 
     /**
      * Creates a referral code for a given referrer type and ID.

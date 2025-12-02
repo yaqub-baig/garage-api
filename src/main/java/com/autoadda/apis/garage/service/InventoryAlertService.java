@@ -36,7 +36,7 @@ public class InventoryAlertService {
 
         return alerts.stream()
                 .map(mapper::alertToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -49,7 +49,7 @@ public class InventoryAlertService {
 
         return alerts.stream()
                 .map(mapper::alertToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -114,6 +114,6 @@ public class InventoryAlertService {
 
         return alerts.stream()
                 .map(mapper::alertToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

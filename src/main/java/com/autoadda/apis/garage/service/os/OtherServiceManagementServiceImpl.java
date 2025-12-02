@@ -275,7 +275,6 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         existing.getServices().addAll(otherServiceBridges);
 
 // Now save the entity
-        // otherServiceRepository.save(existing);
         return otherServiceRepository.save(existing);
     }
 
@@ -299,17 +298,6 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         return garageServices;
     }
 
-    private void handleGarageServices(OtherServiceRequest request, OtherService existing) {
-        if (request.getOsServiceIds() != null && !request.getOsServiceIds().isEmpty()) {
-            existing.getServices().clear();
-            request.getOsServiceIds().forEach(id -> {
-                otherServiceBridgeManagementService.getOtherServiceBridgeById(id)
-                        .map((OtherServiceBridge gs) -> existing.getServices().add(gs))
-                        .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
-            });
-
-        }
-    }
 
     @Override
     @Transactional
@@ -402,22 +390,10 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
                 }
             }
 
-            if (StringUtils.isNotEmpty(garageName)) {
-                if (!garage.getName().toLowerCase().contains(garageName.toLowerCase())) {
+            if (StringUtils.isNotEmpty(garageName) && !garage.getName().toLowerCase().contains(garageName.toLowerCase())) {
                     nameCheck = false;
                 }
-            }
 
-//            if ( StringUtils.isNotEmpty ( brand ) ) {
-//                if ( ! garage.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
-//                    brandCheck = false;
-//                }
-//            }
-//            if ( StringUtils.isNotEmpty ( model ) ) {
-//                if ( ! garage.getModels ( ).toLowerCase ( ).contains ( model.toLowerCase ( ) ) ) {
-//                    modelCheck = false;
-//                }
-//            }
 
             if (availableServiceIds != null && !availableServiceIds.isEmpty()) {
 

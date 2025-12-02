@@ -25,7 +25,7 @@ public class AdditionalRequestService {
     public JobCardAdditionalRequest createAdditionalRequest(JobCardAdditionalAPIRequest request) {
         JobCardAdditionalRequest additionalRequest = JobCardAdditionalRequest.builder ( ).garageId ( request.getGarageId ( ) )
                 .customerId ( request.getCustomerId ( ) ).technicianId ( request.getTechnicianId ( ) ).status ( Status.REQUESTED )
-                .requestType ( request.getRequestType ( ) ).comments ( request.getComments ( ) ).insert_tms ( DateHelper.dbDate ( ) )
+                .requestType ( request.getRequestType ( ) ).comments ( request.getComments ( ) ).insertTms( DateHelper.dbDate ( ) )
                 .build ( );
 
         return additionalRequestRepo.save ( additionalRequest );
@@ -50,7 +50,6 @@ public class AdditionalRequestService {
      * Deletes an additional request by its ID.
      *
      * @param requestId the ID of the additional request to delete
-     * @return true if the request was deleted, false if it did not exist
      * @return true if the request was deleted, false if it did not exist
      */
     @Transactional

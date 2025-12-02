@@ -5,7 +5,6 @@ package com.autoadda.apis.garage.exception;
  */
 public class OtherServiceNotFoundException extends RuntimeException {
 
-    private String message;
 
     public OtherServiceNotFoundException() {
         super();
@@ -13,7 +12,7 @@ public class OtherServiceNotFoundException extends RuntimeException {
 
     public OtherServiceNotFoundException(String message) {
         super(message);
-        this.message = message;
+
     }
 
     public OtherServiceNotFoundException(String message, Throwable cause) {

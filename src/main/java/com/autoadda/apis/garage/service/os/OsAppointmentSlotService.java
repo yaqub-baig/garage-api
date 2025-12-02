@@ -36,7 +36,7 @@ public class OsAppointmentSlotService {
     private final OsSlotService slotService;
     private final OsSlotRepository slotRepository;
     private final OsAppointmentDetailMapper appointmentDetailMapper;
-    private final OsServiceRepository OsServiceRepository;
+    private final OsServiceRepository osServiceRepository;
     private final OsAppointmentServiceRepository appointmentServiceRepository;
 
     /**
@@ -133,19 +133,19 @@ public class OsAppointmentSlotService {
                 .selectedOtherServiceIds ( selectedOtherServiceIds )
                 .appointmentReferenceId ( appointmentService.generateAppointmentCode ( ) )
                 .slot ( slot )
-                .insert_tms ( DateHelper.dbDate ( ) ).build ( );
+                .insertTms( DateHelper.dbDate ( ) ).build ( );
         slotService.incrementSlotBookings ( slot.getId ( ) );
         OsAppointmentDetails save = bookingRepo.save ( appointment );
-        generateAppointmentServices(save, selectedOtherServiceIds, otherServiceId);
+        generateAppointmentServices(save, selectedOtherServiceIds);
         return appointmentDetailMapper.entityToResponse (save);
     }
 
-    private void generateAppointmentServices(OsAppointmentDetails appointment, String selectedOtherServiceIds, Integer otherServiceId) {
+    private void generateAppointmentServices(OsAppointmentDetails appointment, String selectedOtherServiceIds) {
         List<Integer> serviceIds = Arrays.stream ( selectedOtherServiceIds.split ( "," ) )
                 .map ( Integer::parseInt )
                 .toList ( ) ;
 
-        List<OsService> services = OsServiceRepository.findAllById ( serviceIds );
+        List<OsService> services = osServiceRepository.findAllById ( serviceIds );
 
         List<com.autoadda.apis.garage.entity.os.OsAppointmentServices> appointmentServices = services.stream ( )
                 .map ( service -> com.autoadda.apis.garage.entity.os.OsAppointmentServices.builder ( )

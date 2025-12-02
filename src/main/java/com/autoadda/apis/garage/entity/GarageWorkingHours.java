@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Setter
 @Getter
 public class GarageWorkingHours {
-    final private int slotDurationMinutes = 20;
+    private final int slotDurationMinutes = 20;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

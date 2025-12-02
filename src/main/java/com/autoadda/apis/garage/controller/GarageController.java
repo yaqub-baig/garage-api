@@ -54,7 +54,7 @@ public class GarageController {
     @PutMapping("/{id}")
     public ResponseEntity<GarageResponse> updateGarage(@PathVariable Integer id,
                                                        @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
-                                                       @RequestBody GarageRequest garage) throws IOException {
+                                                       @RequestBody GarageRequest garage){
 
         return ResponseEntity.ok ( garageService.updateGarage ( id, garage ) );
     }
@@ -86,7 +86,7 @@ public class GarageController {
     }
 
     @GetMapping("/brandname/{name}")
-    public ResponseEntity<List<GarageResponse>> searchByLegalName(@RequestParam String name) {
+    public ResponseEntity<List<GarageResponse>> searchByLegalName(@PathVariable String name) {
         return ResponseEntity.ok ( garageService.findGaragesByLegalName ( name ) );
     }
 

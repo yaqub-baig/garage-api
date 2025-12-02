@@ -7,7 +7,6 @@ import com.autoadda.apis.garage.repository.InsuranceClaimRepository;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,11 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InsuranceClaimService {
 
-    @Autowired
-    private InsuranceClaimRepository claimRepo;
-
-    @Autowired
-    private InsuranceClaimDocumentRepository docRepo;
+    private final InsuranceClaimRepository claimRepo;
+    private final InsuranceClaimDocumentRepository docRepo;
 
     /**
      * Submits a new insurance claim.

@@ -125,14 +125,12 @@ public class InvoiceService {
                 appointment.setStatus ( Status.READY_FOR_DELIVERY );
                 appointmentRepo.save ( appointment );
             }
-        } else if ( request.getPaymentStatus ( ) == InvoiceStatus.PENDING ) {
-            // If payment is pending, update WorkOrder status accordingly
-            if ( workOrder.getStatus ( ) == WorkOrderStatus.INVOICE_INITIATED ||
-                 workOrder.getStatus ( ) == WorkOrderStatus.INVOICED ) {
+        } else if ( request.getPaymentStatus ( ) == InvoiceStatus.PENDING && (workOrder.getStatus ( ) == WorkOrderStatus.INVOICE_INITIATED ||
+                 workOrder.getStatus ( ) == WorkOrderStatus.INVOICED) ) {
                 workOrder.updateStatus ( WorkOrderStatus.PENDING_PAYMENT );
                 workOrderRepository.save ( workOrder );
             }
-        }
+
 
         return invoiceResponseMapper.toResponse ( invoiceRepository.save ( invoice ) );
     }
@@ -140,7 +138,7 @@ public class InvoiceService {
     /**
      * Retrieves all invoices for a specific garage.
      *
-     * @param garageId the ID of the garage
+     * @param workOrderId the ID of the garage
      * @return a list of AppointmentInvoices for the specified garage
      */
     @Transactional
@@ -177,30 +175,13 @@ public class InvoiceService {
             workOrderRepository.save ( workOrder );
         }
 
-//		double totalCost = lineItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
-//		int pointsValue = pointsToRedeem; // 1 point = $1 for example
-//		BigDecimal discount = BigDecimal.valueOf(pointsValue);
-//
-//		if (discount.compareTo(totalCost) > 0) {
-//			discount = totalCost;
-//			pointsToRedeem = discount.intValue();
-//		}
-//
-//		BigDecimal amountPaid = totalCost.subtract(discount);
-//
-//		loyaltyService.applyLoyaltyPoints(owner, pointsToRedeem);
-//		int pointsEarned = loyaltyService.calculateEarnedPoints(amountPaid);
-//		loyaltyService.rewardPoints(owner, pointsEarned);
-//		invoice.setLoyaltyPointsUsed(pointsToRedeem);
-//		invoice.setTotalAmount(total);
-
         return invoiceRepository.save ( invoice );
     }
 
     /**
      * Retrieves all invoices for a specific garage.
      *
-     * @param garageId the ID of the garage
+     * @param id the ID of the garage
      * @return a list of AppointmentInvoices for the specified garage
      */
     @Transactional
@@ -208,16 +189,7 @@ public class InvoiceService {
         return invoiceRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException ( "Invoice not found" ) );
     }
 
-    /**
-     * Retrieves all invoices for a specific garage.
-     *
-     * @param garageId the ID of the garage
-     * @return a list of AppointmentInvoices for the specified garage
-     */
-//	@Transactional
-//	public List<Invoice> getInvoicesForGarage(Integer garageId) {
-//		return invoiceRepository.findByWorkOrderJobCardGarageId(garageId);
-//	}
+
 
     /**
      * Retrieves all invoices for a specific garage (through WorkOrder).
@@ -245,7 +217,7 @@ public class InvoiceService {
 
         WorkOrder workOrder = invoice.getWorkOrder ( );
 
-        if ( invoice.getIsPaid ( ) ) {
+        if (Boolean.TRUE.equals(invoice.getIsPaid ( )) ) {
             // Update WorkOrder status when payment is received
             if ( workOrder.getStatus ( ) != WorkOrderStatus.PAYMENT_RECEIVED ) {
                 workOrder.updateStatus ( WorkOrderStatus.PAYMENT_RECEIVED );
@@ -388,7 +360,7 @@ public class InvoiceService {
             String customerPhone = vehicleDetails.getOwner ( ).getMobileNumber ( );
 
             // Create SMS message with invoice details
-            String message = buildInvoiceMessage ( invoice, workOrder, appointment, vehicleDetails );
+            String message = buildInvoiceMessage ( invoice, workOrder, vehicleDetails );
 
             // Send SMS
             SmsRequest smsRequest = new SmsRequest ( customerPhone, message );
@@ -414,7 +386,7 @@ public class InvoiceService {
     /**
      * Builds the SMS message for invoice notification
      */
-    private String buildInvoiceMessage(Invoice invoice, WorkOrder workOrder, AppointmentDetails appointment, VehicleDetailResponse vehicleDetails) {
+    private String buildInvoiceMessage(Invoice invoice, WorkOrder workOrder, VehicleDetailResponse vehicleDetails) {
         StringBuilder message = new StringBuilder ( );
 
         // Header
@@ -464,15 +436,5 @@ public class InvoiceService {
         return message.toString ( );
     }
 
-    /**
-     * Retrieves all invoices created within a specific date range.
-     *
-     * @param startDate the start date of the range
-     * @param endDate   the end date of the range
-     * @return a list of invoices created within the specified date range
-     */
-//	@Transactional
-//	public List<Invoice> getInvoicesByDateRange(LocalDate startDate, LocalDate endDate) {
-//		return invoiceRepository.findByCreatedDateBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
-//	}
+
 }

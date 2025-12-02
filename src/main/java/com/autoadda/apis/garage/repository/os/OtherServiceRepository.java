@@ -28,9 +28,6 @@ public interface OtherServiceRepository extends JpaRepository<OtherService, Inte
     // Find by status
     List<OtherService> findByAccountStatus(Status status);
 
-    // Find by chain ID
-//    List<OtherService> findByChainId(Integer chainId);
-
     // Find by email
     Optional<OtherService> findByEmail(String email);
 
@@ -55,8 +52,6 @@ public interface OtherServiceRepository extends JpaRepository<OtherService, Inte
     // Find by status and active status
     List<OtherService> findByAccountStatusAndIsActiveTrue(Status status);
 
-    // Find by chain ID and active status
-//    List<OtherService> findByChainIdAndIsActiveTrue(Integer chainId);
 
     // Find by email and active status
     Optional<OtherService> findByEmailAndIsActiveTrue(String email);
@@ -65,8 +60,6 @@ public interface OtherServiceRepository extends JpaRepository<OtherService, Inte
     @Query("SELECT o FROM OtherService o WHERE (o.phoneNumber = :contact OR o.mobileNumber = :contact) AND o.isActive = true")
     List<OtherService> findByPhoneNumberOrMobileNumberAndIsActiveTrue(@Param("contact") String contact);
 
-    // Find by company owner ID and active status
-    List<OtherService> findByCompanyOwnerAndIsActiveTrue(Integer ownerId);
 
     // Count references to media files
     @Query("SELECT COUNT(o) FROM OtherService o WHERE o.companyLogo.id = :mediaFileId")

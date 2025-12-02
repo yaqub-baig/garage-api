@@ -158,12 +158,12 @@ public class GarageManagementService {
     private List<GarageService> handleGarageService(GarageRequest garageRequest, Garage save) {
         List<GarageService> garageServices = new ArrayList<> ( );
         if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
-            garageRequest.getGarageServiceIds ( ).forEach ( sId -> {
+            garageRequest.getGarageServiceIds ( ).forEach ( sId ->
                 availableServiceRepository.findById ( sId )
                         .map ( availableService -> garageServiceManagementService.createGarageService (
                                 new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
-            } );
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) )
+             );
         }
         return garageServices;
     }
@@ -188,13 +188,13 @@ public class GarageManagementService {
                     .toList ( );
 
             // Create only NEW garage services
-            newServiceIds.forEach ( sId -> {
+            newServiceIds.forEach ( sId ->
                 availableServiceRepository.findById ( sId )
                         .map ( availableService -> garageServiceManagementService.createGarageService (
                                 new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) )
                         .map ( garageServices::add )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) );
-            } );
+                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) )
+            );
         }
         return garageServices;
     }
@@ -354,18 +354,6 @@ public class GarageManagementService {
         return garageMapper.entityToResponse ( save );
     }
 
-    private void handleGarageServices(GarageRequest request, Garage existing) {
-        if ( request.getGarageServiceIds ( ) != null && ! request.getGarageServiceIds ( ).isEmpty ( ) ) {
-            existing.getServices ( ).clear ( );
-            request.getGarageServiceIds ( ).forEach ( id -> {
-                garageServiceManagementService.getGarageServiceById ( id )
-                        .map ( (GarageService gs) -> existing.getServices ( ).add ( gs ) )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) );
-            } );
-        }
-
-    }
-
     private void handleVatCertificates(GarageRequest request, Garage existing, List<Long> filesToCleanup) {
         if ( request.getVatCertificateIds ( ) != null && ! request.getVatCertificateIds ( ).isEmpty ( ) ) {
             // Schedule old VAT certificates for cleanup
@@ -507,15 +495,7 @@ public class GarageManagementService {
         return garageRepository.findByAccountStatus ( status );
     }
 
-//	@Transactional
-//    public List<Garage> findGaragesByChainId(Integer chainId) {
-//        return garageRepository.findByChainId ( chainId );
-//    }
 
-//    @Transactional
-//    public List<Garage> findGaragesByType(String type) {
-//        return garageRepository.findByGarageType ( type );
-//    }
 
     @Transactional
     public Optional<Garage> findGarageByEmail(String email) {
@@ -637,7 +617,7 @@ public class GarageManagementService {
             log.info ( " 4 enabledGarages -> " );
             if ( StringUtils.isNotEmpty ( city ) ) {
                 log.info ( " 5 enabledGarages -> " );
-                if ( ! address.getCity ( ).toLowerCase ( ).equalsIgnoreCase ( city.toLowerCase ( ) ) ) {
+                if ( ! address.getState ( ).toLowerCase ( ).equalsIgnoreCase ( city.toLowerCase ( ) ) ) {
                     cityCheck = false;
                 }
             }
@@ -649,22 +629,19 @@ public class GarageManagementService {
                 }
             }
 
-            if ( StringUtils.isNotEmpty ( garageName ) ) {
-                if ( ! garage.getName ( ).toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
+            if ( StringUtils.isNotEmpty ( garageName ) && ! garage.getName ( ).toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
                     nameCheck = false;
                 }
-            }
 
-            if ( StringUtils.isNotEmpty ( brand ) ) {
-                if ( ! garage.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
+
+            if ( StringUtils.isNotEmpty ( brand ) && ! garage.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
                     brandCheck = false;
                 }
-            }
-            if ( StringUtils.isNotEmpty ( model ) ) {
-                if ( ! garage.getModels ( ).toLowerCase ( ).contains ( model.toLowerCase ( ) ) ) {
+
+            if ( StringUtils.isNotEmpty ( model ) && ! garage.getModels ( ).toLowerCase ( ).contains ( model.toLowerCase ( ) ) ) {
                     modelCheck = false;
                 }
-            }
+
 
             if ( availableServiceIds != null && ! availableServiceIds.isEmpty ( ) ) {
 

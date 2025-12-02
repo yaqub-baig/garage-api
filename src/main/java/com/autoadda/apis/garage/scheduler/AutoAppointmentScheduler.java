@@ -36,7 +36,6 @@ public class AutoAppointmentScheduler {
 
                 if ( ! alreadyScheduled ) {
                     FutureAppointment appointment = new FutureAppointment ( );
-                    // appointment.setId(UUID.randomUUID().toString());
                     appointment.setVehicleId ( vehicle.getId ( ) );
                     appointment.setServiceType ( rule.getServiceType ( ) );
                     appointment.setScheduledDate ( nextDate );

@@ -4,7 +4,7 @@ import com.autoadda.apis.garage.entity.RoadsideAssistance;
 import com.autoadda.apis.garage.repository.RoadsideAssistanceRepository;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,10 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class RoadsideAssistanceService {
 
-    @Autowired
-    private RoadsideAssistanceRepository assistanceRepository;
+
+    private final RoadsideAssistanceRepository assistanceRepository;
 
     /**
      * Creates a new roadside assistance request.
@@ -25,9 +26,9 @@ public class RoadsideAssistanceService {
      */
     @Transactional
     public RoadsideAssistance createRequest(RoadsideAssistance request) {
-        request.setStatus ( Status.REQUESTED );
-        request.setRequestTime ( LocalDateTime.now ( ) );
-        return assistanceRepository.save ( request );
+        request.setStatus(Status.REQUESTED);
+        request.setRequestTime(LocalDateTime.now());
+        return assistanceRepository.save(request);
     }
 
     /**
@@ -37,7 +38,7 @@ public class RoadsideAssistanceService {
      */
     @Transactional
     public List<RoadsideAssistance> getRequestsByOwner(Integer ownerId) {
-        return assistanceRepository.findByVehicleOwnerId ( ownerId );
+        return assistanceRepository.findByVehicleOwnerId(ownerId);
     }
 
     /**
@@ -50,14 +51,14 @@ public class RoadsideAssistanceService {
      */
     @Transactional
     public RoadsideAssistance updateStatus(Integer requestId, Status status, String remarks) {
-        RoadsideAssistance request = assistanceRepository.findById ( requestId )
-                .orElseThrow ( () -> new RuntimeException ( "Request not found" ) );
-        request.setStatus ( status );
-        if ( status == Status.COMPLETED ) {
-            request.setCompletedAt ( LocalDateTime.now ( ) );
+        RoadsideAssistance request = assistanceRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        request.setStatus(status);
+        if (status == Status.COMPLETED) {
+            request.setCompletedAt(LocalDateTime.now());
         }
-        request.setRemarks ( remarks );
-        return assistanceRepository.save ( request );
+        request.setRemarks(remarks);
+        return assistanceRepository.save(request);
     }
 
     /**
@@ -69,6 +70,6 @@ public class RoadsideAssistanceService {
      */
     @Transactional
     public Optional<RoadsideAssistance> getRequestById(Integer id) {
-        return assistanceRepository.findById ( id );
+        return assistanceRepository.findById(id);
     }
 }

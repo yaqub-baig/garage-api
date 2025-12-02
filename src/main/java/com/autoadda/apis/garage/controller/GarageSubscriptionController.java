@@ -31,12 +31,6 @@ public class GarageSubscriptionController {
         return garageSubscriptionService.getPlansByGarage ( garageId );
     }
 
-//	@PostMapping("/{garageId}")
-//	public ResponseEntity<List<GarageSubscription>> createPlan(@PathVariable Integer garageId,
-//			@RequestBody GarageSubscription plan) {
-//
-//		return ResponseEntity.ok(garageSubscriptionService.createPlan(garageId, plan));
-//	}
 
     @GetMapping("/{id}")
     public ResponseEntity<GarageSubscriptionResponse> getPlanById(@PathVariable Integer id) {

@@ -164,7 +164,7 @@ class GarageWorkflowIntegrationTest {
 					item.setPrice(availableSrc.getPrice());
 					item.setQuantity(1); // or however quantity is determined
 					return item;
-				}).collect(Collectors.toList());
+				}).toList();
 		assertFalse(lineItems.isEmpty(), "Line items should not be empty after job card completion");
 
 		// Step 9: Generate Invoice using dynamic line items

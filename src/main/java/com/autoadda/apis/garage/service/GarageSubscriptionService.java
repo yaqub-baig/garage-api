@@ -86,7 +86,7 @@ public class GarageSubscriptionService {
         newPlan.setBenefits ( plan.getBenefits ( ) );
         newPlan.setServicesIncluded ( services ); // Set all at once
         newPlan.setServiceQuantity ( plan.getServices ( ) );
-        System.out.println ( "About to save subscription with " + services.size ( ) + " services" );
+        log.info ( "About to save subscription with " + services.size ( ) + " services" );
 
         return subscriptionRepository.save ( newPlan );
     }
@@ -99,8 +99,7 @@ public class GarageSubscriptionService {
      */
     @Transactional
     public List<GarageSubscriptionResponse> getPlansByGarage(Integer garageId) {
-//		return subscriptionRepository.findAll().stream().filter(p -> p.getGarage().getId().equals(garageId))
-//				.collect(Collectors.toList());
+
         return subscriptionRepository.findByGarageId ( garageId )
                 .stream()
                 .map(garageSubscriptionMapper::toResponse)
@@ -186,17 +185,14 @@ public class GarageSubscriptionService {
             }
 
 
-            if ( StringUtils.isNotEmpty ( garageName ) ) {
-                if ( ! plan.getGarage ( ).getName ( ).toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
+            if ( StringUtils.isNotEmpty ( garageName ) && ! plan.getGarage ( ).getName ( ).toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
                     nameCheck = false;
                 }
-            }
 
-            if ( StringUtils.isNotEmpty ( brand ) ) {
-                if ( ! plan.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
+
+            if ( StringUtils.isNotEmpty ( brand ) && ! plan.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
                     brandCheck = false;
                 }
-            }
 
 
             if ( cityCheck && nameCheck && brandCheck ) {
@@ -254,10 +250,7 @@ public class GarageSubscriptionService {
 
     public GarageSubscriptionResponse changeStatus(Integer id) {
         GarageSubscription subscriptionPlan = subscriptionRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
-        if ( subscriptionPlan.getIsActive ( ) )
-            subscriptionPlan.setIsActive ( false );
-        else
-            subscriptionPlan.setIsActive ( true );
+        subscriptionPlan.setIsActive (!Boolean.TRUE.equals(subscriptionPlan.getIsActive()));
         GarageSubscription saved = subscriptionRepository.save ( subscriptionPlan );
         return garageSubscriptionMapper.toResponse(saved);
 

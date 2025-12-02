@@ -91,7 +91,7 @@ public class JobCardService {
                 .memberId ( request.getMemberId ( ) )
                 .memberType ( request.getMemberType ( ) )
                 .comments ( request.getComments ( ) )
-                .insert_tms ( DateHelper.dbDate ( ) )
+                .insertTms( DateHelper.dbDate ( ) )
                 .build ( ) );
 
         log.info ( "8" );
@@ -110,8 +110,6 @@ public class JobCardService {
         AppointmentServices service = appointmentServiceRepo.findById ( request.getServiceId ( ) )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) );
 
-//		Garage garage = garageRepo.findById(request.getGarageId())
-//				.orElseThrow(() -> new ResourceNotFoundException ("Garage not found"));
         WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "WorkOrder not found" ) );
         Technician technician = technicianRepo.findById ( request.getTechnicianId ( ) )
@@ -138,7 +136,7 @@ public class JobCardService {
                 .memberId ( request.getMemberId ( ) )
                 .memberType ( request.getMemberType ( ) )
                 .comments ( request.getComments ( ) )
-                .insert_tms ( DateHelper.dbDate ( ) )
+                .insertTms( DateHelper.dbDate ( ) )
                 .build ( ) );
 
         service.setStatus ( Status.ASSIGNED );
@@ -203,12 +201,11 @@ public class JobCardService {
                 request.getJobcardId(), request.getStatus());
 
         // Auto-set status to WAITING_FOR_PARTS if part items are provided but status is null
-        if (request.getPartRequestItems() != null && !request.getPartRequestItems().isEmpty()) {
-            if (request.getStatus() == null) {
+        if (request.getPartRequestItems() != null && !request.getPartRequestItems().isEmpty() && request.getStatus() == null) {
                 request.setStatus(JobCardStatus.WAITING_FOR_PARTS);
                 log.info("Auto-setting status to WAITING_FOR_PARTS since part items are provided");
             }
-        }
+
 
         // If status is WAITING_FOR_PARTS, validate that part details are provided
         if (request.getStatus() == JobCardStatus.WAITING_FOR_PARTS) {

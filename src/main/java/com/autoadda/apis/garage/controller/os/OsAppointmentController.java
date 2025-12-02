@@ -1,18 +1,10 @@
 package com.autoadda.apis.garage.controller.os;
 
 
-import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.entity.os.OsAppointmentDetails;
-import com.autoadda.apis.garage.entity.os.OsAppointmentServices;
-import com.autoadda.apis.garage.exception.GarageNotFoundException;
 import com.autoadda.apis.garage.exception.OtherServiceNotFoundException;
-import com.autoadda.apis.garage.request.AppointmentStatusRequest;
-import com.autoadda.apis.garage.request.CustomerAppointmentRequest;
 import com.autoadda.apis.garage.request.os.OsAppointmentStatusRequest;
 import com.autoadda.apis.garage.request.os.OsCustomerAppointmentRequest;
-import com.autoadda.apis.garage.response.AppointmentDetailResponse;
-import com.autoadda.apis.garage.response.AppointmentResponse;
-import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.OsAppointmentResponse;
 import com.autoadda.apis.garage.response.os.OsAppointmentDetailResponse;
 import com.autoadda.apis.garage.response.os.OsGenericResponse;
@@ -47,14 +39,14 @@ public class OsAppointmentController {
     }
 
     @PostMapping("/{serviceId}/book")
-    public ResponseEntity<?> bookAppointment(@PathVariable Integer otherServiceId, @RequestParam Integer vehicleId,
+    public ResponseEntity<?> bookAppointment(@PathVariable Integer serviceId, @RequestParam Integer vehicleId,
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
                                              @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
                                              @RequestParam(required = false) String selectedOtherServiceIds) {
         try {
             LocalDate date = time.toLocalDate ( );
             LocalTime timestamp = time.toLocalTime ( );
-            OsAppointmentDetailResponse booking = appointmentSlotService.bookSlot ( otherServiceId, vehicleId, date, timestamp, autoAddaId, selectedOtherServiceIds );
+            OsAppointmentDetailResponse booking = appointmentSlotService.bookSlot ( serviceId, vehicleId, date, timestamp, autoAddaId, selectedOtherServiceIds );
             return ResponseEntity.ok ( booking );
         }
         catch ( IllegalStateException e ) {

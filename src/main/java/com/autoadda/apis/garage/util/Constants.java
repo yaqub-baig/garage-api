@@ -1,6 +1,9 @@
 package com.autoadda.apis.garage.util;
 
 public class Constants {
+    private Constants() {
+        throw new UnsupportedOperationException("Utility class cannot be instantiated");
+    }
 
     //member type
     public static final String NEW = "NEW";

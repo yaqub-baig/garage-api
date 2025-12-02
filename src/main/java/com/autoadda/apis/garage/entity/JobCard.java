@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,14 +73,14 @@ public class JobCard {
     @MapKeyEnumerated(EnumType.STRING)
     @Column(name = "timestamp")
     @Builder.Default
-    private Map<JobCardStatus, LocalDateTime> statusTimestamps = new HashMap<> ( );
+    private Map<JobCardStatus, LocalDateTime> statusTimestamps = new EnumMap<>(JobCardStatus.class );
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now ( );
         status = JobCardStatus.CREATED;
         if ( statusTimestamps == null ) {
-            statusTimestamps = new HashMap<> ( );
+            statusTimestamps = new EnumMap<> (JobCardStatus.class );
         }
         // Record the initial CREATED status timestamp
         statusTimestamps.put ( JobCardStatus.CREATED, LocalDateTime.now ( ) );

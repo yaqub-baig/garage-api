@@ -3,47 +3,49 @@ package com.autoadda.apis.garage.controller;
 import com.autoadda.apis.garage.entity.LoyaltyPoint;
 import com.autoadda.apis.garage.entity.LoyaltyTransaction;
 import com.autoadda.apis.garage.service.LoyaltyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/loyalty")
+@RequiredArgsConstructor
 public class LoyaltyController {
 
-    @Autowired
-    private LoyaltyService loyaltyService;
+
+    private final LoyaltyService loyaltyService;
 
     @PostMapping("/earn")
     public ResponseEntity<String> earnPoints(@RequestParam Integer ownerId, @RequestParam Integer garageId,
                                              @RequestParam int points, @RequestParam String reason) {
-        loyaltyService.addPoints ( ownerId, garageId, points, reason );
-        return ResponseEntity.ok ( "Points added" );
+        loyaltyService.addPoints(ownerId, garageId, points, reason);
+        return ResponseEntity.ok("Points added");
     }
 
     @PostMapping("/redeem")
     public ResponseEntity<String> redeemPoints(@RequestParam Integer ownerId, @RequestParam Integer garageId,
                                                @RequestParam int points) {
-        loyaltyService.redeemPoints ( ownerId, garageId, points );
-        return ResponseEntity.ok ( "Points redeemed" );
+        loyaltyService.redeemPoints(ownerId, garageId, points);
+        return ResponseEntity.ok("Points redeemed");
     }
 
     @GetMapping("/balance")
     public ResponseEntity<LoyaltyPoint> getPoints(@RequestParam Integer ownerId, @RequestParam Integer garageId) {
-        return ResponseEntity.ok ( loyaltyService.getLoyaltyStatus ( ownerId, garageId ) );
+        return ResponseEntity.ok(loyaltyService.getLoyaltyStatus(ownerId, garageId));
     }
 
     @GetMapping("/history")
     public ResponseEntity<List<LoyaltyTransaction>> getHistory(@RequestParam Integer ownerId) {
-        return ResponseEntity.ok ( loyaltyService.getTransactionHistory ( ownerId ) );
+        return ResponseEntity.ok(loyaltyService.getTransactionHistory(ownerId));
     }
 
     @GetMapping("/history/garage/{garageId}/owner/{ownerId}")
-    public ResponseEntity<List<LoyaltyTransaction>> getHistoryByGarage(@RequestParam Integer garageId,
-                                                                       @RequestParam(required = false) Integer ownerId) {
-        return ResponseEntity.ok ( loyaltyService.getTransactionHistoryByGarage ( garageId, ownerId ) );
+    public ResponseEntity<List<LoyaltyTransaction>> getHistoryByGarage(@PathVariable Integer garageId,
+                                                                       @PathVariable Integer ownerId) {
+        return ResponseEntity.ok(loyaltyService.getTransactionHistoryByGarage(garageId, ownerId));
     }
 
 }

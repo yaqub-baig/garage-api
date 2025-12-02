@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.config;
 
+import com.autoadda.apis.garage.exception.FileStorageException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +31,7 @@ public class FileStorageConfig implements WebMvcConfigurer {
         }
         catch ( IOException e ) {
             log.error ( "Could not initialize storage directories", e );
-            throw new RuntimeException ( "Could not initialize storage directories", e );
+            throw new FileStorageException( "Could not initialize storage directories", e );
         }
     }
 

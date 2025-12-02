@@ -2,7 +2,6 @@ package com.autoadda.apis.garage.response;
 
 import com.autoadda.apis.garage.util.InvoiceStatus;
 import com.autoadda.apis.garage.util.PaymentMethod;
-import com.autoadda.apis.garage.util.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

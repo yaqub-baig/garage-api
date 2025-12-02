@@ -1,8 +1,6 @@
 package com.autoadda.apis.garage.apis.garage.test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -82,9 +80,6 @@ public class CommunicationPreferenceServiceTest {
 
 	@Test
 	 void testDeletePreference() {
-//		CommunicationPreference pref = new CommunicationPreference();
-//		pref.setId(1);
-//		when(repository.findById(1)).thenReturn(Optional.of(pref));
 		service.deletePreference(1);
 		verify(repository).deleteById(1); // ✅ match actual behavior
 	}
@@ -125,7 +120,7 @@ public class CommunicationPreferenceServiceTest {
 
 		Optional<CommunicationPreference> result = service.getPreferenceByIdAndCustomerId(1, 1);
 		assertTrue(result.isPresent());
-		assertTrue(result.get().getId().equals(1));
-		assertTrue(result.get().getCustomerId().equals(1));
+		assertEquals(1, result.get().getId());
+		assertEquals(1, result.get().getCustomerId());
 	}
 }

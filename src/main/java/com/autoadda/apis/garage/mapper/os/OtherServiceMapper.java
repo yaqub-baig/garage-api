@@ -29,18 +29,12 @@ public class OtherServiceMapper {
         otherServiceResponse.setCompanyLogo ( osServices.getCompanyLogo ( ) != null ? osServices.getCompanyLogo ( ) : null );
         otherServiceResponse.setAccountStatus ( osServices.getAccountStatus ( ) != null ? osServices.getAccountStatus ( ) : null );
         otherServiceResponse.setCreatedAt ( osServices.getCreatedAt ( ) != null ? osServices.getCreatedAt ( ) : null );
-//        otherServiceResponse.setBrands ( osServices.getB ( ) != null ? osServices.getBrands ( ) : null );
-//        otherServiceResponse.setModels ( osServices.getModels ( ) != null ? osServices.getModels ( ) : null );
         otherServiceResponse.setCompanyOwnerId ( osServices.getCompanyOwner ( ) != null ? osServices.getCompanyOwner ( ) : null );
         otherServiceResponse.setIsActive ( osServices.isActive ( ) );
-//        otherServiceResponse.setConcurrentAppointmentCapacity ( osServices.getConcurrentAppointmentCapacity ( ) != null ? osServices.getConcurrentAppointmentCapacity ( ) : null );
-//        otherServiceResponse.setServices ( osServices.getServices ( ) != null ? osServices.getServices ( ).stream ( ).map ( osServiceMapper::entityToResponse ).toList ( ) : null );
         otherServiceResponse.setCompanyImages ( osServices.getCompanyImages ( ) != null ? osServices.getCompanyImages ( ) : null );
         otherServiceResponse.setTradeLicenseAttachment ( osServices.getTradeLicenseAttachment ( ) != null ? osServices.getTradeLicenseAttachment ( ) : null );
         otherServiceResponse.setVatCertificate ( osServices.getVatCertificate ( ) != null ? osServices.getVatCertificate ( ) : null );
         otherServiceResponse.setCompnayLocation ( osServices.getCompanyLocation ( ) != null ? osServices.getCompanyLocation ( ) : null );
-       // otherServiceResponse.setBreakStartTime ( osServices.getBreakStartTime ( ) != null ? osServices.getBreakStartTime ( ) : null );
-       // otherServiceResponse.setBreakEndTime ( osServices.getBreakEndTime ( ) != null ? osServices.getBreakEndTime ( ) : null );
         return otherServiceResponse;
     }
 
