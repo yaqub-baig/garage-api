@@ -3,12 +3,12 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.*;
-import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.*;
 import com.autoadda.apis.garage.response.*;
-import com.autoadda.apis.garage.util.*;
+import com.autoadda.apis.garage.util.CustomerChoice;
+import com.autoadda.apis.garage.util.PartRequestStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

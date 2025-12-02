@@ -35,6 +35,9 @@ import static java.lang.Boolean.TRUE;
 @Service
 @RequiredArgsConstructor
 public class GarageManagementService {
+    public static final String GARAGE_NOT_FOUND = "Garage not found";
+    public static final String GARAGE_NOT_FOUND_WITH_ID = "Garage not found with id: ";
+    public static final String FILE_NOT_FOUND = "File not found";
     private final GarageWorkingHoursRepository workingHoursRepository;
     private final GarageRepository garageRepository;
     private final TechnicianRepository technicianRepository;
@@ -259,21 +262,21 @@ public class GarageManagementService {
     public Optional<GarageResponse> getGarageById(Integer id) {
         return Optional.of ( garageRepository.findById ( id )
                 .map ( garageMapper::entityToResponse )
-                .orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) ) );
+                .orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) ) );
     }
 
     // Get garage with services
     @Transactional
     public Garage getGarageWithServicesById(Integer id) {
         return garageRepository.findWithServicesById ( id )
-                .orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
+                .orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) );
     }
 
     // Update existing garage
     @Transactional
     public GarageResponse updateGarage(Integer id, GarageRequest request) {
         Garage existing = garageRepository.findById ( id )
-                .orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
+                .orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) );
 
 
         if ( request.getGarageLocation ( ) != null ) {
@@ -367,7 +370,7 @@ public class GarageManagementService {
             List<MediaFile> newVatCertificates = new ArrayList<> ( );
             request.getVatCertificateIds ( ).forEach ( vid -> {
                 MediaFile mediaFile = mediaFileRepository.findById ( vid )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
+                        .orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
                 newVatCertificates.add ( mediaFile );
             } );
             existing.setVatCertificate ( newVatCertificates );
@@ -388,7 +391,7 @@ public class GarageManagementService {
             List<MediaFile> newGarageImages = new ArrayList<> ( );
             request.getGarageImagesIds ( ).forEach ( gid -> {
                 MediaFile mediaFile = mediaFileRepository.findById ( gid )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
+                        .orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
                 newGarageImages.add ( mediaFile );
             } );
             existing.setGarageImages ( newGarageImages );
@@ -409,7 +412,7 @@ public class GarageManagementService {
             List<MediaFile> newTradeLicenseAttachments = new ArrayList<> ( );
             request.getTradeLicenseAttachmentIds ( ).forEach ( tid -> {
                 MediaFile mediaFile = mediaFileRepository.findById ( tid )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
+                        .orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
                 newTradeLicenseAttachments.add ( mediaFile );
             } );
             existing.setTradeLicenseAttachment ( newTradeLicenseAttachments );
@@ -419,7 +422,7 @@ public class GarageManagementService {
     private void handleGarageLogo(GarageRequest request, Garage existing, List<Long> filesToCleanup) {
         if ( request.getLogoId ( ) != null ) {
             Long prevLogoId = existing.getGarageLogo ( ) != null ? existing.getGarageLogo ( ).getId ( ) : null;
-            MediaFile mediaFile = mediaFileRepository.findById ( request.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "File not found" ) );
+            MediaFile mediaFile = mediaFileRepository.findById ( request.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
             existing.setGarageLogo ( mediaFile );
             // Schedule old logo for cleanup if changed
             if ( prevLogoId != null && ! prevLogoId.equals ( mediaFile.getId ( ) ) ) {
@@ -432,7 +435,7 @@ public class GarageManagementService {
     // Delete garage
     @Transactional
     public void deleteGarage(Integer id) {
-        Garage garage = garageRepository.findById ( id ).orElseThrow ( () -> new NoSuchElementException ( "Garage not found with id: " + id ) );
+        Garage garage = garageRepository.findById ( id ).orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) );
         garage.setActive ( false );
         garageRepository.save ( garage );
     }
@@ -522,12 +525,11 @@ public class GarageManagementService {
     @Transactional
     public Technician onboardTechnician(Integer garageId, Technician technician, Integer ownerId) {
         Garage garage = garageRepository.findById ( garageId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (GARAGE_NOT_FOUND) );
         UserResponse user = authClient.getUser ( ownerId );
         technician.setAutoAddaId ( user.getId ( ) );
         // You may check for duplicate email, phone etc.
         technician.setFirstName ( user.getName ( ) );
-        technician.setMobileNumber ( user.getMobileNumber ( ) );
         technician.setEmailId ( user.getEmail ( ) );
         technician.setStatus ( Status.ACTIVE );
         technician.setGarage ( garage );
@@ -560,64 +562,104 @@ public class GarageManagementService {
 
     @Transactional(readOnly = true)
     public List<GarageResponse> searchGarages(String brand, String city, String zip, String garageName, List<Integer> availableServiceIds, String model) {
+        Set<Garage> garages = garageRepository.findAllWithLocationAndServices();
+        log.info("Searching through {} garages with filters - city: {}, zip: {}, name: {}, brand: {}, model: {}, serviceIds: {}",
+                garages.size(), city, zip, garageName, brand, model, availableServiceIds);
 
-        Set<Garage> garages = garageRepository.findAllWithLocationAndServices ( );
-        List<Garage> searchResults = new ArrayList<> ( List.of ( ) );
-        for (Garage garage : garages) {
-            boolean cityCheck = true;
-            boolean nameCheck = true;
-            boolean zipCheck = true;
-            boolean brandCheck = true;
-            boolean serviceCheck = true;
-            boolean modelCheck = true;
-            log.info ( " 2  enabledGarages -> " + garages.size ( ) );
-            log.info ( "   currentGarage -> " + garage.getName ( ) );
+        List<Garage> searchResults = garages.stream()
+                .filter(garage -> matchesSearchCriteria(garage, brand, city, zip, garageName, availableServiceIds, model))
+                .toList();
 
-            Location address = garage.getGarageLocation ( );
-            log.info ( " 4 enabledGarages -> " );
-            if ( StringUtils.isNotEmpty ( city ) ) {
-                log.info ( " 5 enabledGarages -> " );
-                if ( ! address.getState ( ).toLowerCase ( ).equalsIgnoreCase ( city.toLowerCase ( ) ) ) {
-                    cityCheck = false;
-                }
-            }
+        log.info("Search found {} matching garages", searchResults.size());
+        return searchResults.stream().map(garageMapper::entityToResponse).toList();
+    }
 
-            if ( StringUtils.isNotEmpty ( zip ) ) {
-                log.info ( " 6 enabledGarages -> " );
-                if ( ! address.getPostalCode ( ).toLowerCase ( ).equalsIgnoreCase ( zip.toLowerCase ( ) ) ) {
-                    zipCheck = false;
-                }
-            }
+    /**
+     * Checks if a garage matches all provided search criteria.
+     * Empty/null criteria are ignored (match all).
+     *
+     * @return true if garage matches all non-empty criteria
+     */
+    private boolean matchesSearchCriteria(Garage garage, String brand, String city, String zip,
+                                          String garageName, List<Integer> availableServiceIds, String model) {
+        return matchesCityFilter(garage, city)
+                && matchesZipFilter(garage, zip)
+                && matchesNameFilter(garage, garageName)
+                && matchesBrandFilter(garage, brand)
+                && matchesModelFilter(garage, model)
+                && matchesServiceFilter(garage, availableServiceIds);
+    }
 
-            if ( StringUtils.isNotEmpty ( garageName ) && ! garage.getName ( ).toLowerCase ( ).contains ( garageName.toLowerCase ( ) ) ) {
-                    nameCheck = false;
-                }
-
-
-            if ( StringUtils.isNotEmpty ( brand ) && ! garage.getBrands ( ).toLowerCase ( ).contains ( brand.toLowerCase ( ) ) ) {
-                    brandCheck = false;
-                }
-
-            if ( StringUtils.isNotEmpty ( model ) && ! garage.getModels ( ).toLowerCase ( ).contains ( model.toLowerCase ( ) ) ) {
-                    modelCheck = false;
-                }
-
-
-            if ( availableServiceIds != null && ! availableServiceIds.isEmpty ( ) ) {
-
-                List<Integer> garageServiceIds = garage.getServices ( ).stream ( )
-                        .map ( GarageService::getAvailableService ).map ( AvailableService::getId )
-                        .toList ( );
-
-                serviceCheck = availableServiceIds.stream ( )
-                        .anyMatch ( garageServiceIds::contains );
-            }
-
-            if ( cityCheck && nameCheck && zipCheck && brandCheck && serviceCheck && modelCheck ) {
-                searchResults.add ( garage );
-            }
+    /**
+     * Checks if garage location matches the city filter.
+     * Compares against the state field (case-insensitive).
+     */
+    private boolean matchesCityFilter(Garage garage, String city) {
+        if (StringUtils.isEmpty(city)) {
+            return true; // No filter applied
         }
-        return searchResults.stream ( ).map ( garageMapper::entityToResponse ).toList ( );
+        Location location = garage.getGarageLocation();
+        return location != null && city.equalsIgnoreCase(location.getState());
+    }
+
+    /**
+     * Checks if garage location matches the zip/postal code filter (case-insensitive).
+     */
+    private boolean matchesZipFilter(Garage garage, String zip) {
+        if (StringUtils.isEmpty(zip)) {
+            return true; // No filter applied
+        }
+        Location location = garage.getGarageLocation();
+        return location != null && zip.equalsIgnoreCase(location.getPostalCode());
+    }
+
+    /**
+     * Checks if garage name contains the search term (case-insensitive).
+     */
+    private boolean matchesNameFilter(Garage garage, String garageName) {
+        if (StringUtils.isEmpty(garageName)) {
+            return true; // No filter applied
+        }
+        return garage.getName() != null
+                && garage.getName().toLowerCase().contains(garageName.toLowerCase());
+    }
+
+    /**
+     * Checks if garage serves the specified brand (case-insensitive).
+     */
+    private boolean matchesBrandFilter(Garage garage, String brand) {
+        if (StringUtils.isEmpty(brand)) {
+            return true; // No filter applied
+        }
+        return garage.getBrands() != null
+                && garage.getBrands().toLowerCase().contains(brand.toLowerCase());
+    }
+
+    /**
+     * Checks if garage services the specified model (case-insensitive).
+     */
+    private boolean matchesModelFilter(Garage garage, String model) {
+        if (StringUtils.isEmpty(model)) {
+            return true; // No filter applied
+        }
+        return garage.getModels() != null
+                && garage.getModels().toLowerCase().contains(model.toLowerCase());
+    }
+
+    /**
+     * Checks if garage offers any of the specified services.
+     */
+    private boolean matchesServiceFilter(Garage garage, List<Integer> availableServiceIds) {
+        if (availableServiceIds == null || availableServiceIds.isEmpty()) {
+            return true; // No filter applied
+        }
+
+        List<Integer> garageServiceIds = garage.getServices().stream()
+                .map(GarageService::getAvailableService)
+                .map(AvailableService::getId)
+                .toList();
+
+        return availableServiceIds.stream().anyMatch(garageServiceIds::contains);
     }
 
     @Transactional(readOnly = true)
@@ -689,7 +731,7 @@ public class GarageManagementService {
 
     public void updateGarageVerification(Integer id) {
         Garage garage = garageRepository.findById ( id )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Garage not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (GARAGE_NOT_FOUND) );
         garage.setActive ( true );
         garageRepository.save ( garage );
     }
@@ -708,7 +750,7 @@ public class GarageManagementService {
     @Transactional
     public GarageResponse approveGarage(Integer garageId, Integer adminUserId) {
         Garage garage = garageRepository.findById(garageId)
-                .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
+                .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND));
 
         if (garage.getAccountStatus() != GarageVerificationStatus.PENDING) {
             throw new IllegalStateException("Can only approve PENDING garages");
@@ -750,7 +792,7 @@ public class GarageManagementService {
         }
 
         Garage garage = garageRepository.findById(garageId)
-                .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
+                .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND));
 
         if (garage.getAccountStatus() != GarageVerificationStatus.PENDING) {
             throw new IllegalStateException("Can only reject PENDING garages");
@@ -782,20 +824,9 @@ public class GarageManagementService {
     @Transactional
     public GarageResponse resubmitGarage(Integer garageId) {
         Garage garage = garageRepository.findById(garageId)
-                .orElseThrow(() -> new EntityNotFoundException("Garage not found"));
+                .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND));
 
-        if (garage.getAccountStatus() != GarageVerificationStatus.REJECTED) {
-            throw new IllegalStateException("Can only resubmit REJECTED garages");
-        }
-
-        garage.setResubmissionCount(garage.getResubmissionCount() + 1);
-        garage.setAccountStatus(GarageVerificationStatus.PENDING);
-        garage.setRejectionReason(null);
-
-        Garage saved = garageRepository.save(garage);
-        log.info("Garage {} resubmitted (attempt #{})", garageId, garage.getResubmissionCount());
-
-        return garageMapper.entityToResponse(saved);
+        return performResubmission(garage);
     }
 
     /**
@@ -814,7 +845,7 @@ public class GarageManagementService {
 
         // Fetch garage and validate existence
         Garage garage = garageRepository.findById(garageId)
-                .orElseThrow(() -> new EntityNotFoundException("Garage not found with id: " + garageId));
+                .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND_WITH_ID + garageId));
 
         // Authorization: Verify the requester is the garage owner
         if (!garage.getGarageOwner().equals(ownerId)) {
@@ -824,8 +855,32 @@ public class GarageManagementService {
                 "You are not authorized to resubmit this garage. Only the garage owner can resubmit.");
         }
 
-        // Delegate to existing business logic
-        return resubmitGarage(garageId);
+        // Execute resubmission logic
+        return performResubmission(garage);
+    }
+
+    /**
+     * Private helper method to perform the actual resubmission logic.
+     * This method contains the shared business logic for resubmitting a rejected garage.
+     * It should only be called from within @Transactional methods.
+     *
+     * @param garage The garage entity to resubmit
+     * @return Updated garage response
+     * @throws IllegalStateException if garage is not in REJECTED status
+     */
+    private GarageResponse performResubmission(Garage garage) {
+        if (garage.getAccountStatus() != GarageVerificationStatus.REJECTED) {
+            throw new IllegalStateException("Can only resubmit REJECTED garages");
+        }
+
+        garage.setResubmissionCount(garage.getResubmissionCount() + 1);
+        garage.setAccountStatus(GarageVerificationStatus.PENDING);
+        garage.setRejectionReason(null);
+
+        Garage saved = garageRepository.save(garage);
+        log.info("Garage {} resubmitted (attempt #{})", garage.getId(), garage.getResubmissionCount());
+
+        return garageMapper.entityToResponse(saved);
     }
 
     // ====================================================================================

@@ -1,27 +1,25 @@
 package com.autoadda.apis.garage.service.os;
 
-import java.time.LocalTime;
-import java.util.List;
-
-import com.autoadda.apis.garage.entity.*;
+import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.entity.os.*;
+import com.autoadda.apis.garage.exception.MemberNotFoundException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.os.OsJobCardMapper;
-import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.repository.os.*;
 import com.autoadda.apis.garage.request.os.OsAssignServiceRequest;
 import com.autoadda.apis.garage.request.os.OsJobCardStatusRequest;
 import com.autoadda.apis.garage.response.os.OsJobCardResponse;
+import com.autoadda.apis.garage.util.BusinessValidator;
+import com.autoadda.apis.garage.util.DateHelper;
+import com.autoadda.apis.garage.util.Status;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.autoadda.apis.garage.exception.MemberNotFoundException;
-import com.autoadda.apis.garage.util.BusinessValidator;
-import com.autoadda.apis.garage.util.DateHelper;
-import com.autoadda.apis.garage.util.Status;
-
-import lombok.RequiredArgsConstructor;
+import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

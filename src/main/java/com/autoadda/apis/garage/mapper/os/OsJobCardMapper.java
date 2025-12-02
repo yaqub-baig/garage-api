@@ -1,8 +1,6 @@
 package com.autoadda.apis.garage.mapper.os;
 
-import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.os.OsJobCard;
-import com.autoadda.apis.garage.response.JobCardResponse;
 import com.autoadda.apis.garage.response.os.OsJobCardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -20,6 +20,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LoyaltyService {
+    public static final String GARAGE_NOT_FOUND = "Garage not found";
+    public static final String VEHICLE_OWNER_NOT_FOUND = "Vehicle Owner not found";
     private final LoyaltyPointRepository pointRepo;
     private final GarageRepository garageRepo;
     private final VehicleOwnerRepository ownerRepo;
@@ -40,11 +42,11 @@ public class LoyaltyService {
 
             // Ensure the owner exists before setting it
             VehicleOwner vehilceOwner = ownerRepo.findById(ownerId)
-                    .orElseThrow(() -> new RuntimeException("Vehicle Owner not found"));
+                    .orElseThrow(() -> new RuntimeException(VEHICLE_OWNER_NOT_FOUND));
             newLp.setOwner(vehilceOwner);
 
             // Ensure the garage exists before setting it
-            Garage garage = garageRepo.findById(garageId).orElseThrow(() -> new RuntimeException("Garage not found"));
+            Garage garage = garageRepo.findById(garageId).orElseThrow(() -> new RuntimeException(GARAGE_NOT_FOUND));
 
             newLp.setGarage(garage);
             newLp.setPoints(0);
@@ -58,9 +60,9 @@ public class LoyaltyService {
         LoyaltyTransaction tx = new LoyaltyTransaction();
         // Ensure the owner exists before setting it
         VehicleOwner owner = ownerRepo.findById(ownerId)
-                .orElseThrow(() -> new RuntimeException("Vehicle Owner not found"));
+                .orElseThrow(() -> new RuntimeException(VEHICLE_OWNER_NOT_FOUND));
         // Ensure the garage exists before setting it
-        Garage garage = garageRepo.findById(garageId).orElseThrow(() -> new RuntimeException("Garage not found"));
+        Garage garage = garageRepo.findById(garageId).orElseThrow(() -> new RuntimeException(GARAGE_NOT_FOUND));
         tx.setOwner(owner);
         tx.setGarage(garage);
         tx.setPointsChanged(earnedPoints);
@@ -93,10 +95,10 @@ public class LoyaltyService {
         LoyaltyTransaction tx = new LoyaltyTransaction();
         // Ensure the owner exists before setting it
         VehicleOwner owner = ownerRepo.findById(ownerId)
-                .orElseThrow(() -> new RuntimeException("Vehicle Owner not found"));
+                .orElseThrow(() -> new RuntimeException(VEHICLE_OWNER_NOT_FOUND));
         tx.setOwner(owner);
         // Ensure the garage exists before setting it
-        Garage garage = garageRepo.findById(garageId).orElseThrow(() -> new RuntimeException("Garage not found"));
+        Garage garage = garageRepo.findById(garageId).orElseThrow(() -> new RuntimeException(GARAGE_NOT_FOUND));
         tx.setGarage(garage);
         tx.setPointsChanged(-redeemPoints);
         tx.setDescription("Points Redeemed");

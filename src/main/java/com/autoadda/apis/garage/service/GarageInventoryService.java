@@ -18,13 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class GarageInventoryService {
 
+    public static final String INVENTORY_ITEM_NOT_FOUND = "Inventory item not found";
+    public static final String TECHNICIAN_NOT_FOUND = "Technician not found";
     private final GarageInventoryItemRepository inventoryItemRepo;
     private final InventoryTransactionRepository transactionRepo;
     private final InventoryAlertRepository alertRepo;
@@ -87,7 +88,7 @@ public class GarageInventoryService {
         // Check for duplicates
         if (request.getInventoryPartId() != null) {
             inventoryItemRepo.findByGarageIdAndInventoryPartId(
-                    request.getGarageId(), request.getInventoryPartId())
+                            request.getGarageId(), request.getInventoryPartId())
                     .ifPresent(item -> {
                         throw new IllegalStateException("Inventory item already exists for this part");
                     });
@@ -95,8 +96,8 @@ public class GarageInventoryService {
 
         // Validate threshold levels
         if (request.getMinimumStockLevel() != null && request.getMaximumStockLevel() != null && request.getMinimumStockLevel() >= request.getMaximumStockLevel()) {
-                throw new IllegalArgumentException("Minimum stock level must be less than maximum stock level");
-            }
+            throw new IllegalArgumentException("Minimum stock level must be less than maximum stock level");
+        }
 
 
         GarageInventoryItem item = GarageInventoryItem.builder()
@@ -128,7 +129,7 @@ public class GarageInventoryService {
         log.info("Fetching inventory item: {}", itemId);
 
         GarageInventoryItem item = inventoryItemRepo.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(INVENTORY_ITEM_NOT_FOUND));
 
         return mapper.entityToResponse(item);
     }
@@ -141,7 +142,7 @@ public class GarageInventoryService {
         log.info("Updating inventory item: {}", itemId);
 
         GarageInventoryItem item = inventoryItemRepo.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(INVENTORY_ITEM_NOT_FOUND));
 
         // Update fields if provided
         if (request.getUnitPrice() != null) {
@@ -168,8 +169,8 @@ public class GarageInventoryService {
 
         // Validate threshold levels
         if (item.getMinimumStockLevel() != null && item.getMaximumStockLevel() != null && item.getMinimumStockLevel() >= item.getMaximumStockLevel()) {
-                throw new IllegalArgumentException("Minimum stock level must be less than maximum stock level");
-            }
+            throw new IllegalArgumentException("Minimum stock level must be less than maximum stock level");
+        }
 
 
         item = inventoryItemRepo.save(item);
@@ -194,10 +195,10 @@ public class GarageInventoryService {
         }
 
         GarageInventoryItem item = inventoryItemRepo.findById(request.getInventoryItemId())
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(INVENTORY_ITEM_NOT_FOUND));
 
         Technician technician = technicianRepo.findById(request.getTechnicianId())
-                .orElseThrow(() -> new ResourceNotFoundException("Technician not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(TECHNICIAN_NOT_FOUND));
 
         int quantityBefore = item.getQuantityInStock();
         int quantityAfter = quantityBefore + request.getQuantity();
@@ -243,10 +244,10 @@ public class GarageInventoryService {
         }
 
         GarageInventoryItem item = inventoryItemRepo.findById(request.getInventoryItemId())
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(INVENTORY_ITEM_NOT_FOUND));
 
         Technician technician = technicianRepo.findById(request.getTechnicianId())
-                .orElseThrow(() -> new ResourceNotFoundException("Technician not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(TECHNICIAN_NOT_FOUND));
 
         int quantityBefore = item.getQuantityInStock();
 
@@ -302,10 +303,10 @@ public class GarageInventoryService {
         }
 
         GarageInventoryItem item = inventoryItemRepo.findById(request.getInventoryItemId())
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(INVENTORY_ITEM_NOT_FOUND));
 
         Technician technician = technicianRepo.findById(request.getTechnicianId())
-                .orElseThrow(() -> new ResourceNotFoundException("Technician not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(TECHNICIAN_NOT_FOUND));
 
         int quantityBefore = item.getQuantityInStock();
         int quantityAfter = request.getNewQuantity();
@@ -454,7 +455,7 @@ public class GarageInventoryService {
         log.info("Deactivating inventory item: {}", itemId);
 
         GarageInventoryItem item = inventoryItemRepo.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory item not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(INVENTORY_ITEM_NOT_FOUND));
 
         item.setIsActive(false);
         inventoryItemRepo.save(item);

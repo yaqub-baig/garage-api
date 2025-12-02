@@ -7,7 +7,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 @Entity

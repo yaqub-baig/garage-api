@@ -3,7 +3,7 @@ package com.autoadda.apis.garage.service.os;
 import com.autoadda.apis.garage.entity.os.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.os.OsAppointmentDetailMapper;
-import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.repository.CustomerRepository;
 import com.autoadda.apis.garage.repository.os.*;
 import com.autoadda.apis.garage.response.os.OsAppointmentDetailResponse;
 import com.autoadda.apis.garage.util.DateHelper;

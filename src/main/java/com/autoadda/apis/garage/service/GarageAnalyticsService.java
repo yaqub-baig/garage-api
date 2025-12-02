@@ -1,7 +1,9 @@
 package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.TechnicianShift;
-import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.repository.InvoiceRepository;
+import com.autoadda.apis.garage.repository.JobCardRepository;
+import com.autoadda.apis.garage.repository.TechnicianShiftRepository;
 import com.autoadda.apis.garage.request.RevenueSummaryDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +21,6 @@ public class GarageAnalyticsService {
 
     private final JobCardRepository jobCardRepo;
     private final InvoiceRepository invoiceRepo;
-    private final TechnicianRepository technicianRepo;
-    private final TechnicianAvailabilityRepository availabilityRepo;
     private final TechnicianShiftRepository shiftRepository;
 
 

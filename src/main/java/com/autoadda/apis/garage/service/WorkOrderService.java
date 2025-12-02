@@ -1,22 +1,13 @@
 package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.clients.AuthClient;
-import com.autoadda.apis.garage.entity.JobCard;
-import com.autoadda.apis.garage.entity.VehicleReceived;
-import com.autoadda.apis.garage.entity.WorkOrder;
+import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.WorkOrderMapper;
-import com.autoadda.apis.garage.repository.AppointmentDetailsRepository;
-import com.autoadda.apis.garage.repository.JobCardRepository;
-import com.autoadda.apis.garage.repository.VehicleReceivedRepository;
-import com.autoadda.apis.garage.repository.WorkOrderRepository;
+import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
 import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.request.WorkOrderRequest;
-import com.autoadda.apis.garage.entity.Invoice;
-import com.autoadda.apis.garage.entity.VehicleDelivery;
-import com.autoadda.apis.garage.repository.InvoiceRepository;
-import com.autoadda.apis.garage.repository.VehicleDeliveryRepository;
 import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.VehicleRecievedStatus;

@@ -1,16 +1,10 @@
 package com.autoadda.apis.garage.service.os;
 
-import com.autoadda.apis.garage.entity.AppointmentSlot;
 import com.autoadda.apis.garage.entity.os.OsAppointmentSlot;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
-import com.autoadda.apis.garage.mapper.SlotMapper;
 import com.autoadda.apis.garage.mapper.os.OsSlotMapper;
-import com.autoadda.apis.garage.repository.SlotRepository;
 import com.autoadda.apis.garage.repository.os.OsSlotRepository;
-import com.autoadda.apis.garage.request.AppointmentSlotRequest;
 import com.autoadda.apis.garage.request.os.OsAppointmentSlotRequest;
-import com.autoadda.apis.garage.response.AppointmentSlotResponse;
-import com.autoadda.apis.garage.response.MonthlyAvailabilityResponse;
 import com.autoadda.apis.garage.response.os.OsAppointmentSlotResponse;
 import com.autoadda.apis.garage.response.os.OsMonthlyAvailabilityResponse;
 import lombok.RequiredArgsConstructor;

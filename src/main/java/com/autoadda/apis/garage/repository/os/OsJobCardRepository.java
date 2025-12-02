@@ -1,16 +1,11 @@
 package com.autoadda.apis.garage.repository.os;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.autoadda.apis.garage.entity.os.OsJobCard;
+import com.autoadda.apis.garage.util.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.autoadda.apis.garage.entity.JobCard;
-import com.autoadda.apis.garage.util.Status;
+import java.util.List;
 
 @Repository
 public interface OsJobCardRepository extends JpaRepository<OsJobCard, Integer> {

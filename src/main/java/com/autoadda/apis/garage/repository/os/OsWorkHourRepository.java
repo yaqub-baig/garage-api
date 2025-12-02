@@ -1,11 +1,12 @@
 package com.autoadda.apis.garage.repository.os;
-import java.time.DayOfWeek;
-import java.util.Optional;
 
 import com.autoadda.apis.garage.entity.os.OsWorkHours;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.DayOfWeek;
+import java.util.Optional;
 public interface OsWorkHourRepository extends JpaRepository<OsWorkHours, Integer> {
     Optional<OsWorkHours> findByOtherServiceIdAndDayOfWeek(Integer otherServiceId, DayOfWeek dayOfWeek);
 

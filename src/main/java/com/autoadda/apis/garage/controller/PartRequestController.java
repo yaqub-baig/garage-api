@@ -1,10 +1,6 @@
 package com.autoadda.apis.garage.controller;
 
-import com.autoadda.apis.garage.request.CreatePartRequestRequest;
-import com.autoadda.apis.garage.request.CustomerPartResponseRequest;
-import com.autoadda.apis.garage.request.GarageProcurementRequest;
-import com.autoadda.apis.garage.request.JobCardStatusRequest;
-import com.autoadda.apis.garage.request.UpdatePartRequestRequest;
+import com.autoadda.apis.garage.request.*;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.JobCardResponse;
 import com.autoadda.apis.garage.response.PartRequestResponse;

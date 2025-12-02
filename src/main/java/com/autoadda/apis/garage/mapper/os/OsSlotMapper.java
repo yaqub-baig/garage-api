@@ -1,8 +1,6 @@
 package com.autoadda.apis.garage.mapper.os;
 
-import com.autoadda.apis.garage.entity.AppointmentSlot;
 import com.autoadda.apis.garage.entity.os.OsAppointmentSlot;
-import com.autoadda.apis.garage.response.AppointmentSlotResponse;
 import com.autoadda.apis.garage.response.os.OsAppointmentSlotResponse;
 import org.springframework.stereotype.Component;
 

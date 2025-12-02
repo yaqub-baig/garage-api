@@ -1,18 +1,13 @@
 package com.autoadda.apis.garage.entity.os;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.entity.WorkOrder;
 import com.autoadda.apis.garage.util.Status;
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter

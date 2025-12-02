@@ -4,7 +4,6 @@ import com.autoadda.apis.garage.entity.CommunicationPreference;
 import com.autoadda.apis.garage.repository.CommunicationPreferenceRepository;
 import com.autoadda.apis.garage.request.CommunicationPreferenceRequest;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
