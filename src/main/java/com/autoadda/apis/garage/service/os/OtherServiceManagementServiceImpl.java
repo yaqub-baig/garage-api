@@ -15,15 +15,13 @@ import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.request.os.OtherServiceRequest;
 import com.autoadda.apis.garage.response.os.OsResponse;
 import com.autoadda.apis.garage.service.LocationService;
-import com.autoadda.apis.garage.service.MediaFileService;
+import com.autoadda.apis.garage.service.MediaFileCleanupService;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -39,10 +37,10 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
     private final OtherServiceRepository otherServiceRepository;
     private final OsAvailableServiceRepository availableServiceRepository;
     private final LocationService locationService;
-    private final MediaFileService mediaFileService;
     private final MediaFileRepository mediaFileRepository;
     private final OtherServiceBridgeManagementService otherServiceBridgeManagementService;
     private final OtherServiceMapper otherServiceMapper;
+    private final MediaFileCleanupService mediaFileCleanupService;
 
     private OtherService mapToEntity(OtherServiceRequest request) {
         OtherService otherService = new OtherService();
@@ -206,7 +204,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         if (request.getLogoId() != null) {
             // Schedule old logo for cleanup
             if (existing.getCompanyLogo() != null) {
-                scheduleMediaFileCleanup(Collections.singletonList(existing.getCompanyLogo().getId()));
+                mediaFileCleanupService.scheduleCleanup(Collections.singletonList(existing.getCompanyLogo().getId()));
             }
             // Upload and set new logo
             MediaFile mediaFile = mediaFileRepository.findById(request.getLogoId()).orElseThrow(() -> new ResourceNotFoundException("File not found"));
@@ -220,7 +218,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
                     .map(MediaFile::getId)
                     .toList();
             if (!oldVatCertIds.isEmpty()) {
-                scheduleMediaFileCleanup(oldVatCertIds);
+                mediaFileCleanupService.scheduleCleanup(oldVatCertIds);
             }
 
             // Upload and set new VAT certificates
@@ -239,7 +237,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
                     .map(MediaFile::getId)
                     .toList();
             if (!oldTradeLicenseIds.isEmpty()) {
-                scheduleMediaFileCleanup(oldTradeLicenseIds);
+                mediaFileCleanupService.scheduleCleanup(oldTradeLicenseIds);
             }
 
             existing.getTradeLicenseAttachment().clear();
@@ -256,7 +254,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
                     .map(MediaFile::getId)
                     .toList();
             if (!oldCompanyImageIds.isEmpty()) {
-                scheduleMediaFileCleanup(oldCompanyImageIds);
+                mediaFileCleanupService.scheduleCleanup(oldCompanyImageIds);
             }
 
             // Upload and set new company images
@@ -329,7 +327,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
                 .toList());
 
         if (!mediaFileIds.isEmpty()) {
-            scheduleMediaFileCleanup(mediaFileIds);
+            mediaFileCleanupService.scheduleCleanup(mediaFileIds);
         }
     }
 
@@ -410,29 +408,5 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
             }
         }
         return searchResults.stream().map(otherServiceMapper::entityToResponse).toList();
-    }
-
-
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void scheduleMediaFileCleanup(List<Long> mediaFileIds) {
-        for (Long mediaFileId : mediaFileIds) {
-            try {
-                if ( ! isMediaFileStillReferenced ( mediaFileId ) ) {
-                    mediaFileService.delete ( mediaFileId );
-                }
-            }
-            catch ( Exception e ) {
-                log.error ( "Error cleaning up media file with id: " + mediaFileId, e );
-            }
-        }
-    }
-
-    private boolean isMediaFileStillReferenced(Long mediaFileId) {
-        // Check if the media file is still referenced by any other entity
-        return otherServiceRepository.countByCompanyLogoId ( mediaFileId ) > 0 ||
-                otherServiceRepository.countByVatCertificateId ( mediaFileId ) > 0 ||
-                otherServiceRepository.countByTradeLicenseAttachmentId ( mediaFileId ) > 0 ||
-                otherServiceRepository.countByCompanyImagesId ( mediaFileId ) > 0;
     }
 }

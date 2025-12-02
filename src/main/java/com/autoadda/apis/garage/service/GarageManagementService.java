@@ -20,9 +20,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
@@ -50,6 +48,7 @@ public class GarageManagementService {
     private final GarageMapper garageMapper;
     private final AuthClient authClient;
     private final TechnicianService technicianService;
+    private final MediaFileCleanupService mediaFileCleanupService;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage ( );
@@ -348,7 +347,7 @@ public class GarageManagementService {
         Garage save = garageRepository.save ( existing );
 
         if ( ! filesToCleanup.isEmpty ( ) ) {
-            scheduleMediaFileCleanup ( filesToCleanup );
+            mediaFileCleanupService.scheduleCleanup ( filesToCleanup );
         }
 
         return garageMapper.entityToResponse ( save );
@@ -428,45 +427,6 @@ public class GarageManagementService {
             }
 
         }
-    }
-
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void scheduleMediaFileCleanup(List<Long> mediaFileIds) {
-        // Small delay to ensure transaction is committed
-        try {
-            Thread.sleep ( 3000 );
-
-            for (Long fileId : mediaFileIds) {
-                try {
-                    // Check if file is still referenced elsewhere before deleting
-                    if ( ! isMediaFileStillReferenced ( fileId ) ) {
-                        mediaFileRepository.deleteById ( fileId );
-                        log.info ( "Successfully cleaned up media file: {}", fileId );
-                    } else {
-                        log.info ( "Media file {} still referenced, skipping cleanup", fileId );
-                    }
-                }
-                catch ( Exception e ) {
-                    log.warn ( "Failed to cleanup media file {}: {}", fileId, e.getMessage ( ) );
-                }
-            }
-        }
-        catch ( InterruptedException e ) {
-            Thread.currentThread ( ).interrupt ( );
-            log.warn ( "Media file cleanup interrupted" );
-        }
-    }
-
-    private boolean isMediaFileStillReferenced(Long mediaFileId) {
-        // Check if this media file is still referenced by any garage
-        // This is a safety check to prevent deleting files that might still be in use
-        long garageLogoCount = garageRepository.countByGarageLogoId ( mediaFileId );
-        long garageImageCount = garageRepository.countByGarageImageId ( mediaFileId );
-        long garageTradeLicenseCount = garageRepository.countByTradeLicenseId ( mediaFileId );
-        long garageVatCertCount = garageRepository.countByVatCertificateId ( mediaFileId );
-        long totalReferences = garageLogoCount + garageImageCount + garageTradeLicenseCount + garageVatCertCount;
-        return totalReferences > 0;
     }
 
     // Delete garage
