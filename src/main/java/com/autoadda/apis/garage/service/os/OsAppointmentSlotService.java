@@ -38,6 +38,7 @@ public class OsAppointmentSlotService {
     private final OsAppointmentDetailMapper appointmentDetailMapper;
     private final OsServiceRepository osServiceRepository;
     private final OsAppointmentServiceRepository appointmentServiceRepository;
+    private final com.autoadda.apis.garage.service.VehicleBookingValidationService vehicleBookingValidationService;
 
     /**
      * Retrieves available time slots for a garage on a specific date.
@@ -126,6 +127,9 @@ public class OsAppointmentSlotService {
 
         OtherService otherService1 = otherService.findById( otherServiceId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) );
 
+        // Validate vehicle is not already booked at this date/time
+        vehicleBookingValidationService.validateVehicleAvailability ( vehicleId, date, time );
+
         OsAppointmentDetails appointment = OsAppointmentDetails.builder ( ).otherService ( otherService1 ).scheduleDate ( date )
                 .serviceStartTime ( time ).status ( Status.CONFIRMED ).comments ( "Booked via platform" )
                 .vehicleId ( vehicleId )
@@ -198,6 +202,12 @@ public class OsAppointmentSlotService {
             if ( existing.isPresent ( ) && existing.get ( ).getStatus ( ) == Status.CONFIRMED ) {
                 throw new IllegalStateException ( "Slot already booked." );
             }
+
+            // Validate vehicle availability for reschedule
+            Integer targetVehicleId = vehicleId != null ? vehicleId : appointmentDetails.getVehicleId ( );
+            vehicleBookingValidationService.validateVehicleAvailabilityForEdit (
+                    targetVehicleId, date, time1, appointmentId, false );
+
             appointmentDetails.setOtherService ( otherService.findById ( otherServiceId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
 
         }

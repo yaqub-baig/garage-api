@@ -20,7 +20,7 @@ import com.autoadda.apis.garage.request.CommunicationPreferenceRequest;
 import com.autoadda.apis.garage.service.CommunicationPreferenceService;
 
 @ExtendWith(MockitoExtension.class)
-public class CommunicationPreferenceServiceTest {
+ class CommunicationPreferenceServiceTest {
 
 	@InjectMocks
 	private CommunicationPreferenceService service;

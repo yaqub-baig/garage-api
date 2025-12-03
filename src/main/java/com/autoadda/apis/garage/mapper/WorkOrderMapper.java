@@ -47,9 +47,7 @@ public class WorkOrderMapper {
         workOrderResponse.setStatus ( save.getStatus ( ) );
         workOrderResponse.setTotalAmount ( save.getJobCards ( ).stream ( )
                 .map ( JobCard::getService )
-                .map ( AppointmentServices::getService )
-                .map ( GarageService::getAvailableService )
-                .mapToDouble ( as -> as.getLaborPrice ( ) + as.getPrice ( ) ).sum ( ) );
+                .mapToDouble ( as -> as.getLabourPrice ( ) + as.getPrice ( ) ).sum ( ) );
         log.info ( "15" );
         workOrderResponse.setCustomerAcknowledged ( save.getCustomerAcknowledged ( ) );
         workOrderResponse.setGarageNegotiatedAmount1 ( save.getGarageNegotiatedAmount ( ) );

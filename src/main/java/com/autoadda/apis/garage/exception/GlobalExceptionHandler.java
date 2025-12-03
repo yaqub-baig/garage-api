@@ -163,8 +163,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<GenericResponse> handleConflict(ConflictException ex) {
-        log.warn ( "Conflict error", ex );
-        return buildResponse (  HttpStatus.CONFLICT, ErrorMessage.ERROR_DATA_INTEGRITY );
+        log.warn ( "Conflict error: {}", ex.getMessage() );
+        return buildResponse (  HttpStatus.CONFLICT, ex.getMessage() );
     }
 
     @ExceptionHandler(Exception.class)

@@ -41,14 +41,14 @@ public class AppointmentController {
     //2025-09-12T11:40:00:00
     @PostMapping("/{garageId}/book")
     public ResponseEntity<AppointmentDetailResponse> bookAppointment(@PathVariable Integer garageId, @RequestParam Integer vehicleId,
-                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
-                                             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
-                                             @RequestParam(required = false) String selectedGarageServiceIds) {
+                                                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
+                                                                     @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
+                                                                     @RequestParam(required = false) String selectedGarageServiceIds) {
 
-            LocalDate date = time.toLocalDate();
-            LocalTime timestamp = time.toLocalTime();
-            AppointmentDetailResponse booking = appointmentSlotService.bookSlot(garageId, vehicleId, date, timestamp, autoAddaId, selectedGarageServiceIds);
-            return ResponseEntity.ok(booking);
+        LocalDate date = time.toLocalDate();
+        LocalTime timestamp = time.toLocalTime();
+        AppointmentDetailResponse booking = appointmentSlotService.bookSlot(garageId, vehicleId, date, timestamp, autoAddaId, selectedGarageServiceIds);
+        return ResponseEntity.ok(booking);
 
     }
 

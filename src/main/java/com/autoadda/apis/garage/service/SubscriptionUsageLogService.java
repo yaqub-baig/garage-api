@@ -5,7 +5,6 @@ import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.SubscriptionUsageLogRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,7 +25,7 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public SubscriptionUsageLog saveUsageLog(SubscriptionUsageLog log) {
-        return usageLogRepository.save ( log );
+        return usageLogRepository.save(log);
     }
 
     /**
@@ -36,7 +35,7 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public List<SubscriptionUsageLog> getAllLogs() {
-        return usageLogRepository.findAll ( );
+        return usageLogRepository.findAll();
     }
 
     /**
@@ -47,8 +46,8 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public SubscriptionUsageLog getLogById(Integer id) {
-        return usageLogRepository.findById ( id )
-                .orElseThrow ( () -> new RuntimeException ( "Usage log not found for id: " + id ) );
+        return usageLogRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usage log not found for id: " + id));
     }
 
     /**
@@ -59,7 +58,7 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public List<SubscriptionUsageLog> getLogsBySubscriptionId(Integer subscriptionId) {
-        return usageLogRepository.findBySubscriptionId ( subscriptionId );
+        return usageLogRepository.findBySubscriptionId(subscriptionId);
     }
 
     /**
@@ -70,7 +69,7 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public List<SubscriptionUsageLog> getLogsByServiceName(String serviceName) {
-        return usageLogRepository.findByServiceName ( serviceName );
+        return usageLogRepository.findByServiceName(serviceName);
     }
 
     /**
@@ -81,7 +80,7 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public List<SubscriptionUsageLog> getLogsByTechnicianId(Integer technicianId) {
-        return usageLogRepository.findByTechnicianId ( technicianId );
+        return usageLogRepository.findByTechnicianId(technicianId);
     }
 
     /**
@@ -93,7 +92,7 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public List<SubscriptionUsageLog> getLogsByDateRange(LocalDate startDate, LocalDate endDate) {
-        return usageLogRepository.findByUsedOnBetween ( startDate, endDate );
+        return usageLogRepository.findByUsedOnBetween(startDate, endDate);
     }
 
     /**
@@ -108,7 +107,7 @@ public class SubscriptionUsageLogService {
     @Transactional
     public List<SubscriptionUsageLog> getLogsBySubscriptionIdAndDateRange(Integer subscriptionId, LocalDate startDate,
                                                                           LocalDate endDate) {
-        return usageLogRepository.findBySubscriptionIdAndUsedOnBetween ( subscriptionId, startDate, endDate );
+        return usageLogRepository.findBySubscriptionIdAndUsedOnBetween(subscriptionId, startDate, endDate);
     }
 
     /**
@@ -122,7 +121,7 @@ public class SubscriptionUsageLogService {
     @Transactional
     public List<SubscriptionUsageLog> getLogsBySubscriptionIdAndServiceName(Integer subscriptionId,
                                                                             String serviceName) {
-        return usageLogRepository.findBySubscriptionIdAndServiceName ( subscriptionId, serviceName );
+        return usageLogRepository.findBySubscriptionIdAndServiceName(subscriptionId, serviceName);
     }
 
     /**
@@ -132,9 +131,9 @@ public class SubscriptionUsageLogService {
      */
     @Transactional
     public void deleteLog(Integer id) {
-        if ( ! usageLogRepository.existsById ( id ) ) {
-            throw new ResourceNotFoundException( "Cannot delete. Log not found for id: " + id );
+        if (!usageLogRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Cannot delete. Log not found for id: " + id);
         }
-        usageLogRepository.deleteById ( id );
+        usageLogRepository.deleteById(id);
     }
 }

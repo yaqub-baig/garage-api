@@ -42,4 +42,32 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
 
     @Query("SELECT a.appointmentReferenceId FROM AppointmentDetails a WHERE a.appointmentReferenceId LIKE :prefix% ORDER BY a.appointmentReferenceId DESC")
     List<String> findLatestCodesByPrefix(@Param("prefix") String codePrefix);
+
+    boolean existsByVehicleIdAndScheduleDateAndServiceStartTimeAndStatus(
+            Integer vehicleId,
+            LocalDate scheduleDate,
+            LocalTime serviceStartTime,
+            Status status
+    );
+
+    Optional<AppointmentDetails> findByVehicleIdAndScheduleDateAndServiceStartTimeAndStatus(
+            Integer vehicleId,
+            LocalDate scheduleDate,
+            LocalTime serviceStartTime,
+            Status status
+    );
+
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM AppointmentDetails a " +
+            "WHERE a.vehicleId = :vehicleId " +
+            "AND a.scheduleDate = :scheduleDate " +
+            "AND a.serviceStartTime = :serviceStartTime " +
+            "AND a.status = :status " +
+            "AND a.id != :appointmentId")
+    boolean existsByVehicleIdAndScheduleDateAndServiceStartTimeAndStatusAndIdNot(
+            @Param("vehicleId") Integer vehicleId,
+            @Param("scheduleDate") LocalDate scheduleDate,
+            @Param("serviceStartTime") LocalTime serviceStartTime,
+            @Param("status") Status status,
+            @Param("appointmentId") Integer appointmentId
+    );
 }

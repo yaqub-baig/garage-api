@@ -146,7 +146,7 @@ class AvailableServiceManagementServiceTest {
 	}
 
 	@Test
-	public void testSearchByDescription_success() {
+	 void testSearchByDescription_success() {
 		String keyword = "oil change";
 
 		AvailableService srvc = new AvailableService();

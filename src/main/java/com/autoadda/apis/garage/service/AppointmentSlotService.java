@@ -36,6 +36,7 @@ public class AppointmentSlotService {
     private final AppointmentDetailMapper appointmentDetailMapper;
     private final GarageServiceRepository garageServiceRepository;
     private final AppointmentServiceRepository appointmentServiceRepository;
+    private final VehicleBookingValidationService vehicleBookingValidationService;
 
     /**
      * Retrieves available time slots for a garage on a specific date.
@@ -127,6 +128,9 @@ public class AppointmentSlotService {
 
         Garage garage = garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) );
 
+        // Validate vehicle is not already booked at this date/time
+        vehicleBookingValidationService.validateVehicleAvailability ( vehicleId, date, time );
+
         // Increment bookings immediately within the same transaction
         slot.setCurrentBookings ( slot.getCurrentBookings ( ) + 1 );
         slotRepository.save ( slot );
@@ -211,6 +215,12 @@ public class AppointmentSlotService {
             if ( existing.isPresent ( ) && existing.get ( ).getStatus ( ) == Status.CONFIRMED ) {
                 throw new IllegalStateException ( "Slot already booked." );
             }
+
+            // Validate vehicle availability for reschedule
+            Integer targetVehicleId = vehicleId != null ? vehicleId : appointmentDetails.getVehicleId ( );
+            vehicleBookingValidationService.validateVehicleAvailabilityForEdit (
+                    targetVehicleId, date, time1, appointmentId, true );
+
             appointmentDetails.setGarage ( garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
         }
 
