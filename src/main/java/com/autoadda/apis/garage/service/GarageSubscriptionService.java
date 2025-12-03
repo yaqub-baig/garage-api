@@ -25,6 +25,7 @@ import java.util.*;
 public class GarageSubscriptionService {
 
 
+    public static final String SUBSCRIPTION_PLAN_NOT_FOUND = "Subscription plan not found";
     private final GarageSubscriptionRepository subscriptionRepository;
 
     private final AvailableServiceManagementService availableServiceManagementService;
@@ -115,7 +116,7 @@ public class GarageSubscriptionService {
     @Transactional
     public GarageSubscriptionResponse getPlanById(Integer id) {
         GarageSubscription subscription = subscriptionRepository.findById ( id )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (SUBSCRIPTION_PLAN_NOT_FOUND) );
         return garageSubscriptionMapper.toResponse(subscription);
     }
 
@@ -129,7 +130,7 @@ public class GarageSubscriptionService {
     @Transactional
     public GarageSubscriptionResponse updatePlan(Integer id, GarageSubscription updatedPlan) {
         GarageSubscription existingPlan = subscriptionRepository.findById ( id )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (SUBSCRIPTION_PLAN_NOT_FOUND) );
         existingPlan.setName ( updatedPlan.getName ( ) );
         existingPlan.setDescription ( updatedPlan.getDescription ( ) );
         existingPlan.setPrice ( updatedPlan.getPrice ( ) );
@@ -149,7 +150,7 @@ public class GarageSubscriptionService {
     @Transactional
     public void deletePlan(Integer id) {
         GarageSubscription existingPlan = subscriptionRepository.findById ( id )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (SUBSCRIPTION_PLAN_NOT_FOUND) );
         subscriptionRepository.delete ( existingPlan );
     }
 
@@ -249,7 +250,7 @@ public class GarageSubscriptionService {
     }
 
     public GarageSubscriptionResponse changeStatus(Integer id) {
-        GarageSubscription subscriptionPlan = subscriptionRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException ( "Subscription plan not found" ) );
+        GarageSubscription subscriptionPlan = subscriptionRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException (SUBSCRIPTION_PLAN_NOT_FOUND) );
         subscriptionPlan.setIsActive (!Boolean.TRUE.equals(subscriptionPlan.getIsActive()));
         GarageSubscription saved = subscriptionRepository.save ( subscriptionPlan );
         return garageSubscriptionMapper.toResponse(saved);

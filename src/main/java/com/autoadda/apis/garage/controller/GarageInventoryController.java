@@ -27,7 +27,7 @@ public class GarageInventoryController {
             @RequestBody AddInventoryItemRequest request) {
         log.info("Adding inventory item for garage: {}", request.getGarageId());
         GarageInventoryItemResponse response = inventoryService.addInventoryItem(request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Inventory item added successfully", response));
     }
 
@@ -40,7 +40,7 @@ public class GarageInventoryController {
             @PathVariable Integer garageId) {
         log.info("Fetching inventory for garage: {}", garageId);
         List<GarageInventoryItemResponse> responses = inventoryService.getGarageInventory(garageId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Inventory retrieved successfully", responses));
     }
 
@@ -53,7 +53,7 @@ public class GarageInventoryController {
             @PathVariable Integer itemId) {
         log.info("Fetching inventory item: {}", itemId);
         GarageInventoryItemResponse response = inventoryService.getInventoryItem(itemId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Inventory item retrieved successfully", response));
     }
 
@@ -67,7 +67,7 @@ public class GarageInventoryController {
             @RequestBody UpdateInventoryItemRequest request) {
         log.info("Updating inventory item: {}", itemId);
         GarageInventoryItemResponse response = inventoryService.updateInventoryItem(itemId, request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Inventory item updated successfully", response));
     }
 
@@ -82,7 +82,7 @@ public class GarageInventoryController {
         log.info("Adding stock to item: {}", itemId);
         request.setInventoryItemId(itemId);
         GarageInventoryItemResponse response = inventoryService.addStock(request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Stock added successfully", response));
     }
 
@@ -97,7 +97,7 @@ public class GarageInventoryController {
         log.info("Removing stock from item: {}", itemId);
         request.setInventoryItemId(itemId);
         GarageInventoryItemResponse response = inventoryService.removeStock(request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Stock removed successfully", response));
     }
 
@@ -112,7 +112,7 @@ public class GarageInventoryController {
         log.info("Adjusting stock for item: {}", itemId);
         request.setInventoryItemId(itemId);
         GarageInventoryItemResponse response = inventoryService.adjustStock(request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Stock adjusted successfully", response));
     }
 
@@ -125,7 +125,7 @@ public class GarageInventoryController {
             @PathVariable Integer garageId) {
         log.info("Fetching low stock items for garage: {}", garageId);
         List<GarageInventoryItemResponse> responses = inventoryService.getLowStockItems(garageId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Low stock items retrieved successfully", responses));
     }
 
@@ -138,7 +138,7 @@ public class GarageInventoryController {
             @PathVariable Integer garageId) {
         log.info("Fetching out of stock items for garage: {}", garageId);
         List<GarageInventoryItemResponse> responses = inventoryService.getOutOfStockItems(garageId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Out of stock items retrieved successfully", responses));
     }
 
@@ -153,7 +153,7 @@ public class GarageInventoryController {
         log.info("Searching inventory for garage: {} with term: {}", garageId, q);
         List<GarageInventoryItemResponse> responses =
                 inventoryService.searchInventoryItems(garageId, q);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Search completed successfully", responses));
     }
 
@@ -167,7 +167,7 @@ public class GarageInventoryController {
         log.info("Fetching transaction history for item: {}", itemId);
         List<InventoryTransactionResponse> responses =
                 inventoryService.getTransactionHistory(itemId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Transaction history retrieved successfully", responses));
     }
 
@@ -180,7 +180,7 @@ public class GarageInventoryController {
             @PathVariable Integer garageId) {
         log.info("Fetching inventory summary for garage: {}", garageId);
         InventorySummaryResponse response = inventoryService.getInventorySummary(garageId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Inventory summary retrieved successfully", response));
     }
 
@@ -193,7 +193,7 @@ public class GarageInventoryController {
             @RequestParam String partNumber) {
         log.info("Searching for part with part number: {}", partNumber);
         ProductDetailResponse product = inventoryService.searchPartByPartNumber(partNumber);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Part found successfully", product));
     }
 
@@ -206,7 +206,7 @@ public class GarageInventoryController {
             @PathVariable Integer itemId) {
         log.info("Deactivating inventory item: {}", itemId);
         inventoryService.deactivateInventoryItem(itemId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Inventory item deactivated successfully", null));
     }
 }

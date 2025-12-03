@@ -22,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VehicleOwnerSubscriptionService {
 
+    public static final String SUBSCRIPTION_NOT_FOUND = "Subscription not found";
     private final VehicleOwnerRepository vehicleOwnerRepository;
 
     private final GarageSubscriptionRepository planRepository;
@@ -70,7 +71,7 @@ public class VehicleOwnerSubscriptionService {
     @Transactional
     public void cancelSubscription(Integer subscriptionId) {
         VehicleOwnerSubscription subscription = vehicleOwnerSubscriptionRepository.findById ( subscriptionId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (SUBSCRIPTION_NOT_FOUND) );
         subscription.setStatus ( SubscriptionStatus.CANCELLED );
         vehicleOwnerSubscriptionRepository.save ( subscription );
     }
@@ -84,7 +85,7 @@ public class VehicleOwnerSubscriptionService {
     @Transactional
     public VehicleOwnerSubscription getSubscriptionById(Integer subscriptionId) {
         return vehicleOwnerSubscriptionRepository.findById ( subscriptionId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (SUBSCRIPTION_NOT_FOUND) );
     }
 
     /**
@@ -168,7 +169,7 @@ public class VehicleOwnerSubscriptionService {
     @Transactional
     public VehicleOwnerSubscription updateSubscriptionStatus(Integer subscriptionId, SubscriptionStatus status) {
         VehicleOwnerSubscription subscription = vehicleOwnerSubscriptionRepository.findById ( subscriptionId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Subscription not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (SUBSCRIPTION_NOT_FOUND) );
 
         subscription.setStatus ( status );
         return vehicleOwnerSubscriptionRepository.save ( subscription );

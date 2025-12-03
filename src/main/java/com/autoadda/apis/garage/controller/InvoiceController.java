@@ -25,7 +25,7 @@ public class InvoiceController {
     @PutMapping("/pay")
     public ResponseEntity<GenericResponse> payInvoice(@RequestBody InvoicePayRequest request) {
         InvoiceResponse invoice = invoiceService.updateInvoicePayment ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoice updated as paid", invoice ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Invoice updated as paid", invoice ) );
     }
 
     // Modern Invoice endpoints (WorkOrder-based) with DTO support
@@ -33,7 +33,7 @@ public class InvoiceController {
     @PostMapping("/generate")
     public ResponseEntity<GenericResponse> generateInvoice(@RequestBody InvoiceRequest request) {
         InvoiceResponse invoice = invoiceService.generateInvoiceFromRequest ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoice generated successfully", invoice ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Invoice generated successfully", invoice ) );
     }
 
     @PostMapping("/work-order/{workOrderId}/auto-generate")
@@ -42,25 +42,25 @@ public class InvoiceController {
             @RequestParam(required = false, defaultValue = "10.0") Double taxRate,
             @RequestParam(required = false) String notes) {
         InvoiceResponse invoice = invoiceService.generateInvoiceFromWorkOrder ( workOrderId, taxRate, notes );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoice auto-generated successfully", invoice ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Invoice auto-generated successfully", invoice ) );
     }
 
     @GetMapping("/{invoiceId}")
     public ResponseEntity<GenericResponse> getInvoiceById(@PathVariable Integer invoiceId) {
         InvoiceResponse invoice = invoiceService.getInvoiceResponse ( invoiceId );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoice retrieved successfully", invoice ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Invoice retrieved successfully", invoice ) );
     }
 
     @GetMapping("/work-order/{workOrderId}")
     public ResponseEntity<GenericResponse> getInvoiceByWorkOrderId(@PathVariable Integer workOrderId) {
         InvoiceResponse invoice = invoiceService.getInvoiceByWorkOrderId ( workOrderId );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoice retrieved successfully", invoice ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Invoice retrieved successfully", invoice ) );
     }
 
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<GenericResponse> getInvoicesForGarage(@PathVariable Integer garageId) {
         List<Invoice> invoices = invoiceService.getInvoicesForGarage ( garageId );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoices retrieved successfully", invoices ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Invoices retrieved successfully", invoices ) );
     }
 
     @PutMapping("/{invoiceId}/payment-status")
@@ -68,7 +68,7 @@ public class InvoiceController {
             @PathVariable Integer invoiceId,
             @RequestParam InvoiceStatus paymentStatus) {
         Invoice invoice = invoiceService.updateInvoicePaymentStatus ( invoiceId, paymentStatus );
-        return ResponseEntity.ok ( GenericResponse.success ( "Invoice payment status updated", invoice ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Invoice payment status updated", invoice ) );
     }
 
     @PostMapping("/{invoiceId}/send-to-customer")

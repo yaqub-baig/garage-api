@@ -36,7 +36,7 @@ public class OsRequest {
     private List<DayOfWeek> workingDays;
     private String mobileNumber;
     private LocationRequest otherServiceLocation;
-    private List<Integer> OsServiceIds;
+    private List<Integer> osServiceIds;
     private String brands;
     private String models;
     private Long logoId;

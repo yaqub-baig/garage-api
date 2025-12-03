@@ -33,9 +33,6 @@ public class VehicleOwner {
     @Column(name = "owner_type", insertable = false, updatable = false)
     private OwnerType ownerType;
 
-//	@OneToMany(mappedBy = "vehicleOwner")
-//	private List<VehicleOwnerSubscription> subscriptions;
-
     @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;

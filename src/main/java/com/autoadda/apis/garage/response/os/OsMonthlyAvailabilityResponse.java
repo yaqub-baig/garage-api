@@ -22,7 +22,7 @@ public class OsMonthlyAvailabilityResponse {
     // Helper method to get count of available days
     public Long getAvailableDaysCount() {
         return dailyAvailability.values().stream()
-                .mapToLong(available -> available ? 1 : 0)
+                .mapToLong(available -> Boolean.TRUE.equals(available) ? 1 : 0)
                 .sum();
     }
 }

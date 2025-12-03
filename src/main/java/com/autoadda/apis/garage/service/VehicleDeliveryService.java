@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class VehicleDeliveryService {
 
+    public static final String VEHICLE_DELIVERY_NOT_FOUND = "Vehicle delivery not found";
     private final VehicleDeliveryRepository vehicleDeliveryRepo;
     private final WorkOrderRepository workOrderRepo;
     private final TechnicianRepository technicianRepo;
@@ -87,7 +88,7 @@ public class VehicleDeliveryService {
         log.info("Submitting delivery checklist for delivery ID: {}", deliveryId);
 
         VehicleDelivery delivery = vehicleDeliveryRepo.findById(deliveryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle delivery not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(VEHICLE_DELIVERY_NOT_FOUND));
 
         // Validate status
         if (delivery.getStatus() != DeliveryStatus.PENDING_VERIFICATION) {
@@ -155,7 +156,7 @@ public class VehicleDeliveryService {
 
         // Get latest delivery record
         VehicleDelivery delivery = vehicleDeliveryRepo.findTopByWorkOrderIdOrderByCreatedAtDesc(workOrderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle delivery not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(VEHICLE_DELIVERY_NOT_FOUND));
 
         // Build receiving checklist
         VehicleDeliveryComparisonResponse.ItemsChecklist receivingChecklist =
@@ -197,11 +198,11 @@ public class VehicleDeliveryService {
         // Get photo URLs
         List<String> receivingPhotos = vehicleReceived.getVehiclePhotos().stream()
                 .map(MediaFile::getFilePath)
-                .collect(Collectors.toList());
+                .toList();
 
         List<String> deliveryPhotos = delivery.getDeliveryPhotos().stream()
                 .map(MediaFile::getFilePath)
-                .collect(Collectors.toList());
+                .toList();
 
         return VehicleDeliveryComparisonResponse.builder()
                 .deliveryId(delivery.getId())
@@ -223,7 +224,7 @@ public class VehicleDeliveryService {
         log.info("Processing customer approval for delivery ID: {}. Approved: {}", deliveryId, request.getApproved());
 
         VehicleDelivery delivery = vehicleDeliveryRepo.findById(deliveryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle delivery not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(VEHICLE_DELIVERY_NOT_FOUND));
 
         // Validate status
         if (delivery.getStatus() != DeliveryStatus.PENDING_CUSTOMER_APPROVAL) {
@@ -231,11 +232,10 @@ public class VehicleDeliveryService {
         }
 
         // Validate rejection reason if rejected
-        if (Boolean.FALSE.equals(request.getApproved())) {
-            if (request.getRejectionReason() == null || request.getRejectionReason().trim().isEmpty()) {
+        if (Boolean.FALSE.equals(request.getApproved()) && (request.getRejectionReason() == null || request.getRejectionReason().trim().isEmpty())) {
                 throw new IllegalArgumentException("Rejection reason is required when rejecting delivery");
             }
-        }
+
 
         WorkOrder workOrder = delivery.getWorkOrder();
 
@@ -296,7 +296,7 @@ public class VehicleDeliveryService {
         log.info("Fetching delivery details by ID: {}", deliveryId);
 
         VehicleDelivery delivery = vehicleDeliveryRepo.findById(deliveryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle delivery not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(VEHICLE_DELIVERY_NOT_FOUND));
 
         return convertToResponse(delivery);
     }
@@ -454,7 +454,7 @@ public class VehicleDeliveryService {
     private VehicleDeliveryResponse convertToResponse(VehicleDelivery delivery) {
         List<String> photoUrls = delivery.getDeliveryPhotos().stream()
                 .map(MediaFile::getFilePath)
-                .collect(Collectors.toList());
+                .toList();
 
         String technicianName = delivery.getDeliveredBy() != null ?
                 delivery.getDeliveredBy().getFirstName() : null;
@@ -493,7 +493,7 @@ public class VehicleDeliveryService {
                                                                                                        VehicleReceived vehicleReceived) {
         List<String> photoUrls = delivery.getDeliveryPhotos().stream()
                 .map(MediaFile::getFilePath)
-                .collect(Collectors.toList());
+                .toList();
 
         String technicianName = delivery.getDeliveredBy() != null ?
                 delivery.getDeliveredBy().getFirstName() : null;

@@ -34,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InvoiceService {
 
+    public static final String WORK_ORDER_NOT_FOUND = "Work order not found";
     private final AppointmentInvoiceRepository invoiceRepo;
     private final AppointmentInvoiceBreakDownRepository breakdownRepo;
     private final AppointmentDetailsRepository appointmentRepo;
@@ -144,7 +145,7 @@ public class InvoiceService {
     @Transactional
     public Invoice generateInvoice(Integer workOrderId, List<InvoiceLineItem> lineItems) {
         WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Work order not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (WORK_ORDER_NOT_FOUND) );
 
         boolean hasCompletedJobCards = workOrder.getJobCards ( ).stream ( )
                 .anyMatch ( j -> j.getStatus ( ) == JobCardStatus.COMPLETED );
@@ -254,7 +255,7 @@ public class InvoiceService {
     @Transactional
     public InvoiceResponse generateInvoiceFromRequest(InvoiceRequest request) {
         WorkOrder workOrder = workOrderRepository.findById ( request.getWorkOrderId ( ) )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Work order not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (WORK_ORDER_NOT_FOUND) );
 
         // Convert DTOs to entities
         List<InvoiceLineItem> lineItems = lineItemMapper.toEntityList ( request.getLineItems ( ) );
@@ -306,7 +307,7 @@ public class InvoiceService {
     @Transactional
     public InvoiceResponse generateInvoiceFromWorkOrder(Integer workOrderId, Double taxRate, String notes) {
         WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
-                .orElseThrow ( () -> new EntityNotFoundException ( "Work order not found" ) );
+                .orElseThrow ( () -> new EntityNotFoundException (WORK_ORDER_NOT_FOUND) );
 
         // Auto-generate line items from WorkOrder
         var generatedLineItems = lineItemGenerator.generateLineItemsFromWorkOrder ( workOrder );
@@ -372,7 +373,7 @@ public class InvoiceService {
                     workOrder.updateStatus ( WorkOrderStatus.INVOICED );
                     workOrderRepository.save ( workOrder );
                 }
-                return GenericResponse.success ( "Invoice sent to customer successfully", smsResponse );
+                return GenericResponse.makeSuccessResponse( "Invoice sent to customer successfully", smsResponse );
             } else {
                 return GenericResponse.failed ( "Failed to send invoice to customer", smsResponse );
             }

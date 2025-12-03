@@ -35,7 +35,7 @@ public class AppointmentController {
     @PostMapping
     public ResponseEntity<GenericResponse> createCustomerAppointment(@RequestBody CustomerAppointmentRequest request) {
         AppointmentDetails appointment = appointmentService.createCustomerAppointment(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.success(appointment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.makeSuccessResponse(appointment));
     }
 
     //2025-09-12T11:40:00:00
@@ -56,19 +56,19 @@ public class AppointmentController {
     public ResponseEntity<GenericResponse> getGarageAppointments(@PathVariable Integer garageId,
                                                                  @RequestParam(required = false) String status) throws GarageNotFoundException {
         List<AppointmentDetailResponse> appointments = appointmentService.getAppointmentsByGarage(garageId, status);
-        return ResponseEntity.ok(GenericResponse.success(appointments));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(appointments));
     }
 
     @PutMapping("/status")
     public ResponseEntity<GenericResponse> updateAppointmentStatus(@RequestBody AppointmentStatusRequest request) {
         AppointmentDetails updated = appointmentService.updateAppointmentStatus(request);
-        return ResponseEntity.ok(GenericResponse.success(updated));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(updated));
     }
 
     @GetMapping("/{appointmentId}")
     public ResponseEntity<GenericResponse> getAppointmentDetails(@PathVariable Integer appointmentId) {
         AppointmentDetailResponse response = appointmentService.getAppointmentsDetails(appointmentId);
-        return ResponseEntity.ok(GenericResponse.success(response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(response));
     }
 
 

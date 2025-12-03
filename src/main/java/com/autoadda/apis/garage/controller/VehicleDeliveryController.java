@@ -30,7 +30,7 @@ public class VehicleDeliveryController {
             @RequestParam Integer technicianId) {
         log.info("API: Initiate delivery for work order: {}, technician: {}", workOrderId, technicianId);
         VehicleDeliveryResponse response = vehicleDeliveryService.initiateDelivery(workOrderId, technicianId);
-        return ResponseEntity.ok(GenericResponse.success("Delivery initiated successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Delivery initiated successfully", response));
     }
 
     /**
@@ -42,7 +42,7 @@ public class VehicleDeliveryController {
             @RequestBody VehicleDeliveryRequest request) {
         log.info("API: Submit delivery checklist for delivery ID: {}", deliveryId);
         VehicleDeliveryResponse response = vehicleDeliveryService.submitDeliveryChecklist(deliveryId, request);
-        return ResponseEntity.ok(GenericResponse.success("Delivery checklist submitted successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Delivery checklist submitted successfully", response));
     }
 
     /**
@@ -52,7 +52,7 @@ public class VehicleDeliveryController {
     public ResponseEntity<GenericResponse> getDeliveryComparison(@PathVariable Integer workOrderId) {
         log.info("API: Get delivery comparison for work order: {}", workOrderId);
         VehicleDeliveryComparisonResponse response = vehicleDeliveryService.getDeliveryComparison(workOrderId);
-        return ResponseEntity.ok(GenericResponse.success("Delivery comparison retrieved successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Delivery comparison retrieved successfully", response));
     }
 
     /**
@@ -69,7 +69,7 @@ public class VehicleDeliveryController {
                 "Delivery approved successfully. Vehicle delivered to customer." :
                 "Delivery rejected. Please resolve issues and re-initiate delivery.";
 
-        return ResponseEntity.ok(GenericResponse.success(message, response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(message, response));
     }
 
     /**
@@ -79,7 +79,7 @@ public class VehicleDeliveryController {
     public ResponseEntity<GenericResponse> getDeliveryByWorkOrderId(@PathVariable Integer workOrderId) {
         log.info("API: Get delivery details for work order: {}", workOrderId);
         VehicleDeliveryWithReceivedChecklistResponse response = vehicleDeliveryService.getDeliveryByWorkOrderId(workOrderId);
-        return ResponseEntity.ok(GenericResponse.success("Delivery details retrieved successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Delivery details retrieved successfully", response));
     }
 
     /**
@@ -89,6 +89,6 @@ public class VehicleDeliveryController {
     public ResponseEntity<GenericResponse> getDeliveryById(@PathVariable Integer deliveryId) {
         log.info("API: Get delivery details by ID: {}", deliveryId);
         VehicleDeliveryResponse response = vehicleDeliveryService.getDeliveryById(deliveryId);
-        return ResponseEntity.ok(GenericResponse.success("Delivery details retrieved successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Delivery details retrieved successfully", response));
     }
 }

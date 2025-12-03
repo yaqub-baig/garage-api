@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JobCardService {
 
+    public static final String UNKNOWN = "UNKNOWN";
+    public static final String APPOINTMENT_NOT_FOUND = "Appointment not found";
     private final JobCardRepository jobCardRepo;
     private final JobcardStatusActivityRepository jobcardStatusActivityRepo;
     private final AppointmentServiceRepository appointmentServiceRepo;
@@ -55,7 +57,7 @@ public class JobCardService {
     @Transactional
     public JobCardResponse assignTechnicianToService(AssignServiceRequest request) {
         AppointmentDetails appointment = appointmentRepo.findById ( request.getAppointmentId ( ) )
-                .orElseThrow ( () -> new ResourceNotFoundException ( "Appointment not found" ) );
+                .orElseThrow ( () -> new ResourceNotFoundException (APPOINTMENT_NOT_FOUND) );
         log.info ( "3" );
         AppointmentServices service = appointmentServiceRepo.findById ( request.getServiceId ( ) )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) );
@@ -104,7 +106,7 @@ public class JobCardService {
     @Transactional
     public JobCard assignTechnicianToServiceWithOutResponse(AssignServiceRequest request, Integer workOrderId) {
         AppointmentDetails appointment = appointmentRepo.findById ( request.getAppointmentId ( ) )
-                .orElseThrow ( () -> new ResourceNotFoundException ( "Appointment not found" ) );
+                .orElseThrow ( () -> new ResourceNotFoundException (APPOINTMENT_NOT_FOUND) );
 
         AppointmentServices service = appointmentServiceRepo.findById ( request.getServiceId ( ) )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Service not found" ) );
@@ -158,7 +160,7 @@ public class JobCardService {
 
         jobCard.updateStatus ( request );
         Integer appointmentId = jobCard.getService ( ).getAppointmentId ( );
-        AppointmentDetails appointmentDetails = appointmentRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException ( "Appointment not found" ) );
+        AppointmentDetails appointmentDetails = appointmentRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException (APPOINTMENT_NOT_FOUND) );
         VehicleDetailResponse vehicleDetailsByIdResponse = vehicleClient.getVehicleDetailsByIdResponse ( appointmentDetails.getVehicleId ( ) );
         String vehicleOwnerNumber = vehicleDetailsByIdResponse.getOwner ( ).getMobileNumber ( );
 
@@ -333,7 +335,7 @@ public class JobCardService {
                                                 .workOrderId ( workOrderId )
                                                 .jobCards ( jobCardList )
                                                 .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus ( workOrder != null ? workOrder.getStatus ( ).toString ( ) : "UNKNOWN" )
+                                                .workOrderStatus ( workOrder != null ? workOrder.getStatus ( ).toString ( ) : UNKNOWN)
                                                 .build ( );
                                     }
                                     catch ( Exception e ) {
@@ -342,7 +344,7 @@ public class JobCardService {
                                                 .workOrderId ( workOrderId )
                                                 .jobCards ( jobCardList )
                                                 .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus ( "UNKNOWN" )
+                                                .workOrderStatus (UNKNOWN)
 
                                                 .build ( );
                                     }
@@ -399,7 +401,7 @@ public class JobCardService {
                                                 .workOrderId ( workOrderId )
                                                 .jobCards ( jobCardList )
                                                 .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus ( workOrder != null ? workOrder.getStatus ( ).toString ( ) : "UNKNOWN" )
+                                                .workOrderStatus ( workOrder != null ? workOrder.getStatus ( ).toString ( ) : UNKNOWN)
                                                 .build ( );
                                     }
                                     catch ( Exception e ) {
@@ -408,7 +410,7 @@ public class JobCardService {
                                                 .workOrderId ( workOrderId )
                                                 .jobCards ( jobCardList )
                                                 .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus ( "UNKNOWN" )
+                                                .workOrderStatus (UNKNOWN)
 
                                                 .build ( );
                                     }

@@ -28,7 +28,7 @@ public class InventoryAlertController {
             @PathVariable Integer garageId) {
         log.info("Fetching active alerts for garage: {}", garageId);
         List<InventoryAlertResponse> responses = alertService.getActiveAlerts(garageId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Active alerts retrieved successfully", responses));
     }
 
@@ -41,7 +41,7 @@ public class InventoryAlertController {
             @PathVariable Integer garageId) {
         log.info("Fetching alert count for garage: {}", garageId);
         Long count = alertService.getActiveAlertCount(garageId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Alert count retrieved successfully", count));
     }
 
@@ -55,7 +55,7 @@ public class InventoryAlertController {
             @RequestBody ResolveAlertRequest request) {
         log.info("Resolving alert: {}", alertId);
         InventoryAlertResponse response = alertService.resolveAlert(alertId, request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Alert resolved successfully", response));
     }
 
@@ -69,7 +69,7 @@ public class InventoryAlertController {
             @RequestBody ResolveAlertRequest request) {
         log.info("Dismissing alert: {}", alertId);
         InventoryAlertResponse response = alertService.dismissAlert(alertId, request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Alert dismissed successfully", response));
     }
 
@@ -82,7 +82,7 @@ public class InventoryAlertController {
             @PathVariable Integer itemId) {
         log.info("Fetching alert history for item: {}", itemId);
         List<InventoryAlertResponse> responses = alertService.getAlertHistory(itemId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Alert history retrieved successfully", responses));
     }
 }

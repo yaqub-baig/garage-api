@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.VehicleFavorite;
+import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.repository.VehicleFavoriteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class VehicleFavoriteService {
 
     public VehicleFavorite addFavoriteVehicle(Integer vehicleOwnerId, Integer favVehicleId) {
         if ( vehicleFavRepo.existsByVehicleOwnerIdAndFavoriteVehicleId ( vehicleOwnerId, favVehicleId ) ) {
-            throw new RuntimeException ( "Already marked as favorite" );
+            throw new AlreadyExistsException( "Already marked as favorite" );
         }
         VehicleFavorite fav = new VehicleFavorite ( );
         fav.setVehicleOwnerId ( vehicleOwnerId );

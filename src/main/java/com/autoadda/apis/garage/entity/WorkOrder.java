@@ -5,10 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -59,7 +56,7 @@ public class WorkOrder {
     @MapKeyEnumerated(EnumType.STRING)
     @Column(name = "timestamp")
     @Builder.Default
-    private Map<WorkOrderStatus, LocalDateTime> statusTimestamps = new HashMap<> ( );
+    private Map<WorkOrderStatus, LocalDateTime> statusTimestamps = new EnumMap<> (WorkOrderStatus.class);
 
     @PrePersist
     protected void onCreate() {
@@ -69,7 +66,7 @@ public class WorkOrder {
             jobCards = new ArrayList<> ( );
         }
         if ( statusTimestamps == null ) {
-            statusTimestamps = new HashMap<> ( );
+            statusTimestamps = new EnumMap<>(WorkOrderStatus.class);
         }
         // Record the initial CREATED status timestamp
         statusTimestamps.put ( WorkOrderStatus.CREATED, LocalDateTime.now ( ) );

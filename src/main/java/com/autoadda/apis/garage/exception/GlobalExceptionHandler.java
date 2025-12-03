@@ -25,6 +25,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    public static final String MESSAGE = "message";
+    public static final String ERROR = "error";
+    public static final String UNHANDLED_EXCEPTION = "Unhandled exception";
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GenericResponse> handleValidation(MethodArgumentNotValidException ex) {
         String errors = ex.getBindingResult ( ).getFieldErrors ( ).stream ( )
@@ -50,13 +55,13 @@ public class GlobalExceptionHandler {
         Map<String, String> response = new HashMap<> ( );
 
         if ( ex.getCause ( ) instanceof FileCountLimitExceededException ) {
-            response.put ( "error", "Too many files in the request" );
-            response.put ( "message", "Maximum file count exceeded. Please reduce the number of files." );
+            response.put (ERROR, "Too many files in the request" );
+            response.put (MESSAGE, "Maximum file count exceeded. Please reduce the number of files." );
             return ResponseEntity.status ( HttpStatus.PAYLOAD_TOO_LARGE ).body ( response );
         }
 
-        response.put ( "error", "File upload error" );
-        response.put ( "message", ex.getMessage ( ) );
+        response.put (ERROR, "File upload error" );
+        response.put (MESSAGE, ex.getMessage ( ) );
         return ResponseEntity.status ( HttpStatus.BAD_REQUEST ).body ( response );
     }
 
@@ -70,8 +75,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Map<String, String>> handleMaxSizeException(MaxUploadSizeExceededException ex) {
         Map<String, String> error = new HashMap<> ( );
-        error.put ( "error", "File size exceeded" );
-        error.put ( "message", "Maximum upload size exceeded" );
+        error.put (ERROR, "File size exceeded" );
+        error.put (MESSAGE, "Maximum upload size exceeded" );
         error.put ( "maxSize", ex.getMaxUploadSize ( ) + " bytes" );
 
         return ResponseEntity.status ( HttpStatus.PAYLOAD_TOO_LARGE ).body ( error );
@@ -164,17 +169,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GenericResponse> handleGenericException(Exception ex) {
-        log.error ( "Unhandled exception", ex );
+        log.error (UNHANDLED_EXCEPTION, ex );
         return buildResponse (  HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessage.ERROR_INTERNAL_SERVER );
     }
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<GenericResponse> handleGenericException(BadRequestException ex) {
-        log.error ( "Unhandled exception", ex );
+        log.error (UNHANDLED_EXCEPTION, ex );
         return buildResponse (  HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessage.ERROR_INTERNAL_SERVER );
     }
     @ExceptionHandler(InsufficientPointsException.class)
     public ResponseEntity<GenericResponse> handleGenericException(InsufficientPointsException ex) {
-        log.error ( "Unhandled exception", ex );
+        log.error (UNHANDLED_EXCEPTION, ex );
         return buildResponse (  HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessage.ERROR_INTERNAL_SERVER );
     }
 

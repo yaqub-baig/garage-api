@@ -42,10 +42,6 @@ public class GarageAnalyticsService {
     }
 
 
-    private double calculateUtilization(long jobsHandled) {
-        int expectedJobs = 50; // you can configure per technician per period
-        return (double) jobsHandled / expectedJobs * 100;
-    }
 
     /**
      * Calculates true technician utilization based on their shift schedule and

@@ -95,10 +95,25 @@ public class GarageController {
     }
 
     //search garage based on  city,postal code,available services ,brand, garage name
+    // Universal search using 'query' parameter searches across all fields
 
     @GetMapping("/search")
-    public ResponseEntity<List<GarageResponse>> searchGarages(@RequestParam(required = false) String model, @RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String zip, @RequestParam(required = false) String garageName, @RequestParam(required = false) List<Integer> availableServiceIds) {
-        return ResponseEntity.ok ( garageService.searchGarages ( brand, city, zip, garageName, availableServiceIds, model ) );
+    public ResponseEntity<List<GarageResponse>> searchGarages(
+            @RequestParam(required = false) String query,              // Universal search parameter
+            @RequestParam(required = false) String model,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String zip,
+            @RequestParam(required = false) String garageName,
+            @RequestParam(required = false) List<Integer> availableServiceIds) {
+
+        // If query parameter provided, use universal search
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(query)) {
+            return ResponseEntity.ok(garageService.universalSearch(query, availableServiceIds));
+        }
+
+        // Otherwise use existing specific parameter search
+        return ResponseEntity.ok(garageService.searchGarages(brand, city, zip, garageName, availableServiceIds, model));
     }
 
 

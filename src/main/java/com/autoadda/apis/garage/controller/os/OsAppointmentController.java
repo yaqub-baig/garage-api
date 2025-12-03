@@ -5,7 +5,7 @@ import com.autoadda.apis.garage.entity.os.OsAppointmentDetails;
 import com.autoadda.apis.garage.exception.OtherServiceNotFoundException;
 import com.autoadda.apis.garage.request.os.OsAppointmentStatusRequest;
 import com.autoadda.apis.garage.request.os.OsCustomerAppointmentRequest;
-import com.autoadda.apis.garage.response.OsAppointmentResponse;
+import com.autoadda.apis.garage.response.os.OsAppointmentResponse;
 import com.autoadda.apis.garage.response.os.OsAppointmentDetailResponse;
 import com.autoadda.apis.garage.response.os.OsGenericResponse;
 import com.autoadda.apis.garage.service.os.OsAppointmentService;
@@ -35,11 +35,11 @@ public class OsAppointmentController {
     @PostMapping
     public ResponseEntity<OsGenericResponse> createCustomerAppointment(@RequestBody OsCustomerAppointmentRequest request) {
         OsAppointmentDetails appointment = appointmentService.createCustomerAppointment ( request );
-        return ResponseEntity.status ( HttpStatus.CREATED ).body ( OsGenericResponse.success ( appointment ) );
+        return ResponseEntity.status ( HttpStatus.CREATED ).body ( OsGenericResponse.makeSuccessResponse( appointment ) );
     }
 
     @PostMapping("/{serviceId}/book")
-    public ResponseEntity<?> bookAppointment(@PathVariable Integer serviceId, @RequestParam Integer vehicleId,
+    public ResponseEntity<OsAppointmentDetailResponse> bookAppointment(@PathVariable Integer serviceId, @RequestParam Integer vehicleId,
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
                                              @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
                                              @RequestParam(required = false) String selectedOtherServiceIds) {
@@ -59,19 +59,19 @@ public class OsAppointmentController {
     public ResponseEntity<OsGenericResponse> getOtherServiceAppointments(@PathVariable Integer otherServiceId,
                                                                  @RequestParam(required = false) String status) throws OtherServiceNotFoundException {
         List<OsAppointmentDetailResponse> appointments = appointmentService.getAppointmentsByGarage ( otherServiceId, status );
-        return ResponseEntity.ok ( OsGenericResponse.success ( appointments ) );
+        return ResponseEntity.ok ( OsGenericResponse.makeSuccessResponse( appointments ) );
     }
 
     @PutMapping("/status")
     public ResponseEntity<OsGenericResponse> updateAppointmentStatus(@RequestBody OsAppointmentStatusRequest request) {
         OsAppointmentDetails updated = appointmentService.updateAppointmentStatus ( request );
-        return ResponseEntity.ok ( OsGenericResponse.success ( updated ) );
+        return ResponseEntity.ok ( OsGenericResponse.makeSuccessResponse( updated ) );
     }
 
     @GetMapping("/{appointmentId}")
     public ResponseEntity<OsGenericResponse> getAppointmentDetails(@PathVariable Integer appointmentId) {
         OsAppointmentResponse response = appointmentService.getAppointmentsDetails ( appointmentId );
-        return ResponseEntity.ok ( OsGenericResponse.success ( response ) );
+        return ResponseEntity.ok ( OsGenericResponse.makeSuccessResponse( response ) );
     }
     //TODO:33
     @GetMapping("/{otherServiceId}/available-slots")
@@ -94,13 +94,13 @@ public class OsAppointmentController {
     }
 
     @DeleteMapping("/{appointmentId}/cancel")
-    public ResponseEntity<?> cancelAppointment(@PathVariable Integer appointmentId, @RequestHeader(value = "X-Auto-Adda-Id") String userId) {
+    public ResponseEntity<String> cancelAppointment(@PathVariable Integer appointmentId, @RequestHeader(value = "X-Auto-Adda-Id") String userId) {
         appointmentSlotService.cancelBooking ( appointmentId );
         return ResponseEntity.ok ( "Booking cancelled successfully." );
     }
 
     @PutMapping("/edit/appointment")
-    public ResponseEntity<?> editAppointment(@RequestParam(required = false) Integer otherServiceId,
+    public ResponseEntity<OsAppointmentDetails> editAppointment(@RequestParam(required = false) Integer otherServiceId,
                                              @RequestParam(required = false) Integer vehicleId,
                                              @RequestParam Integer appointmentId,
                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,

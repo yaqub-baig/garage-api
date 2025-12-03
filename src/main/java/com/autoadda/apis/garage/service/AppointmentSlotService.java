@@ -30,7 +30,6 @@ public class AppointmentSlotService {
     private final GarageHolidayOverrideRepository holidayRepo;
     private final AppointmentDetailsRepository bookingRepo;
     private final GarageRepository garageRepo;
-    private final CustomerRepository customerRepo;
     private final AppointmentService appointmentService;
     private final SlotService slotService;
     private final SlotRepository slotRepository;
@@ -109,7 +108,7 @@ public class AppointmentSlotService {
      *
      * @param garageId                 The ID of the garage.
      * @param date                     The date for which to retrieve all slots.
-     * @param selectedGarageServiceIds
+     * @param selectedGarageServiceIds garage
      * @return A list of LocalTime slots.
      */
     @Transactional

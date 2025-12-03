@@ -28,7 +28,7 @@ public class OsAvailableServiceController {
     @PostMapping
     public ResponseEntity<OsGenericResponse> assignTechnician(@RequestBody OsAvailableService request) {
         OsAvailableService osAvailableService = service.create(request);
-        return ResponseEntity.ok(OsGenericResponse.success("OS Available service created", osAvailableService));
+        return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse("OS Available service created", osAvailableService));
     }
     // Get one service by ID
     @GetMapping("/{id}")
@@ -42,6 +42,6 @@ public class OsAvailableServiceController {
             @PathVariable Integer id,
             @RequestBody OsAvailableService updatedService) {
         service.update(id, updatedService);
-        return ResponseEntity.ok(OsGenericResponse.success("Os service Updated Successfully", updatedService));
+        return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse("Os service Updated Successfully", updatedService));
     }
 }

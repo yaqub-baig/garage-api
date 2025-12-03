@@ -29,7 +29,7 @@ public class OsJobcardStatusActivity {
     private String comments;
 
     @Column(name = "insert_tms")
-    private LocalDate insert_tms;
+    private LocalDate insertTms;
 
     @Column(name = "member_id")
     private Integer memberId;

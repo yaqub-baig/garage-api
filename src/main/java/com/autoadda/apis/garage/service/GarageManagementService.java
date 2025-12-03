@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
 
@@ -54,379 +55,398 @@ public class GarageManagementService {
     private final MediaFileCleanupService mediaFileCleanupService;
 
     Garage mapToEntity(GarageRequest garageRequest) {
-        Garage garage = new Garage ( );
-        log.info ( "------>" + garageRequest.getBreakStartTime ( ).format ( DateTimeFormatter.ofPattern ( "HH:mm" ) ) );
-        log.info ( "------>" + garageRequest.getBreakEndTime ( ).format ( DateTimeFormatter.ofPattern ( "HH:mm" ) ) );
-        if ( garageRequest.getGarageBrandName ( ) != null )
-            garage.setGarageBrandName ( garageRequest.getGarageBrandName ( ) );
+        Garage garage = new Garage();
 
-        if ( garageRequest.getBreakStartTime ( ) != null ) {
-            garage.setBreakStartTime ( garageRequest.getBreakStartTime ( ).toString ( ) );
-        }
-        if ( garageRequest.getBreakEndTime ( ) != null ) {
-            garage.setBreakEndTime ( garageRequest.getBreakEndTime ( ).toString ( ) );
-        }
+        logBreakTimes(garageRequest);
+        mapBasicInfo(garageRequest, garage);
+        mapContactInfo(garageRequest, garage);
+        mapTimeInfo(garageRequest, garage);
+        mapBusinessInfo(garageRequest, garage);
+        mapVehicleInfo(garageRequest, garage);
 
-        if ( garageRequest.getName ( ) != null )
-            garage.setName ( garageRequest.getName ( ) );
-
-        if ( garageRequest.getEmail ( ) != null )
-            garage.setEmail ( garageRequest.getEmail ( ) );
-
-        if ( garageRequest.getTradeLicenceNumber ( ) != null )
-            garage.setTradeLicenceNumber ( garageRequest.getTradeLicenceNumber ( ) );
-
-        if ( garageRequest.getOpeningTime ( ) != null )
-            garage.setOpeningTime ( garageRequest.getOpeningTime ( ).toString ( ) );
-
-        if ( garageRequest.getClosingTime ( ) != null )
-            garage.setClosingTime ( garageRequest.getClosingTime ( ).toString ( ) );
-
-        if ( garageRequest.getWorkingDays ( ) != null )
-            garage.setWorkingDays ( garageRequest.getWorkingDays ( ).toString ( ) );
-
-        if ( garageRequest.getWebsite( ) != null )
-            garage.setWebsite( garageRequest.getWebsite( ) );
-
-        if ( garageRequest.getPhoneNumber ( ) != null )
-            garage.setPhoneNumber ( garageRequest.getPhoneNumber ( ) );
-
-        if ( garageRequest.getMobileNumber ( ) != null )
-            garage.setMobileNumber ( garageRequest.getMobileNumber ( ) );
-
-        if ( garageRequest.getConcurrentAppointmentCapacity ( ) != null )
-            garage.setConcurrentAppointmentCapacity ( garageRequest.getConcurrentAppointmentCapacity ( ) );
-
-        if ( garageRequest.getTrnNumber ( ) != null )
-            garage.setTrnNumber ( garageRequest.getTrnNumber ( ) );
-
-        if ( garageRequest.getWebsite( ) != null )
-            garage.setWebsite( garageRequest.getWebsite( ) );
-
-        garage.setAccountStatus ( GarageVerificationStatus.PENDING ); // Default status
-
-        if ( garageRequest.getBrands ( ) != null )
-            garage.setBrands ( garageRequest.getBrands ( ) );
-
-        if ( garageRequest.getModels ( ) != null )
-            garage.setModels ( garageRequest.getModels ( ) );
-
-        if ( garageRequest.getGarageArabicName ( ) != null )
-            garage.setGarageArabicName ( garageRequest.getGarageArabicName ( ) );
-        garage.setCreatedAt ( LocalDateTime.now ( ) );
+        garage.setAccountStatus(GarageVerificationStatus.PENDING);
+        garage.setCreatedAt(LocalDateTime.now());
         return garage;
+    }
+
+    private void logBreakTimes(GarageRequest garageRequest) {
+        Optional.ofNullable(garageRequest.getBreakStartTime())
+                .ifPresent(time -> log.info("------>1" + time.format(DateTimeFormatter.ofPattern("HH:mm"))));
+        Optional.ofNullable(garageRequest.getBreakEndTime())
+                .ifPresent(time -> log.info("------>" + time.format(DateTimeFormatter.ofPattern("HH:mm"))));
+    }
+
+    private void mapBasicInfo(GarageRequest request, Garage garage) {
+        Optional.ofNullable(request.getGarageBrandName()).ifPresent(garage::setGarageBrandName);
+        Optional.ofNullable(request.getName()).ifPresent(garage::setName);
+        Optional.ofNullable(request.getGarageArabicName()).ifPresent(garage::setGarageArabicName);
+    }
+
+    private void mapContactInfo(GarageRequest request, Garage garage) {
+        Optional.ofNullable(request.getEmail()).ifPresent(garage::setEmail);
+        Optional.ofNullable(request.getPhoneNumber()).ifPresent(garage::setPhoneNumber);
+        Optional.ofNullable(request.getMobileNumber()).ifPresent(garage::setMobileNumber);
+        Optional.ofNullable(request.getWebsite()).ifPresent(garage::setWebsite);
+    }
+
+    private void mapTimeInfo(GarageRequest request, Garage garage) {
+        Optional.ofNullable(request.getOpeningTime())
+                .map(LocalTime::toString)
+                .ifPresent(garage::setOpeningTime);
+        Optional.ofNullable(request.getClosingTime())
+                .map(LocalTime::toString)
+                .ifPresent(garage::setClosingTime);
+        Optional.ofNullable(request.getBreakStartTime())
+                .map(LocalTime::toString)
+                .ifPresent(garage::setBreakStartTime);
+        Optional.ofNullable(request.getBreakEndTime())
+                .map(LocalTime::toString)
+                .ifPresent(garage::setBreakEndTime);
+        Optional.ofNullable(request.getWorkingDays())
+                .map(Object::toString)
+                .ifPresent(garage::setWorkingDays);
+    }
+
+    private void mapBusinessInfo(GarageRequest request, Garage garage) {
+        Optional.ofNullable(request.getTradeLicenceNumber()).ifPresent(garage::setTradeLicenceNumber);
+        Optional.ofNullable(request.getTrnNumber()).ifPresent(garage::setTrnNumber);
+        Optional.ofNullable(request.getConcurrentAppointmentCapacity())
+                .ifPresent(garage::setConcurrentAppointmentCapacity);
+    }
+
+    private void mapVehicleInfo(GarageRequest request, Garage garage) {
+        Optional.ofNullable(request.getBrands()).ifPresent(garage::setBrands);
+        Optional.ofNullable(request.getModels()).ifPresent(garage::setModels);
     }
 
     @Transactional
     public GarageResponse createGarage(GarageRequest garageRequest, String autoAddaId) {
-        validateGarageOwnerExists ( Integer.parseInt ( autoAddaId ) );
-        Garage garage = mapToEntity ( garageRequest );
-        if ( garageRequest.getGarageLocation ( ) != null ) {
-            Location location = locationService.createLocation ( garageRequest.getGarageLocation ( ) );
-            garage.setGarageLocation ( location );
+        validateGarageOwnerExists(Integer.parseInt(autoAddaId));
+        Garage garage = mapToEntity(garageRequest);
+        if (garageRequest.getGarageLocation() != null) {
+            Location location = locationService.createLocation(garageRequest.getGarageLocation());
+            garage.setGarageLocation(location);
         }
-        garage.setGarageOwner ( Integer.parseInt ( autoAddaId ) );
-        if ( garageRequest.getLogoId ( ) != null )
-            garage.setGarageLogo ( mediaFileRepository.findById ( garageRequest.getLogoId ( ) )
-                    .orElseThrow ( () -> new ResourceNotFoundException ( "garage logo not found" ) ) );
+        garage.setGarageOwner(Integer.parseInt(autoAddaId));
+        if (garageRequest.getLogoId() != null)
+            garage.setGarageLogo(mediaFileRepository.findById(garageRequest.getLogoId())
+                    .orElseThrow(() -> new ResourceNotFoundException("garage logo not found")));
 
 
-        if ( garageRequest.getVatCertificateIds ( ) != null && ! garageRequest.getVatCertificateIds ( ).isEmpty ( ) )
-            garage.setVatCertificate ( mediaFileRepository.findAllById ( garageRequest.getVatCertificateIds ( ) ) );
+        if (garageRequest.getVatCertificateIds() != null && !garageRequest.getVatCertificateIds().isEmpty())
+            garage.setVatCertificate(mediaFileRepository.findAllById(garageRequest.getVatCertificateIds()));
 
-        if ( garageRequest.getTradeLicenseAttachmentIds ( ) != null && ! garageRequest.getTradeLicenseAttachmentIds ( ).isEmpty ( ) )
-            garage.setTradeLicenseAttachment ( mediaFileRepository.findAllById ( garageRequest.getTradeLicenseAttachmentIds ( ) ) );
+        if (garageRequest.getTradeLicenseAttachmentIds() != null && !garageRequest.getTradeLicenseAttachmentIds().isEmpty())
+            garage.setTradeLicenseAttachment(mediaFileRepository.findAllById(garageRequest.getTradeLicenseAttachmentIds()));
 
-        if ( garageRequest.getGarageImagesIds ( ) != null && ! garageRequest.getGarageImagesIds ( ).isEmpty ( ) )
-            garage.setGarageImages ( mediaFileRepository.findAllById ( garageRequest.getGarageImagesIds ( ) ) );
-        Garage save = garageRepository.save ( garage );
-        List<GarageService> garageServices = handleGarageService ( garageRequest, save );
-        handleGarageWorkingHours ( save, garageRequest.getWorkingDays ( ), garageRequest.getClosingTime ( ), garageRequest.getOpeningTime ( ) );
-        handleGarageBreakHours ( save, garageRequest.getWorkingDays ( ), garageRequest.getBreakStartTime ( ), garageRequest.getBreakEndTime ( ) );
-        save.setServices ( garageServices );
-        Garage saved = garageRepository.save ( save );
-        GenericResponse genericResponse = authClient.updateRole ( saved.getGarageOwner ( ), ERole.GARAGE_OWNER );
-        if ( genericResponse == null ) {
-            throw new ResourceNotFoundException ( "error while updating role" );
+        if (garageRequest.getGarageImagesIds() != null && !garageRequest.getGarageImagesIds().isEmpty())
+            garage.setGarageImages(mediaFileRepository.findAllById(garageRequest.getGarageImagesIds()));
+        Garage save = garageRepository.save(garage);
+        List<GarageService> garageServices = handleGarageService(garageRequest, save);
+        handleGarageWorkingHours(save, garageRequest.getWorkingDays(), garageRequest.getClosingTime(), garageRequest.getOpeningTime());
+        handleGarageBreakHours(save, garageRequest.getWorkingDays(), garageRequest.getBreakStartTime(), garageRequest.getBreakEndTime());
+        save.setServices(garageServices);
+        Garage saved = garageRepository.save(save);
+        GenericResponse genericResponse = authClient.updateRole(saved.getGarageOwner(), ERole.GARAGE_OWNER);
+        if (genericResponse == null) {
+            throw new ResourceNotFoundException("error while updating role");
         }
-        garageRepository.flush ( );
-        workingHoursRepository.flush ( );
-        garageBreakTimeRepository.flush ( );
-        slotGenerationService.generateSlotsForDays ( saved, 60 );
-        onboardTechnician ( saved.getId ( ), new Technician ( ), saved.getGarageOwner ( ) );
-        return garageMapper.entityToResponse ( saved );
+        garageRepository.flush();
+        workingHoursRepository.flush();
+        garageBreakTimeRepository.flush();
+        slotGenerationService.generateSlotsForDays(saved, 60);
+        onboardTechnician(saved.getId(), new Technician(), saved.getGarageOwner());
+        return garageMapper.entityToResponse(saved);
     }
 
     private List<GarageService> handleGarageService(GarageRequest garageRequest, Garage save) {
-        List<GarageService> garageServices = new ArrayList<> ( );
-        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
-            garageRequest.getGarageServiceIds ( ).forEach ( sId ->
-                availableServiceRepository.findById ( sId )
-                        .map ( availableService -> garageServiceManagementService.createGarageService (
-                                new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) ).map ( garageServices::add )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) )
-             );
-        }
-        return garageServices;
-    }
-    private List<GarageService> handleUpdateGarageService(GarageRequest garageRequest, Garage save) {
-        List<GarageService> garageServices = new ArrayList<> ( );
-
-        if ( garageRequest.getGarageServiceIds ( ) != null && ! garageRequest.getGarageServiceIds ( ).isEmpty ( ) ) {
-            // Get existing garage services for this garage
-            List<GarageService> existingGarageServices = garageServiceManagementService.getByGarageIdAndActive ( save.getId ( ), TRUE );
-
-            // Extract existing available service IDs
-            List<Integer> existingAvailableServiceIds = existingGarageServices.stream ( )
-                    .map ( gs -> gs.getAvailableService ( ).getId ( ) )
-                    .toList ( );
-
-            // Add existing services to the result list
-            garageServices.addAll ( existingGarageServices );
-
-            // Filter incoming IDs to only get NEW ones (not already existing)
-            List<Integer> newServiceIds = garageRequest.getGarageServiceIds ( ).stream ( )
-                    .filter ( sId -> ! existingAvailableServiceIds.contains ( sId ) )
-                    .toList ( );
-
-            // Create only NEW garage services
-            newServiceIds.forEach ( sId ->
-                availableServiceRepository.findById ( sId )
-                        .map ( availableService -> garageServiceManagementService.createGarageService (
-                                new GarageServiceRequest ( save.getId ( ), availableService.getId ( ), TRUE ) ) )
-                        .map ( garageServices::add )
-                        .orElseThrow ( () -> new ResourceNotFoundException ( "invalid id for available service" ) )
+        List<GarageService> garageServices = new ArrayList<>();
+        if (garageRequest.getGarageServiceIds() != null && !garageRequest.getGarageServiceIds().isEmpty()) {
+            garageRequest.getGarageServiceIds().forEach(sId ->
+                    availableServiceRepository.findById(sId)
+                            .map(availableService -> garageServiceManagementService.createGarageService(
+                                    new GarageServiceRequest(save.getId(), availableService.getId(), TRUE))).map(garageServices::add)
+                            .orElseThrow(() -> new ResourceNotFoundException("invalid id for available service"))
             );
         }
         return garageServices;
     }
+
+    private List<GarageService> handleUpdateGarageService(GarageRequest garageRequest, Garage save) {
+        List<GarageService> garageServices = new ArrayList<>();
+
+        if (garageRequest.getGarageServiceIds() != null && !garageRequest.getGarageServiceIds().isEmpty()) {
+            // Get existing garage services for this garage
+            List<GarageService> existingGarageServices = garageServiceManagementService.getByGarageIdAndActive(save.getId(), TRUE);
+
+            // Extract existing available service IDs
+            List<Integer> existingAvailableServiceIds = existingGarageServices.stream()
+                    .map(gs -> gs.getAvailableService().getId())
+                    .toList();
+
+            // Add existing services to the result list
+            garageServices.addAll(existingGarageServices);
+
+            // Filter incoming IDs to only get NEW ones (not already existing)
+            List<Integer> newServiceIds = garageRequest.getGarageServiceIds().stream()
+                    .filter(sId -> !existingAvailableServiceIds.contains(sId))
+                    .toList();
+
+            // Create only NEW garage services
+            newServiceIds.forEach(sId ->
+                    availableServiceRepository.findById(sId)
+                            .map(availableService -> garageServiceManagementService.createGarageService(
+                                    new GarageServiceRequest(save.getId(), availableService.getId(), TRUE)))
+                            .map(garageServices::add)
+                            .orElseThrow(() -> new ResourceNotFoundException("invalid id for available service"))
+            );
+        }
+        return garageServices;
+    }
+
     private void validateGarageOwnerExists(int id) {
-        UserResponse user = authClient.getUser ( id );
-        if ( user == null ) {
-            throw new ResourceNotFoundException ( "user not found" );
+        UserResponse user = authClient.getUser(id);
+        if (user == null) {
+            throw new ResourceNotFoundException("user not found");
         }
     }
 
     private void handleGarageBreakHours(Garage save, List<DayOfWeek> workingDays, LocalTime breakStartTime, LocalTime breakEndTime) {
-        workingDays.forEach ( day -> {
-            GarageBreakTime garageBreakTime = new GarageBreakTime ( );
-            garageBreakTime.setGarage ( save );
-            garageBreakTime.setDayOfWeek ( day );
-            garageBreakTime.setBreakStart ( breakStartTime );
-            garageBreakTime.setBreakEnd ( breakEndTime );
-            log.info ( "---------------->" + breakStartTime.toString ( ) );
-            log.info ( "---------------->" + breakEndTime.toString ( ) );
-            garageBreakTimeRepository.save ( garageBreakTime );
-        } );
+        workingDays.forEach(day -> {
+            GarageBreakTime garageBreakTime = new GarageBreakTime();
+            garageBreakTime.setGarage(save);
+            garageBreakTime.setDayOfWeek(day);
+            garageBreakTime.setBreakStart(breakStartTime);
+            garageBreakTime.setBreakEnd(breakEndTime);
+            log.info("---------------->" + breakStartTime.toString());
+            log.info("---------------->" + breakEndTime.toString());
+            garageBreakTimeRepository.save(garageBreakTime);
+        });
 
     }
 
     private void handleGarageWorkingHours(Garage save, List<DayOfWeek> workingDays, LocalTime closingTime, LocalTime openingTime) {
-        workingDays.forEach ( day -> {
-            GarageWorkingHours garageWorkingHours = new GarageWorkingHours ( );
-            garageWorkingHours.setGarage ( save );
-            garageWorkingHours.setDayOfWeek ( day );
-            garageWorkingHours.setOpenTime ( openingTime );
-            garageWorkingHours.setCloseTime ( closingTime );
-            workingHoursRepository.save ( garageWorkingHours );
-        } );
+        workingDays.forEach(day -> {
+            GarageWorkingHours garageWorkingHours = new GarageWorkingHours();
+            garageWorkingHours.setGarage(save);
+            garageWorkingHours.setDayOfWeek(day);
+            garageWorkingHours.setOpenTime(openingTime);
+            garageWorkingHours.setCloseTime(closingTime);
+            workingHoursRepository.save(garageWorkingHours);
+        });
     }
 
     private void validateTradingLicenseNumber(String tradeLicenceNumber) {
-        garageRepository.findByTradeLicenceNumber ( tradeLicenceNumber ).ifPresent ( garage -> {
-            throw new AlreadyExistsException ( "A garage with the same trading license number already exists." );
-        } );
+        garageRepository.findByTradeLicenceNumber(tradeLicenceNumber).ifPresent(garage -> {
+            throw new AlreadyExistsException("A garage with the same trading license number already exists.");
+        });
     }
 
 
     // Get all garages
     @Transactional
     public List<GarageResponse> getAllGarages() {
-        return garageRepository.findAll ( ).stream ( ).filter ( Garage::isActive ).map ( garageMapper::entityToResponse ).toList ( );
+        return garageRepository.findAll().stream().filter(Garage::isActive).map(garageMapper::entityToResponse).toList();
     }
 
     public List<GarageResponse> getAllGaragesByOwnerId(String autoAddaId) {
-        return garageRepository.findByGarageOwner ( Integer.parseInt ( autoAddaId ) ).stream ( )
-                .filter ( Garage::isActive )
-                .map ( garageMapper::entityToResponse ).toList ( );
+        return garageRepository.findByGarageOwner(Integer.parseInt(autoAddaId)).stream()
+                .filter(Garage::isActive)
+                .map(garageMapper::entityToResponse).toList();
     }
 
     // Get all garages with services
     @Transactional
     public List<Garage> getAllGaragesWithServices() {
-        return garageRepository.findAllWithServices ( );
+        return garageRepository.findAllWithServices();
     }
 
     // Get garage by ID
     @Transactional
     public Optional<GarageResponse> getGarageById(Integer id) {
-        return Optional.of ( garageRepository.findById ( id )
-                .map ( garageMapper::entityToResponse )
-                .orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) ) );
+        return Optional.of(garageRepository.findById(id)
+                .map(garageMapper::entityToResponse)
+                .orElseThrow(() -> new NoSuchElementException(GARAGE_NOT_FOUND_WITH_ID + id)));
     }
 
     // Get garage with services
     @Transactional
     public Garage getGarageWithServicesById(Integer id) {
-        return garageRepository.findWithServicesById ( id )
-                .orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) );
+        return garageRepository.findWithServicesById(id)
+                .orElseThrow(() -> new NoSuchElementException(GARAGE_NOT_FOUND_WITH_ID + id));
     }
 
     // Update existing garage
     @Transactional
     public GarageResponse updateGarage(Integer id, GarageRequest request) {
-        Garage existing = garageRepository.findById ( id )
-                .orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) );
+        Garage existing = garageRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(GARAGE_NOT_FOUND_WITH_ID + id));
 
+        updateGarageLocation(request, existing);
+        updateBasicInfo(request, existing);
+        updateContactInfo(request, existing);
+        updateTimeInfo(request, existing);
+        updateBusinessInfo(request, existing);
+        updateVehicleInfo(request, existing);
 
-        if ( request.getGarageLocation ( ) != null ) {
-            Location existingGarageLocation = existing.getGarageLocation ( );
-            Location location = locationService.updateLocation ( existingGarageLocation.getId ( ), request.getGarageLocation ( ) );
-            existing.setGarageLocation ( location );
-        }
-        if ( request.getBrands ( ) != null ) {
-            existing.setBrands ( request.getBrands ( ) );
-        }
+        List<Long> filesToCleanup = new ArrayList<>();
+        updateMediaFiles(request, existing, filesToCleanup);
+        updateGarageServices(request, existing);
 
-        if ( request.getConcurrentAppointmentCapacity ( ) != null ) {
-            existing.setConcurrentAppointmentCapacity ( request.getConcurrentAppointmentCapacity ( ) );
-            slotGenerationService.updateUpcomingSlotsForGarage ( existing );
-        }
+        Garage saved = garageRepository.save(existing);
+        cleanupOldMediaFiles(filesToCleanup);
 
-        if ( request.getModels ( ) != null ) {
-            existing.setModels ( request.getModels ( ) );
-        }
-        if ( request.getGarageArabicName ( ) != null ) {
-            existing.setGarageArabicName ( request.getGarageArabicName ( ) );
-        }
-        if ( request.getTradeLicenceNumber ( ) != null ) {
-            validateTradingLicenseNumber ( request.getTradeLicenceNumber ( ) );
-            existing.setTradeLicenceNumber ( request.getTradeLicenceNumber ( ) );
-        }
-        if ( request.getOpeningTime ( ) != null ) {
-            existing.setOpeningTime ( request.getOpeningTime ( ).toString ( ) );
-        }
-        if ( request.getClosingTime ( ) != null ) {
-            existing.setClosingTime ( request.getClosingTime ( ).toString ( ) );
-        }
-        if ( request.getWorkingDays ( ) != null ) {
-            existing.setWorkingDays ( request.getWorkingDays ( ).toString ( ) );
-        }
-        if ( request.getBreakStartTime ( ) != null ) {
-            existing.setBreakStartTime ( request.getBreakStartTime ( ).toString ( ) );
-        }
-        if ( request.getBreakEndTime ( ) != null ) {
-            existing.setBreakEndTime ( request.getBreakEndTime ( ).toString ( ) );
-        }
+        return garageMapper.entityToResponse(saved);
+    }
 
-        if ( request.getGarageBrandName ( ) != null ) {
-            existing.setGarageBrandName ( request.getGarageBrandName ( ) );
-        }
-        if ( request.getTrnNumber ( ) != null ) {
-            existing.setTrnNumber ( request.getTrnNumber ( ) );
-        }
-        if ( request.getPhoneNumber ( ) != null ) {
-            existing.setPhoneNumber ( request.getPhoneNumber ( ) );
-        }
-        if ( request.getWebsite( ) != null ) {
-            existing.setWebsite( request.getWebsite( ) );
-        }
-        if ( request.getName ( ) != null ) {
-            existing.setName ( request.getName ( ) );
-        }
-        if ( request.getMobileNumber ( ) != null ) {
-            existing.setMobileNumber ( request.getMobileNumber ( ) );
-        }
+    private void updateGarageLocation(GarageRequest request, Garage existing) {
+        Optional.ofNullable(request.getGarageLocation())
+                .ifPresent(locationRequest -> {
+                    Location existingLocation = existing.getGarageLocation();
+                    Location updated = locationService.updateLocation(existingLocation.getId(), locationRequest);
+                    existing.setGarageLocation(updated);
+                });
+    }
 
-        List<Long> filesToCleanup = new ArrayList<> ( );
+    private void updateBasicInfo(GarageRequest request, Garage existing) {
+        Optional.ofNullable(request.getGarageBrandName()).ifPresent(existing::setGarageBrandName);
+        Optional.ofNullable(request.getName()).ifPresent(existing::setName);
+        Optional.ofNullable(request.getGarageArabicName()).ifPresent(existing::setGarageArabicName);
+    }
 
-        // Handle garage logo update
-        handleGarageLogo ( request, existing, filesToCleanup );
-        handleTradeLicense ( request, existing, filesToCleanup );
-        handleGarageImages ( request, existing, filesToCleanup );
-        handleVatCertificates ( request, existing, filesToCleanup );
-        List<GarageService> garageServices = handleUpdateGarageService ( request, existing );
-        existing.setServices ( garageServices );
-        Garage save = garageRepository.save ( existing );
+    private void updateContactInfo(GarageRequest request, Garage existing) {
+        Optional.ofNullable(request.getEmail()).ifPresent(existing::setEmail);
+        Optional.ofNullable(request.getPhoneNumber()).ifPresent(existing::setPhoneNumber);
+        Optional.ofNullable(request.getMobileNumber()).ifPresent(existing::setMobileNumber);
+        Optional.ofNullable(request.getWebsite()).ifPresent(existing::setWebsite);
+    }
 
-        if ( ! filesToCleanup.isEmpty ( ) ) {
-            mediaFileCleanupService.scheduleCleanup ( filesToCleanup );
+    private void updateTimeInfo(GarageRequest request, Garage existing) {
+        Optional.ofNullable(request.getOpeningTime())
+                .map(LocalTime::toString)
+                .ifPresent(existing::setOpeningTime);
+        Optional.ofNullable(request.getClosingTime())
+                .map(LocalTime::toString)
+                .ifPresent(existing::setClosingTime);
+        Optional.ofNullable(request.getBreakStartTime())
+                .map(LocalTime::toString)
+                .ifPresent(existing::setBreakStartTime);
+        Optional.ofNullable(request.getBreakEndTime())
+                .map(LocalTime::toString)
+                .ifPresent(existing::setBreakEndTime);
+        Optional.ofNullable(request.getWorkingDays())
+                .map(Object::toString)
+                .ifPresent(existing::setWorkingDays);
+    }
+
+    private void updateBusinessInfo(GarageRequest request, Garage existing) {
+        Optional.ofNullable(request.getTradeLicenceNumber())
+                .ifPresent(licenceNumber -> {
+                    validateTradingLicenseNumber(licenceNumber);
+                    existing.setTradeLicenceNumber(licenceNumber);
+                });
+        Optional.ofNullable(request.getTrnNumber()).ifPresent(existing::setTrnNumber);
+        Optional.ofNullable(request.getConcurrentAppointmentCapacity())
+                .ifPresent(capacity -> {
+                    existing.setConcurrentAppointmentCapacity(capacity);
+                    slotGenerationService.updateUpcomingSlotsForGarage(existing);
+                });
+    }
+
+    private void updateVehicleInfo(GarageRequest request, Garage existing) {
+        Optional.ofNullable(request.getBrands()).ifPresent(existing::setBrands);
+        Optional.ofNullable(request.getModels()).ifPresent(existing::setModels);
+    }
+
+    private void updateMediaFiles(GarageRequest request, Garage existing, List<Long> filesToCleanup) {
+        handleGarageLogo(request, existing, filesToCleanup);
+        handleTradeLicense(request, existing, filesToCleanup);
+        handleGarageImages(request, existing, filesToCleanup);
+        handleVatCertificates(request, existing, filesToCleanup);
+    }
+
+    private void updateGarageServices(GarageRequest request, Garage existing) {
+        List<GarageService> garageServices = handleUpdateGarageService(request, existing);
+        existing.setServices(garageServices);
+    }
+
+    private void cleanupOldMediaFiles(List<Long> filesToCleanup) {
+        if (!filesToCleanup.isEmpty()) {
+            mediaFileCleanupService.scheduleCleanup(filesToCleanup);
         }
-
-        return garageMapper.entityToResponse ( save );
     }
 
     private void handleVatCertificates(GarageRequest request, Garage existing, List<Long> filesToCleanup) {
-        if ( request.getVatCertificateIds ( ) != null && ! request.getVatCertificateIds ( ).isEmpty ( ) ) {
+        if (request.getVatCertificateIds() != null && !request.getVatCertificateIds().isEmpty()) {
             // Schedule old VAT certificates for cleanup
-            List<Long> oldVatCertIds = existing.getVatCertificate ( ).stream ( )
-                    .map ( MediaFile::getId )
-                    .toList ( );
-            if ( ! oldVatCertIds.isEmpty ( ) ) {
-                filesToCleanup.addAll ( oldVatCertIds );
+            List<Long> oldVatCertIds = existing.getVatCertificate().stream()
+                    .map(MediaFile::getId)
+                    .toList();
+            if (!oldVatCertIds.isEmpty()) {
+                filesToCleanup.addAll(oldVatCertIds);
             }
 
             // Create new VAT certificates collection
-            List<MediaFile> newVatCertificates = new ArrayList<> ( );
-            request.getVatCertificateIds ( ).forEach ( vid -> {
-                MediaFile mediaFile = mediaFileRepository.findById ( vid )
-                        .orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
-                newVatCertificates.add ( mediaFile );
-            } );
-            existing.setVatCertificate ( newVatCertificates );
+            List<MediaFile> newVatCertificates = new ArrayList<>();
+            request.getVatCertificateIds().forEach(vid -> {
+                MediaFile mediaFile = mediaFileRepository.findById(vid)
+                        .orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
+                newVatCertificates.add(mediaFile);
+            });
+            existing.setVatCertificate(newVatCertificates);
         }
     }
 
     private void handleGarageImages(GarageRequest request, Garage existing, List<Long> filesToCleanup) {
-        if ( request.getGarageImagesIds ( ) != null && ! request.getGarageImagesIds ( ).isEmpty ( ) ) {
+        if (request.getGarageImagesIds() != null && !request.getGarageImagesIds().isEmpty()) {
             // Schedule old garage images for cleanup
-            List<Long> oldGarageImageIds = existing.getGarageImages ( ).stream ( )
-                    .map ( MediaFile::getId )
-                    .toList ( );
-            if ( ! oldGarageImageIds.isEmpty ( ) ) {
-                filesToCleanup.addAll ( oldGarageImageIds );
+            List<Long> oldGarageImageIds = existing.getGarageImages().stream()
+                    .map(MediaFile::getId)
+                    .toList();
+            if (!oldGarageImageIds.isEmpty()) {
+                filesToCleanup.addAll(oldGarageImageIds);
             }
 
             // Create new garage images collection
-            List<MediaFile> newGarageImages = new ArrayList<> ( );
-            request.getGarageImagesIds ( ).forEach ( gid -> {
-                MediaFile mediaFile = mediaFileRepository.findById ( gid )
-                        .orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
-                newGarageImages.add ( mediaFile );
-            } );
-            existing.setGarageImages ( newGarageImages );
+            List<MediaFile> newGarageImages = new ArrayList<>();
+            request.getGarageImagesIds().forEach(gid -> {
+                MediaFile mediaFile = mediaFileRepository.findById(gid)
+                        .orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
+                newGarageImages.add(mediaFile);
+            });
+            existing.setGarageImages(newGarageImages);
         }
     }
 
     private void handleTradeLicense(GarageRequest request, Garage existing, List<Long> filesToCleanup) {
-        if ( request.getTradeLicenseAttachmentIds ( ) != null && ! request.getTradeLicenseAttachmentIds ( ).isEmpty ( ) ) {
+        if (request.getTradeLicenseAttachmentIds() != null && !request.getTradeLicenseAttachmentIds().isEmpty()) {
 
-            List<Long> oldTradeLicenseIds = existing.getTradeLicenseAttachment ( ).stream ( )
-                    .map ( MediaFile::getId )
-                    .toList ( );
-            if ( ! oldTradeLicenseIds.isEmpty ( ) ) {
-                filesToCleanup.addAll ( oldTradeLicenseIds );
+            List<Long> oldTradeLicenseIds = existing.getTradeLicenseAttachment().stream()
+                    .map(MediaFile::getId)
+                    .toList();
+            if (!oldTradeLicenseIds.isEmpty()) {
+                filesToCleanup.addAll(oldTradeLicenseIds);
             }
 
             // Create new trade license collection
-            List<MediaFile> newTradeLicenseAttachments = new ArrayList<> ( );
-            request.getTradeLicenseAttachmentIds ( ).forEach ( tid -> {
-                MediaFile mediaFile = mediaFileRepository.findById ( tid )
-                        .orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
-                newTradeLicenseAttachments.add ( mediaFile );
-            } );
-            existing.setTradeLicenseAttachment ( newTradeLicenseAttachments );
+            List<MediaFile> newTradeLicenseAttachments = new ArrayList<>();
+            request.getTradeLicenseAttachmentIds().forEach(tid -> {
+                MediaFile mediaFile = mediaFileRepository.findById(tid)
+                        .orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
+                newTradeLicenseAttachments.add(mediaFile);
+            });
+            existing.setTradeLicenseAttachment(newTradeLicenseAttachments);
         }
     }
 
     private void handleGarageLogo(GarageRequest request, Garage existing, List<Long> filesToCleanup) {
-        if ( request.getLogoId ( ) != null ) {
-            Long prevLogoId = existing.getGarageLogo ( ) != null ? existing.getGarageLogo ( ).getId ( ) : null;
-            MediaFile mediaFile = mediaFileRepository.findById ( request.getLogoId ( ) ).orElseThrow ( () -> new ResourceNotFoundException (FILE_NOT_FOUND) );
-            existing.setGarageLogo ( mediaFile );
+        if (request.getLogoId() != null) {
+            Long prevLogoId = existing.getGarageLogo() != null ? existing.getGarageLogo().getId() : null;
+            MediaFile mediaFile = mediaFileRepository.findById(request.getLogoId()).orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
+            existing.setGarageLogo(mediaFile);
             // Schedule old logo for cleanup if changed
-            if ( prevLogoId != null && ! prevLogoId.equals ( mediaFile.getId ( ) ) ) {
-                filesToCleanup.add ( prevLogoId );
+            if (prevLogoId != null && !prevLogoId.equals(mediaFile.getId())) {
+                filesToCleanup.add(prevLogoId);
             }
 
         }
@@ -435,129 +455,128 @@ public class GarageManagementService {
     // Delete garage
     @Transactional
     public void deleteGarage(Integer id) {
-        Garage garage = garageRepository.findById ( id ).orElseThrow ( () -> new NoSuchElementException ( GARAGE_NOT_FOUND_WITH_ID + id ) );
-        garage.setActive ( false );
-        garageRepository.save ( garage );
+        Garage garage = garageRepository.findById(id).orElseThrow(() -> new NoSuchElementException(GARAGE_NOT_FOUND_WITH_ID + id));
+        garage.setActive(false);
+        garageRepository.save(garage);
     }
 
     // Search/filter methods
     @Transactional
     public List<GarageResponse> findGaragesByLegalName(String legalName) {
-        return garageRepository.findByGarageBrandNameContainingIgnoreCaseAndApproved ( legalName )
-                .stream ( ).map ( garageMapper::entityToResponse )
-                .toList ( );
+        return garageRepository.findByGarageBrandNameContainingIgnoreCaseAndApproved(legalName)
+                .stream().map(garageMapper::entityToResponse)
+                .toList();
     }
 
     @Transactional
     public List<Garage> findGaragesByGarageName(String name) {
-        return garageRepository.findByNameContainingIgnoreCase ( name );
+        return garageRepository.findByNameContainingIgnoreCase(name);
     }
 
     @Transactional
     public List<Garage> findGaragesByStatus(Status status) {
-        return garageRepository.findByAccountStatus ( status );
+        return garageRepository.findByAccountStatus(status);
     }
-
 
 
     @Transactional
     public Optional<Garage> findGarageByEmail(String email) {
-        return garageRepository.findByEmail ( email );
+        return garageRepository.findByEmail(email);
     }
 
     @Transactional
     public Optional<Garage> findGarageByContact(String contact) {
-        return garageRepository.findByPhoneNumber ( contact );
+        return garageRepository.findByPhoneNumber(contact);
     }
 
     @Transactional
     public Optional<Garage> findGarageByWebsite(String website) {
-        return garageRepository.findByWebsite( website );
+        return garageRepository.findByWebsite(website);
     }
 
     @Transactional
     public Optional<Garage> findGarageByGarageNameExact(String garageName) {
-        return garageRepository.findByName ( garageName );
+        return garageRepository.findByName(garageName);
     }
 
     @Transactional
     public List<GarageResponse> findGaragesOfferingAvailableService(Integer serviceId) {
-        return garageRepository.findGaragesByAvailableServiceId ( serviceId ).stream ( ).map ( garageMapper::entityToResponse ).toList ( );
+        return garageRepository.findGaragesByAvailableServiceId(serviceId).stream().map(garageMapper::entityToResponse).toList();
     }
 
     @Transactional
     public Optional<Garage> findGarageByIdAndStatus(Integer id, Status status) {
-        return garageRepository.findByIdAndAccountStatus ( id, status );
+        return garageRepository.findByIdAndAccountStatus(id, status);
     }
 
 
     @Transactional
     public Optional<Garage> findGarageByIdAndLegalName(Integer id, String legalName) {
-        return garageRepository.findByIdAndGarageBrandName ( id, legalName );
+        return garageRepository.findByIdAndGarageBrandName(id, legalName);
     }
 
     @Transactional
     public Optional<Garage> findGarageByIdAndWebsite(Integer id, String website) {
-        return garageRepository.findByIdAndWebsite( id, website );
+        return garageRepository.findByIdAndWebsite(id, website);
     }
 
     @Transactional
     public Optional<Garage> findGarageByIdAndEmail(Integer id, String email) {
-        return garageRepository.findByIdAndEmail ( id, email );
+        return garageRepository.findByIdAndEmail(id, email);
     }
 
     @Transactional
     public Optional<Garage> findGarageByIdAndContact(Integer id, String contactNumber) {
-        return garageRepository.findByIdAndPhoneNumber ( id, contactNumber );
+        return garageRepository.findByIdAndPhoneNumber(id, contactNumber);
     }
 
     @Transactional
     public Optional<Garage> findGarageByIdAndGarageName(Integer id, String name) {
-        return garageRepository.findByIdAndName ( id, name );
+        return garageRepository.findByIdAndName(id, name);
     }
 
 
     @Transactional
     public Optional<Garage> findGarageByIdStatusLegalName(Integer id, Status status, String legalName) {
-        return garageRepository.findByIdAndAccountStatusAndGarageBrandName ( id, status, legalName );
+        return garageRepository.findByIdAndAccountStatusAndGarageBrandName(id, status, legalName);
     }
 
     @Transactional
     public Technician onboardTechnician(Integer garageId, Technician technician, Integer ownerId) {
-        Garage garage = garageRepository.findById ( garageId )
-                .orElseThrow ( () -> new EntityNotFoundException (GARAGE_NOT_FOUND) );
-        UserResponse user = authClient.getUser ( ownerId );
-        technician.setAutoAddaId ( user.getId ( ) );
+        Garage garage = garageRepository.findById(garageId)
+                .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND));
+        UserResponse user = authClient.getUser(ownerId);
+        technician.setAutoAddaId(user.getId());
         // You may check for duplicate email, phone etc.
-        technician.setFirstName ( user.getName ( ) );
-        technician.setEmailId ( user.getEmail ( ) );
-        technician.setStatus ( Status.ACTIVE );
-        technician.setGarage ( garage );
-        technician.setEmployeeRole ( EMPLOYEE_ROLE.OWNER );
-        return technicianRepository.save ( technician );
+        technician.setFirstName(user.getName());
+        technician.setEmailId(user.getEmail());
+        technician.setStatus(Status.ACTIVE);
+        technician.setGarage(garage);
+        technician.setEmployeeRole(EMPLOYEE_ROLE.OWNER);
+        return technicianRepository.save(technician);
     }
 
     @Transactional
     public PickupDropRequest createPickupDropRequest(PickupDropRequest request) {
-        request.setStatus ( Status.REQUESTED );
-        return pickupDropRequestRepository.save ( request );
+        request.setStatus(Status.REQUESTED);
+        return pickupDropRequestRepository.save(request);
     }
 
     @Transactional
     public PickupDropRequest assignDriver(Integer requestId, Integer driverId) {
-        PickupDropRequest request = pickupDropRequestRepository.findById ( requestId )
-                .orElseThrow ( () -> new RuntimeException ( "Request not found" ) );
-        request.setAssignedDriverId ( driverId );
-        request.setStatus ( Status.SCHEDULED );
-        return pickupDropRequestRepository.save ( request );
+        PickupDropRequest request = pickupDropRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        request.setAssignedDriverId(driverId);
+        request.setStatus(Status.SCHEDULED);
+        return pickupDropRequestRepository.save(request);
     }
 
     @Transactional
     public PickupDropRequest updatePickupDropStatus(Integer requestId, Status status) {
-        PickupDropRequest request = pickupDropRequestRepository.findById ( requestId )
-                .orElseThrow ( () -> new RuntimeException ( "Request not found" ) );
-        request.setStatus ( status );
-        return pickupDropRequestRepository.save ( request );
+        PickupDropRequest request = pickupDropRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+        request.setStatus(status);
+        return pickupDropRequestRepository.save(request);
     }
 
     @Transactional(readOnly = true)
@@ -662,78 +681,231 @@ public class GarageManagementService {
         return availableServiceIds.stream().anyMatch(garageServiceIds::contains);
     }
 
+    /**
+     * Universal search method that searches across multiple fields in priority order.
+     * Returns results from the first field that produces matches (cascade search).
+     *
+     * @param query      Generic search term to match across multiple fields
+     * @param serviceIds Optional service IDs filter
+     * @return List of matching garages
+     */
+    @Transactional(readOnly = true)
+    public List<GarageResponse> universalSearch(String query, List<Integer> serviceIds) {
+        Set<Garage> allGarages = garageRepository.findAllWithLocationAndServices();
+
+        log.info("Universal search for query: '{}' across {} garages", query, allGarages.size());
+
+        // Try cascade search in priority order - stop at first non-empty result
+        List<Garage> results = searchByName(allGarages, query);
+        if (!results.isEmpty()) {
+            log.info("Found {} matches in garage names", results.size());
+            return filterAndMapResults(results, serviceIds);
+        }
+
+        results = searchByBrand(allGarages, query);
+        if (!results.isEmpty()) {
+            log.info("Found {} matches in brands", results.size());
+            return filterAndMapResults(results, serviceIds);
+        }
+
+        results = searchByModel(allGarages, query);
+        if (!results.isEmpty()) {
+            log.info("Found {} matches in models", results.size());
+            return filterAndMapResults(results, serviceIds);
+        }
+
+        results = searchByServiceName(allGarages, query);
+        if (!results.isEmpty()) {
+            log.info("Found {} matches in service names", results.size());
+            return filterAndMapResults(results, serviceIds);
+        }
+
+        results = searchByCity(allGarages, query);
+        if (!results.isEmpty()) {
+            log.info("Found {} matches in cities", results.size());
+            return filterAndMapResults(results, serviceIds);
+        }
+
+        results = searchByZip(allGarages, query);
+        if (!results.isEmpty()) {
+            log.info("Found {} matches in zip codes", results.size());
+            return filterAndMapResults(results, serviceIds);
+        }
+
+        log.info("No matches found for query: '{}'", query);
+        return Collections.emptyList();
+    }
+
+    /**
+     * Search garages by name.
+     */
+    private List<Garage> searchByName(Set<Garage> garages, String query) {
+        return garages.stream()
+                .filter(g -> g.getName() != null &&
+                        g.getName().toLowerCase().contains(query.toLowerCase()))
+                .toList();
+    }
+
+    /**
+     * Search garages by vehicle brand.
+     */
+    private List<Garage> searchByBrand(Set<Garage> garages, String query) {
+        return garages.stream()
+                .filter(g -> g.getBrands() != null &&
+                        g.getBrands().toLowerCase().contains(query.toLowerCase()))
+                .toList();
+    }
+
+    /**
+     * Search garages by vehicle model.
+     */
+    private List<Garage> searchByModel(Set<Garage> garages, String query) {
+        return garages.stream()
+                .filter(g -> g.getModels() != null &&
+                        g.getModels().toLowerCase().contains(query.toLowerCase()))
+                .toList();
+    }
+
+    /**
+     * Search garages by service name.
+     */
+    private List<Garage> searchByServiceName(Set<Garage> garages, String query) {
+        return garages.stream()
+                .filter(g -> hasServiceMatchingQuery(g, query))
+                .toList();
+    }
+
+    /**
+     * Check if garage has any service matching the query.
+     */
+    private boolean hasServiceMatchingQuery(Garage garage, String query) {
+        return garage.getServices().stream()
+                .map(GarageService::getAvailableService)
+                .filter(Objects::nonNull)
+                .anyMatch(service -> service.getName() != null &&
+                        service.getName().toLowerCase().contains(query.toLowerCase()));
+    }
+
+    /**
+     * Search garages by city or state.
+     */
+    private List<Garage> searchByCity(Set<Garage> garages, String query) {
+        return garages.stream()
+                .filter(g -> {
+                    Location loc = g.getGarageLocation();
+                    if (loc == null) return false;
+
+                    // Check both city and state fields
+                    boolean cityMatch = loc.getCity() != null &&
+                            loc.getCity().toLowerCase().contains(query.toLowerCase());
+                    boolean stateMatch = loc.getState() != null &&
+                            loc.getState().toLowerCase().contains(query.toLowerCase());
+
+                    return cityMatch || stateMatch;
+                })
+                .toList();
+    }
+
+    /**
+     * Search garages by postal code.
+     */
+    private List<Garage> searchByZip(Set<Garage> garages, String query) {
+        return garages.stream()
+                .filter(g -> {
+                    Location loc = g.getGarageLocation();
+                    return loc != null &&
+                            loc.getPostalCode() != null &&
+                            loc.getPostalCode().toLowerCase().contains(query.toLowerCase());
+                })
+                .toList();
+    }
+
+    /**
+     * Apply service filter if provided, then map to response DTOs.
+     */
+    private List<GarageResponse> filterAndMapResults(List<Garage> garages, List<Integer> serviceIds) {
+        Stream<Garage> stream = garages.stream();
+
+        // Apply service filter if provided
+        if (serviceIds != null && !serviceIds.isEmpty()) {
+            stream = stream.filter(g -> matchesServiceFilter(g, serviceIds));
+        }
+
+        return stream.map(garageMapper::entityToResponse).toList();
+    }
+
     @Transactional(readOnly = true)
     public List<Garage> searchGarages2(String brand, String city, String zip, String garageName, List<Integer> availableServiceIds) {
 
 
 //         Handle null service IDs
-        availableServiceIds = availableServiceIds != null ? availableServiceIds : Collections.emptyList ( );
+        availableServiceIds = availableServiceIds != null ? availableServiceIds : Collections.emptyList();
 
         // Convert search terms to lowercase once
-        final String brandTerm = brand != null ? brand.toLowerCase ( ) : "";
-        final String cityTerm = city != null ? city.toLowerCase ( ) : "";
-        final String zipTerm = zip != null ? zip.toLowerCase ( ) : "";
-        final String garageNameTerm = garageName != null ? garageName.toLowerCase ( ) : "";
-        final List<Integer> serviceIds = new ArrayList<> ( availableServiceIds );
+        final String brandTerm = brand != null ? brand.toLowerCase() : "";
+        final String cityTerm = city != null ? city.toLowerCase() : "";
+        final String zipTerm = zip != null ? zip.toLowerCase() : "";
+        final String garageNameTerm = garageName != null ? garageName.toLowerCase() : "";
+        final List<Integer> serviceIds = new ArrayList<>(availableServiceIds);
 
         // Fetch all necessary data in a single query with joins
-        Set<Garage> garages = garageRepository.findAllWithLocationAndServices ( );
+        Set<Garage> garages = garageRepository.findAllWithLocationAndServices();
 
 
-        return garages.stream ( )
-                .filter ( Objects::nonNull )
-                .filter ( garage -> matchesBrand ( garage, brandTerm ) )
-                .filter ( garage -> matchesCity ( garage, cityTerm ) )
-                .filter ( garage -> matchesZip ( garage, zipTerm ) )
-                .filter ( garage -> matchesName ( garage, garageNameTerm ) )
-                .filter ( garage -> matchesServices ( garage, serviceIds ) )
-                .toList ( );
+        return garages.stream()
+                .filter(Objects::nonNull)
+                .filter(garage -> matchesBrand(garage, brandTerm))
+                .filter(garage -> matchesCity(garage, cityTerm))
+                .filter(garage -> matchesZip(garage, zipTerm))
+                .filter(garage -> matchesName(garage, garageNameTerm))
+                .filter(garage -> matchesServices(garage, serviceIds))
+                .toList();
     }
 
     private boolean matchesBrand(Garage garage, String brandTerm) {
-        return brandTerm.isEmpty ( ) ||
-                (garage.getGarageBrandName ( ) != null &&
-                        garage.getGarageBrandName ( ).toLowerCase ( ).contains ( brandTerm ));
+        return brandTerm.isEmpty() ||
+                (garage.getGarageBrandName() != null &&
+                        garage.getGarageBrandName().toLowerCase().contains(brandTerm));
     }
 
     private boolean matchesCity(Garage garage, String cityTerm) {
-        return cityTerm.isEmpty ( ) ||
-                (garage.getGarageLocation ( ) != null &&
-                        garage.getGarageLocation ( ).getCity ( ) != null &&
-                        garage.getGarageLocation ( ).getCity ( ).toLowerCase ( ).contains ( cityTerm ));
+        return cityTerm.isEmpty() ||
+                (garage.getGarageLocation() != null &&
+                        garage.getGarageLocation().getCity() != null &&
+                        garage.getGarageLocation().getCity().toLowerCase().contains(cityTerm));
     }
 
     private boolean matchesZip(Garage garage, String zipTerm) {
-        return zipTerm.isEmpty ( ) ||
-                (garage.getGarageLocation ( ) != null &&
-                        garage.getGarageLocation ( ).getArea ( ) != null &&
-                        garage.getGarageLocation ( ).getArea ( ).toLowerCase ( ).contains ( zipTerm ));
+        return zipTerm.isEmpty() ||
+                (garage.getGarageLocation() != null &&
+                        garage.getGarageLocation().getArea() != null &&
+                        garage.getGarageLocation().getArea().toLowerCase().contains(zipTerm));
     }
 
     private boolean matchesName(Garage garage, String nameTerm) {
-        return nameTerm.isEmpty ( ) ||
-                (garage.getName ( ) != null &&
-                        garage.getName ( ).toLowerCase ( ).contains ( nameTerm ));
+        return nameTerm.isEmpty() ||
+                (garage.getName() != null &&
+                        garage.getName().toLowerCase().contains(nameTerm));
     }
 
     private boolean matchesServices(Garage garage, List<Integer> serviceIds) {
-        if ( serviceIds.isEmpty ( ) ) {
+        if (serviceIds.isEmpty()) {
             return true;
         }
-        if ( garage.getServices ( ) == null || garage.getServices ( ).isEmpty ( ) ) {
+        if (garage.getServices() == null || garage.getServices().isEmpty()) {
             return false;
         }
-        return garage.getServices ( ).stream ( )
-                .map ( GarageService::getAvailableService )
-                .map ( AvailableService::getId )
-                .anyMatch ( serviceIds::contains );
+        return garage.getServices().stream()
+                .map(GarageService::getAvailableService)
+                .map(AvailableService::getId)
+                .anyMatch(serviceIds::contains);
     }
 
     public void updateGarageVerification(Integer id) {
-        Garage garage = garageRepository.findById ( id )
-                .orElseThrow ( () -> new EntityNotFoundException (GARAGE_NOT_FOUND) );
-        garage.setActive ( true );
-        garageRepository.save ( garage );
+        Garage garage = garageRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND));
+        garage.setActive(true);
+        garageRepository.save(garage);
     }
 
     // ====================================================================================
@@ -743,7 +915,8 @@ public class GarageManagementService {
 
     /**
      * FUTURE: Approve a garage (to be called from admin endpoint)
-     * @param garageId The garage ID to approve
+     *
+     * @param garageId    The garage ID to approve
      * @param adminUserId The admin user performing the approval
      * @return Updated garage response
      */
@@ -776,8 +949,9 @@ public class GarageManagementService {
 
     /**
      * FUTURE: Reject a garage (to be called from admin endpoint)
-     * @param garageId The garage ID to reject
-     * @param adminUserId The admin user performing the rejection
+     *
+     * @param garageId        The garage ID to reject
+     * @param adminUserId     The admin user performing the rejection
      * @param rejectionReason The reason for rejection (required)
      * @return Updated garage response
      */
@@ -818,6 +992,7 @@ public class GarageManagementService {
 
     /**
      * FUTURE: Resubmit a rejected garage (called by garage owner after fixing issues)
+     *
      * @param garageId The garage ID to resubmit
      * @return Updated garage response
      */
@@ -833,11 +1008,11 @@ public class GarageManagementService {
      * Resubmit a rejected garage (owner-facing with authorization)
      *
      * @param garageId The garage ID to resubmit
-     * @param ownerId The owner's user ID from authentication
+     * @param ownerId  The owner's user ID from authentication
      * @return Updated garage response
-     * @throws EntityNotFoundException if garage not found
+     * @throws EntityNotFoundException     if garage not found
      * @throws UnauthorizedAccessException if user is not the garage owner
-     * @throws IllegalStateException if garage is not in REJECTED status
+     * @throws IllegalStateException       if garage is not in REJECTED status
      */
     @Transactional
     public GarageResponse resubmitGarageByOwner(Integer garageId, Integer ownerId) {
@@ -850,9 +1025,9 @@ public class GarageManagementService {
         // Authorization: Verify the requester is the garage owner
         if (!garage.getGarageOwner().equals(ownerId)) {
             log.warn("Unauthorized resubmission attempt: User {} tried to resubmit garage {} owned by {}",
-                     ownerId, garageId, garage.getGarageOwner());
+                    ownerId, garageId, garage.getGarageOwner());
             throw new UnauthorizedAccessException(
-                "You are not authorized to resubmit this garage. Only the garage owner can resubmit.");
+                    "You are not authorized to resubmit this garage. Only the garage owner can resubmit.");
         }
 
         // Execute resubmission logic

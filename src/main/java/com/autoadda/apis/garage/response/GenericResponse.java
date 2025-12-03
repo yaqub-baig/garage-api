@@ -9,23 +9,24 @@ import lombok.*;
 @Getter
 @Setter
 public class GenericResponse {
+    public static final String SUCCESS = "success";
     private String status;
     private String code;
     private String message;
     private Object body;
 
-    public static GenericResponse success(Object body) {
+    public static GenericResponse makeSuccessResponse(Object body) {
         return GenericResponse.builder ( )
-                .status ( "success" )
+                .status (SUCCESS)
                 .code ( "200" )
-                .message ( "success" )
+                .message (SUCCESS)
                 .body ( body )
                 .build ( );
     }
 
-    public static GenericResponse success(String message, Object body) {
+    public static GenericResponse makeSuccessResponse(String message, Object body) {
         return GenericResponse.builder ( )
-                .status ( "success" )
+                .status (SUCCESS)
                 .code ( "200" )
                 .message ( message )
                 .body ( body )
@@ -34,7 +35,7 @@ public class GenericResponse {
 
     public static GenericResponse failed(String s, Object o) {
         return GenericResponse.builder ( )
-                .status ( "success" )
+                .status (SUCCESS)
                 .code ( "200" )
                 .message ( s )
                 .body ( o )

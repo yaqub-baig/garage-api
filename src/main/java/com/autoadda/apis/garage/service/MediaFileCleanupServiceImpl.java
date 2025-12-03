@@ -40,26 +40,45 @@ public class MediaFileCleanupServiceImpl implements MediaFileCleanupService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
     public void scheduleCleanup(List<Long> mediaFileIds) {
-        // Small delay to ensure transaction is committed
+        if (!waitForTransactionCommit()) {
+            return;
+        }
+
+        mediaFileIds.forEach(this::cleanupSingleMediaFile);
+    }
+
+    /**
+     * Waits for the parent transaction to commit.
+     *
+     * @return true if wait was successful, false if interrupted
+     */
+    private boolean waitForTransactionCommit() {
         try {
             Thread.sleep(3000);
-
-            for (Long fileId : mediaFileIds) {
-                try {
-                    // Check if file is still referenced elsewhere before deleting
-                    if (!isMediaFileStillReferenced(fileId)) {
-                        mediaFileRepository.deleteById(fileId);
-                        log.info("Successfully cleaned up media file: {}", fileId);
-                    } else {
-                        log.info("Media file {} still referenced, skipping cleanup", fileId);
-                    }
-                } catch (Exception e) {
-                    log.warn("Failed to cleanup media file {}: {}", fileId, e.getMessage());
-                }
-            }
+            return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.warn("Media file cleanup interrupted");
+            return false;
+        }
+    }
+
+    /**
+     * Attempts to clean up a single media file.
+     * Deletes the file only if it's no longer referenced by any entity.
+     *
+     * @param fileId The ID of the media file to clean up
+     */
+    private void cleanupSingleMediaFile(Long fileId) {
+        try {
+            if (!isMediaFileStillReferenced(fileId)) {
+                mediaFileRepository.deleteById(fileId);
+                log.info("Successfully cleaned up media file: {}", fileId);
+            } else {
+                log.info("Media file {} still referenced, skipping cleanup", fileId);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to cleanup media file {}: {}", fileId, e.getMessage());
         }
     }
 

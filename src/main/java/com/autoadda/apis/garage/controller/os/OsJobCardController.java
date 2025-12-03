@@ -24,26 +24,26 @@ public class OsJobCardController {
     @PostMapping("/assign")
     public ResponseEntity<OsGenericResponse> assignTechnician(@RequestBody OsAssignServiceRequest request) {
         OsJobCardResponse jobCard = jobCardService.assignTechnicianToService(request);
-        return ResponseEntity.ok(OsGenericResponse.success("Technician assigned", jobCard));
+        return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse("Technician assigned", jobCard));
     }
 
     @PutMapping("/status")
     public ResponseEntity<OsGenericResponse> updateJobCardStatus(@RequestBody OsJobCardStatusRequest request) {
         OsJobCard updated = jobCardService.updateJobCardStatus(request);
-        return ResponseEntity.ok(OsGenericResponse.success("Jobcard status updated", updated));
+        return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse("Jobcard status updated", updated));
     }
 
     @GetMapping("/technician/{technicianId}")
     public ResponseEntity<OsGenericResponse> getTechnicianJobCards(@PathVariable Integer technicianId,
                                                                  @RequestParam(required = false) Status status) throws MemberNotFoundException {
         List<OsJobCard> jobCards = jobCardService.getTechnicianJobCards(technicianId, status);
-        return ResponseEntity.ok(OsGenericResponse.success(jobCards));
+        return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse(jobCards));
     }
 
     @GetMapping("/other-service/{otherServiceId}")
     public ResponseEntity<OsGenericResponse> getOtherServiceJobCards(@PathVariable Integer otherServiceId,
                                                              @RequestParam(required = false) Status status) {
         List<OsJobCard> jobCards = jobCardService.getGarageJobCards(otherServiceId, status);
-        return ResponseEntity.ok(OsGenericResponse.success(jobCards));
+        return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse(jobCards));
     }
 }

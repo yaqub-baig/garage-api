@@ -20,7 +20,7 @@ public class OtherServiceController {
     private final OtherServiceManagementService otherService;
 
     @PostMapping
-    public ResponseEntity<?> createOtherService(
+    public ResponseEntity<OtherService> createOtherService(
             @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
             @RequestBody OtherServiceRequest otherServiceRequest) {
         return ResponseEntity.status ( HttpStatus.CREATED )

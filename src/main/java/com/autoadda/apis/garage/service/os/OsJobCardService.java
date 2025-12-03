@@ -69,7 +69,7 @@ public class OsJobCardService {
                 .memberId(request.getMemberId())
                 .memberType(request.getMemberType())
                 .comments(request.getComments())
-                .insert_tms(DateHelper.dbDate())
+                .insertTms(DateHelper.dbDate())
                 .build());
 
         service.setStatus(Status.ASSIGNED);
@@ -102,7 +102,7 @@ public class OsJobCardService {
 
         jobcardStatusActivityRepo.save(OsJobcardStatusActivity.builder().jobcardId(jobCard.getId())
                 .status(request.getStatus()).memberId(request.getMemberId()).memberType(request.getMemberType())
-                .comments(request.getComments()).insert_tms(DateHelper.dbDate()).build());
+                .comments(request.getComments()).insertTms(DateHelper.dbDate()).build());
 
         return osJobCardRepository.save(jobCard);
     }

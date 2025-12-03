@@ -50,7 +50,7 @@ public class SlotController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSlot(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteSlot(@PathVariable Integer id) {
         appointmentSlotService.deleteSlot ( id );
         return ResponseEntity.ok ( "Slot deleted successfully." );
     }

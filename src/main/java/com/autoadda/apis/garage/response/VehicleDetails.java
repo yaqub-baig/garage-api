@@ -51,10 +51,6 @@ public class VehicleDetails {
 
     private Integer customerId;
 
-//	@OneToOne(cascade = CascadeType.ALL)
-//	@JoinColumn(name = "insurance_id", referencedColumnName = "id")
-//	private InsuranceDetails insurance;
-
     private VehicleRegistration registration;
 
 }

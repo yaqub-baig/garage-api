@@ -9,23 +9,24 @@ import lombok.*;
 @Getter
 @Setter
 public class OsGenericResponse {
+    public static final String SUCCESS = "success";
     private String status;
     private String code;
     private String message;
     private Object body;
 
-    public static OsGenericResponse success(Object body) {
+    public static OsGenericResponse makeSuccessResponse(Object body) {
         return OsGenericResponse.builder()
-                .status("success")
+                .status(SUCCESS)
                 .code("200")
-                .message("success")
+                .message(SUCCESS)
                 .body(body)
                 .build();
     }
 
-    public static OsGenericResponse success(String message, Object body) {
+    public static OsGenericResponse makeSuccessResponse(String message, Object body) {
         return OsGenericResponse.builder()
-                .status("success")
+                .status(SUCCESS)
                 .code("200")
                 .message(message)
                 .body(body)

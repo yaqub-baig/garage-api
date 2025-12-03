@@ -29,7 +29,7 @@ import com.autoadda.apis.garage.request.AvailableServiceRequest;
 import com.autoadda.apis.garage.service.AvailableServiceManagementService;
 
 @ExtendWith(MockitoExtension.class)
-public class AvailableServiceManagementServiceTest {
+class AvailableServiceManagementServiceTest {
 
 	@InjectMocks
 	private AvailableServiceManagementService service;

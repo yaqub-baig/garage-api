@@ -9,7 +9,7 @@ import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.repository.os.*;
 import com.autoadda.apis.garage.request.os.OsAppointmentStatusRequest;
 import com.autoadda.apis.garage.request.os.OsCustomerAppointmentRequest;
-import com.autoadda.apis.garage.response.OsAppointmentResponse;
+import com.autoadda.apis.garage.response.os.OsAppointmentResponse;
 import com.autoadda.apis.garage.response.os.OsAppointmentDetailResponse;
 import com.autoadda.apis.garage.util.BusinessValidator;
 import com.autoadda.apis.garage.util.DateHelper;

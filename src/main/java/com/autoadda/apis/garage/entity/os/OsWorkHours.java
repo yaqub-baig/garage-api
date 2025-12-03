@@ -26,5 +26,4 @@ public class OsWorkHours {
     private LocalTime openTime;
     private LocalTime closeTime;
     private boolean isClosed;
-    final private int slotDurationMinutes = 20;
 }

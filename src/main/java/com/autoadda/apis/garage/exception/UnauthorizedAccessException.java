@@ -3,7 +3,7 @@ package com.autoadda.apis.garage.exception;
 public class UnauthorizedAccessException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    private String message;
+
 
     public UnauthorizedAccessException() {
 
@@ -15,7 +15,6 @@ public class UnauthorizedAccessException extends RuntimeException {
 
         super ( message );
 
-        this.message = message;
 
     }
 

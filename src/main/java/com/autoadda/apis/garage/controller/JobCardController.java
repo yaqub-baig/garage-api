@@ -24,27 +24,27 @@ public class JobCardController {
     @PostMapping("/assign")
     public ResponseEntity<GenericResponse> assignTechnician(@RequestBody AssignServiceRequest request) {
         JobCardResponse jobCard = jobCardService.assignTechnicianToService ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( "Technician assigned", jobCard ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Technician assigned", jobCard ) );
     }
 
     @PutMapping("/status/{jobCardId}")
     public ResponseEntity<GenericResponse> updateJobCardStatus(@PathVariable Integer jobCardId, @RequestParam JobCardStatus status) {
         JobCardResponse updated = jobCardService.updateJobCardStatus ( jobCardId, status );
-        return ResponseEntity.ok ( GenericResponse.success ( "Jobcard status updated", updated ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Jobcard status updated", updated ) );
     }
 
     @GetMapping("/technician/{technicianId}")
     public ResponseEntity<GenericResponse> getTechnicianJobCards(@PathVariable Integer technicianId,
                                                                  @RequestParam(required = false) JobCardStatus status) throws MemberNotFoundException {
         List<JobCardResponse> jobCards = jobCardService.getTechnicianJobCards ( technicianId, status );
-        return ResponseEntity.ok ( GenericResponse.success ( jobCards ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( jobCards ) );
     }
 
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<GenericResponse> getGarageJobCards(@PathVariable Integer garageId,
                                                              @RequestParam(required = false) JobCardStatus status) {
         List<JobCardResponse> jobCards = jobCardService.getGarageJobCards ( garageId, status );
-        return ResponseEntity.ok ( GenericResponse.success ( jobCards ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( jobCards ) );
     }
 
     @GetMapping("/{jobCardId}")
@@ -63,13 +63,13 @@ public class JobCardController {
     public ResponseEntity<GenericResponse> getGroupedGarageJobCards(@PathVariable Integer garageId,
                                                                     @RequestParam(required = false) JobCardStatus status) {
         GroupedJobCardResponse groupedJobCards = jobCardService.getGroupedJobCardsByWorkOrder ( garageId, status );
-        return ResponseEntity.ok ( GenericResponse.success ( "Job cards grouped by work order", groupedJobCards ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Job cards grouped by work order", groupedJobCards ) );
     }
 
     @GetMapping("/technician/{technicianId}/grouped")
     public ResponseEntity<GenericResponse> getGroupedTechnicianJobCards(@PathVariable Integer technicianId,
                                                                         @RequestParam(required = false) JobCardStatus status) throws MemberNotFoundException {
         GroupedJobCardResponse groupedJobCards = jobCardService.getGroupedTechnicianJobCardsByWorkOrder ( technicianId, status );
-        return ResponseEntity.ok ( GenericResponse.success ( "Technician job cards grouped by work order", groupedJobCards ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Technician job cards grouped by work order", groupedJobCards ) );
     }
 }

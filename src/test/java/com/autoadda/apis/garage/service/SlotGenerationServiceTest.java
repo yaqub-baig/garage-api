@@ -57,7 +57,7 @@ class SlotGenerationServiceTest {
     private static final DayOfWeek TEST_DAY_OF_WEEK = TEST_DATE.getDayOfWeek();
     private static final LocalTime TEST_OPEN_TIME = LocalTime.of(9, 0);
     private static final LocalTime TEST_CLOSE_TIME = LocalTime.of(17, 0);
-    private static final Integer TEST_SLOT_DURATION = 60; // minutes
+
 
     // Test entities
     private Garage garage;

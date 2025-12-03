@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.SubscriptionUsageLog;
+import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.SubscriptionUsageLogRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubscriptionUsageLogService {
 
-    @Autowired
+
     private final SubscriptionUsageLogRepository usageLogRepository;
 
     /**
@@ -132,7 +133,7 @@ public class SubscriptionUsageLogService {
     @Transactional
     public void deleteLog(Integer id) {
         if ( ! usageLogRepository.existsById ( id ) ) {
-            throw new RuntimeException ( "Cannot delete. Log not found for id: " + id );
+            throw new ResourceNotFoundException( "Cannot delete. Log not found for id: " + id );
         }
         usageLogRepository.deleteById ( id );
     }

@@ -30,7 +30,7 @@ public class PartRequestController {
             @RequestBody CreatePartRequestRequest request) {
         log.info("Creating part request for job card: {}", request.getJobCardId());
         PartRequestResponse response = partRequestService.createPartRequest(request);
-        return ResponseEntity.ok(GenericResponse.success("Part request created successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Part request created successfully", response));
     }
 
     /**
@@ -41,7 +41,7 @@ public class PartRequestController {
             @RequestBody JobCardStatusRequest request) {
         log.info("Updating job card status with part request: {}", request.getJobcardId());
         JobCardResponse response = jobCardService.updateJobCardStatusWithPartRequest(request);
-        return ResponseEntity.ok(GenericResponse.success("Job card status updated successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Job card status updated successfully", response));
     }
 
     /**
@@ -51,7 +51,7 @@ public class PartRequestController {
     public ResponseEntity<GenericResponse> getPartRequestById(@PathVariable Integer id) {
         log.info("Fetching part request by ID: {}", id);
         PartRequestResponse response = partRequestService.getPartRequestById(id);
-        return ResponseEntity.ok(GenericResponse.success("Part request retrieved successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Part request retrieved successfully", response));
     }
 
     /**
@@ -63,7 +63,7 @@ public class PartRequestController {
             @RequestBody UpdatePartRequestRequest request) {
         log.info("Updating part request: {}", id);
         PartRequestResponse response = partRequestService.updatePartRequest(id, request);
-        return ResponseEntity.ok(GenericResponse.success("Part request updated successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Part request updated successfully", response));
     }
 
     /**
@@ -74,7 +74,7 @@ public class PartRequestController {
             @PathVariable Integer jobCardId) {
         log.info("Fetching part request for job card: {}", jobCardId);
         PartRequestResponse response = partRequestService.getPartRequestByJobCardId(jobCardId);
-        return ResponseEntity.ok(GenericResponse.success("Part request retrieved successfully", response));
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Part request retrieved successfully", response));
     }
 
     /**
@@ -85,7 +85,7 @@ public class PartRequestController {
             @PathVariable Integer customerId) {
         log.info("Fetching part requests for customer: {}", customerId);
         List<PartRequestResponse> responses = partRequestService.getPartRequestsByCustomerId(customerId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Part requests retrieved successfully", responses));
     }
 
@@ -97,7 +97,7 @@ public class PartRequestController {
             @PathVariable Integer customerId) {
         log.info("Fetching pending part requests for customer: {}", customerId);
         List<PartRequestResponse> responses = partRequestService.getPendingPartRequestsByCustomerId(customerId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Pending part requests retrieved successfully", responses));
     }
 
@@ -109,7 +109,7 @@ public class PartRequestController {
             @PathVariable Integer garageId) {
         log.info("Fetching part requests for garage: {}", garageId);
         List<PartRequestResponse> responses = partRequestService.getPartRequestsByGarageId(garageId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Part requests retrieved successfully", responses));
     }
 
@@ -122,7 +122,7 @@ public class PartRequestController {
             @RequestBody CustomerPartResponseRequest request) {
         log.info("Customer submitting response for part request: {}", id);
         PartRequestResponse response = partRequestService.submitCustomerResponse(id, request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Customer response submitted successfully", response));
     }
 
@@ -141,7 +141,7 @@ public class PartRequestController {
         }
 
         PartRequestResponse response = partRequestService.addGarageProcurement(request);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Part procurement added and invoice updated successfully", response));
     }
 
@@ -152,7 +152,7 @@ public class PartRequestController {
     public ResponseEntity<GenericResponse> markPartReceived(@PathVariable Integer id) {
         log.info("Marking all parts as received for part request: {}", id);
         PartRequestResponse response = partRequestService.markPartReceived(id);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "All parts marked as received successfully", response));
     }
 
@@ -164,7 +164,7 @@ public class PartRequestController {
     public ResponseEntity<GenericResponse> markPartItemReceived(@PathVariable Integer itemId) {
         log.info("Marking individual part item as received: {}", itemId);
         PartRequestResponse response = partRequestService.markPartItemReceived(itemId);
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Part item marked as received successfully", response));
     }
 }

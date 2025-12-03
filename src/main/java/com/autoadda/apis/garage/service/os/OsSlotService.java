@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OsSlotService {
+    public static final String SLOT_NOT_FOUND = "slot not found";
     private final OsSlotRepository slotRepository;
     private final OsSlotMapper slotMapper;
 
@@ -62,7 +63,7 @@ public class OsSlotService {
     }
 
     public OsAppointmentSlotResponse getSlotById(Integer id) {
-        OsAppointmentSlot slot = slotRepository.findById ( id ).orElseThrow ( () -> new ResourceNotFoundException ( "slot not found" ) );
+        OsAppointmentSlot slot = slotRepository.findById ( id ).orElseThrow ( () -> new ResourceNotFoundException (SLOT_NOT_FOUND) );
         return slotMapper.toResponse ( slot );
     }
 
@@ -76,7 +77,7 @@ public class OsSlotService {
 
     @Transactional
     public void incrementSlotBookings(Integer slotId) {
-        OsAppointmentSlot slot = slotRepository.findById ( slotId ).orElseThrow ( () -> new ResourceNotFoundException ( "slot not found" ) );
+        OsAppointmentSlot slot = slotRepository.findById ( slotId ).orElseThrow ( () -> new ResourceNotFoundException (SLOT_NOT_FOUND) );
         if ( ! slot.isAvailable ( ) ) {
             throw new IllegalStateException ( "Slot is fully booked" );
         }
@@ -86,7 +87,7 @@ public class OsSlotService {
 
     @Transactional
     public void decrementSlotBookings(Integer slotId) {
-        OsAppointmentSlot slot = slotRepository.findById ( slotId ).orElseThrow ( () -> new ResourceNotFoundException ( "slot not found" ) );
+        OsAppointmentSlot slot = slotRepository.findById ( slotId ).orElseThrow ( () -> new ResourceNotFoundException (SLOT_NOT_FOUND) );
         if ( slot.getCurrentBookings ( ) > 0 ) {
             slot.setCurrentBookings ( slot.getCurrentBookings ( ) - 1 );
             slotRepository.save ( slot );

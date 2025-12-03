@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -133,10 +134,7 @@ public class WorkOrderService {
      * @param garageId The ID of the garage for which to retrieve work orders.
      * @return A list of WorkOrder objects associated with the specified garage.
      */
-//	@Transactional
-//	public List<WorkOrder> getWorkOrdersForGarage(Integer garageId) {
-//		return workOrderRepository.findByJobCardGarageId(garageId);
-//	}
+
     public List<WorkOrder> getWorkOrdersForGarage(Integer garageId) {
         return workOrderRepository.findByGarageId ( garageId );
     }
@@ -219,7 +217,7 @@ public class WorkOrderService {
     private VehicleServiceHistoryResponse convertToServiceHistoryResponse(WorkOrder workOrder) {
         // Extract service names from job cards
         List<String> servicesPerformed = workOrder.getJobCards ( ).stream ( )
-                .map ( jobCard -> jobCard.getService ( ) )
+                .map (JobCard::getService)
                 .filter ( appointmentService -> appointmentService != null
                         && appointmentService.getService ( ) != null
                         && appointmentService.getService ( ).getAvailableService ( ) != null )
@@ -266,7 +264,7 @@ public class WorkOrderService {
                 .orElse ( null );
         if ( delivery != null ) {
             List<String> photoUrls = delivery.getDeliveryPhotos ( ).stream ( )
-                    .map ( photo -> photo.getFilePath ( ) )
+                    .map (MediaFile::getFilePath )
                     .toList ( );
 
             latestDelivery = LatestDeliveryInfo.builder ( )
@@ -330,10 +328,10 @@ public class WorkOrderService {
 
     public List<JobCard> getOverdueJobCards() {
         // Implementation to find overdue job cards
-        return null; // TODO: implement
+        return new ArrayList<>();
     }
 
-    public void assignJobCard(JobCard jobCard, Integer technicianId) {
+    public void assignJobCard(JobCard jobCard) {
         // Set technician and update status
         updateJobCardStatus ( jobCard, JobCardStatus.ASSIGNED );
     }

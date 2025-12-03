@@ -61,7 +61,7 @@ class SlotServiceTest {
         slot.setEndTime ( TEST_END_TIME );
         slot.setMaxBookings ( TEST_MAX_BOOKINGS );
         slot.setCurrentBookings ( TEST_CURRENT_BOOKINGS );
-//        slot.setGarage ( TEST_GARAGE_ID );
+
         slot.setSlotDate ( TEST_DATE );
 
         // Initialize Request DTO

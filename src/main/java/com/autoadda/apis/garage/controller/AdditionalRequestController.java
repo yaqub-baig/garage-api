@@ -18,13 +18,13 @@ public class AdditionalRequestController {
     @PostMapping
     public ResponseEntity<GenericResponse> createRequest(@RequestBody JobCardAdditionalAPIRequest request) {
         JobCardAdditionalRequest result = additionalRequestService.createAdditionalRequest ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( "Additional request created", result ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Additional request created", result ) );
     }
 
 
     @PutMapping
     public ResponseEntity<GenericResponse> updateRequest(@RequestBody JobCardAdditionalAPIRequest request) {
         JobCardAdditionalRequest result = additionalRequestService.updateAdditionalRequest ( request );
-        return ResponseEntity.ok ( GenericResponse.success ( "Additional request updated", result ) );
+        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Additional request updated", result ) );
     }
 }

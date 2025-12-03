@@ -1,4 +1,4 @@
-package com.autoadda.apis.garage.response;
+package com.autoadda.apis.garage.response.os;
 
 import com.autoadda.apis.garage.entity.os.OsAppointmentDetails;
 import com.autoadda.apis.garage.entity.os.OsAppointmentServices;

@@ -101,11 +101,6 @@ public class VehicleReceivedService {
         VehicleReceived vehicleReceived = vehicleReceivedRepository.findById ( vehicleRecievedId )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Vehicle received details not found for this id: " + vehicleRecievedId ) );
 
-        // Typically in update operations, you wouldn't change the appointment association
-        // unless there's a specific business requirement to do so
-        // vehicleReceived.setAppointment(appointmentRepository.findById(request.getAppointmentId())
-        //         .orElseThrow(() -> new ResourceNotFoundException("appointment not found")));
-
         if ( request.getComment ( ) != null ) {
             vehicleReceived.setComment ( request.getComment ( ) );
         }

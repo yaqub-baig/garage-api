@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InsuranceClaimService {
 
+    public static final String CLAIM_NOT_FOUND = "Claim not found";
     private final InsuranceClaimRepository claimRepo;
     private final InsuranceClaimDocumentRepository docRepo;
 
@@ -44,7 +45,7 @@ public class InsuranceClaimService {
      */
     @Transactional
     public InsuranceClaim updateClaimStatus(Integer claimId, Status status, String remarks, BigDecimal approvedAmount) {
-        InsuranceClaim claim = claimRepo.findById ( claimId ).orElseThrow ( () -> new RuntimeException ( "Claim not found" ) );
+        InsuranceClaim claim = claimRepo.findById ( claimId ).orElseThrow ( () -> new RuntimeException (CLAIM_NOT_FOUND) );
 
         claim.setStatus ( status );
         claim.setApprovalRemarks ( remarks );
@@ -115,7 +116,7 @@ public class InsuranceClaimService {
      */
     @Transactional
     public InsuranceClaim getClaimById(Integer claimId) {
-        return claimRepo.findById ( claimId ).orElseThrow ( () -> new RuntimeException ( "Claim not found" ) );
+        return claimRepo.findById ( claimId ).orElseThrow ( () -> new RuntimeException (CLAIM_NOT_FOUND) );
     }
 
     /**
@@ -135,7 +136,7 @@ public class InsuranceClaimService {
      */
     @Transactional
     public void deleteClaim(Integer claimId) {
-        InsuranceClaim claim = claimRepo.findById ( claimId ).orElseThrow ( () -> new RuntimeException ( "Claim not found" ) );
+        InsuranceClaim claim = claimRepo.findById ( claimId ).orElseThrow ( () -> new RuntimeException (CLAIM_NOT_FOUND) );
         claimRepo.delete ( claim );
     }
 }

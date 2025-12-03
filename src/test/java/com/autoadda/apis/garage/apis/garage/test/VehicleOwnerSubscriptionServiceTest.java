@@ -102,22 +102,22 @@ class VehicleOwnerSubscriptionServiceTest {
 
 	@Test
 	void testSubscribeToPlan() {
-		VehicleOwner owner = new VehicleOwner();
-		owner.setId(12);
+		VehicleOwner owner1 = new VehicleOwner();
+		owner1.setId(12);
 
-		GarageSubscription plan = new GarageSubscription();
-		plan.setId(123);
-		plan.setDurationMonths(6);
+		GarageSubscription plan1 = new GarageSubscription();
+		plan1.setId(123);
+		plan1.setDurationMonths(6);
 
-		VehicleOwnerSubscription subscription = new VehicleOwnerSubscription();
-		subscription.setCustomerId (owner.getId ());
-		subscription.setGarageSubscription(plan);
+		VehicleOwnerSubscription subscription1 = new VehicleOwnerSubscription();
+		subscription1.setCustomerId (owner1.getId ());
+		subscription1.setGarageSubscription(plan1);
 
-		when(vehicleOwnerRepository.findById(12)).thenReturn(Optional.of(owner));
+		when(vehicleOwnerRepository.findById(12)).thenReturn(Optional.of(owner1));
 
-		when(garageSubscriptionRepository.findById(123)).thenReturn(Optional.of(plan));
+		when(garageSubscriptionRepository.findById(123)).thenReturn(Optional.of(plan1));
 
-		when(vehicleOwnerSubscriptionRepository.save(any(VehicleOwnerSubscription.class))).thenReturn(subscription);
+		when(vehicleOwnerSubscriptionRepository.save(any(VehicleOwnerSubscription.class))).thenReturn(subscription1);
 
 		VehicleOwnerSubscription result = vehicleOwnerSubscriptionService.subscribeToPlan(subscriptionRequest);
 
@@ -128,7 +128,7 @@ class VehicleOwnerSubscriptionServiceTest {
 
 		verify(vehicleOwnerRepository, times(1)).findById(12);
 		verify(garageSubscriptionRepository, times(1)).findById(123);
-		verify(vehicleOwnerSubscriptionRepository, times(1)).save(subscription);
+		verify(vehicleOwnerSubscriptionRepository, times(1)).save(subscription1);
 	}
 
 	@Test

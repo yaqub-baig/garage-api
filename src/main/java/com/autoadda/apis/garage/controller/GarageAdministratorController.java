@@ -44,7 +44,7 @@ public class GarageAdministratorController {
                 Integer.parseInt(adminId)
         );
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Garage approved successfully", response));
     }
 
@@ -66,7 +66,7 @@ public class GarageAdministratorController {
                 request.getRejectionReason()
         );
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Garage rejected successfully", response));
     }
 
@@ -79,7 +79,7 @@ public class GarageAdministratorController {
         log.info("Fetching all pending garages");
         List<GarageResponse> responses = garageManagementService.getPendingGarages();
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Pending garages retrieved successfully", responses));
     }
 
@@ -92,7 +92,7 @@ public class GarageAdministratorController {
         log.info("Fetching all rejected garages");
         List<GarageResponse> responses = garageManagementService.getRejectedGarages();
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Rejected garages retrieved successfully", responses));
     }
 
@@ -105,7 +105,7 @@ public class GarageAdministratorController {
         log.info("Fetching all approved garages");
         List<GarageResponse> responses = garageManagementService.getApprovedGarages();
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Approved garages retrieved successfully", responses));
     }
 
@@ -119,7 +119,7 @@ public class GarageAdministratorController {
         log.info("Fetching garages with status: {}", status);
         List<GarageResponse> responses = garageManagementService.getGaragesByVerificationStatus(status);
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Garages retrieved successfully", responses));
     }
 
@@ -141,7 +141,7 @@ public class GarageAdministratorController {
         stats.put("inactiveCount", garageManagementService.getGarageCountByStatus(GarageVerificationStatus.INACTIVE));
         stats.put("blockedCount", garageManagementService.getGarageCountByStatus(GarageVerificationStatus.BLOCKED));
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Statistics retrieved successfully", stats));
     }
 
@@ -157,7 +157,7 @@ public class GarageAdministratorController {
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(days);
         List<GarageResponse> responses = garageManagementService.getPendingGaragesOlderThan(cutoffDate);
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Stale pending garages retrieved successfully", responses));
     }
 
@@ -172,7 +172,7 @@ public class GarageAdministratorController {
 
         List<GarageResponse> responses = garageManagementService.getGaragesWithMultipleResubmissions(minCount);
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Garages with multiple resubmissions retrieved successfully", responses));
     }
 
@@ -187,7 +187,7 @@ public class GarageAdministratorController {
 
         List<GarageResponse> responses = garageManagementService.getGaragesReviewedBy(adminId);
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Garages reviewed by admin retrieved successfully", responses));
     }
 
@@ -202,7 +202,7 @@ public class GarageAdministratorController {
 
         List<GarageResponse> responses = garageManagementService.getGaragesApprovedBy(adminId);
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Garages approved by admin retrieved successfully", responses));
     }
 
@@ -217,7 +217,7 @@ public class GarageAdministratorController {
 
         List<GarageResponse> responses = garageManagementService.getGaragesRejectedBy(adminId);
 
-        return ResponseEntity.ok(GenericResponse.success(
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Garages rejected by admin retrieved successfully", responses));
     }
 }

@@ -74,10 +74,10 @@ public class TechnicianService {
 
         Technician garageTechnician = mapToEntity ( technician );
         Optional<Technician> existingTechnician = technicianRepository.findByMobileNumber ( technician.getMobileNumber ( ) );
-        if ( existingTechnician.isPresent ( ) && ! existingTechnician.get ( ).getIsDeleted ( ) ) {
+        if ( existingTechnician.isPresent ( ) && !existingTechnician.get().getIsDeleted()) {
             throw new AlreadyExistsException ( "Technician with this phone number already exists" );
         }
-        if ( existingTechnician.isPresent ( ) && existingTechnician.get ( ).getIsDeleted ( ) ) {
+        if ( existingTechnician.isPresent ( ) && existingTechnician.get().getIsDeleted()) {
             existingTechnician.get ( ).setIsDeleted ( false );
             garageTechnician = existingTechnician.get ( );
         }

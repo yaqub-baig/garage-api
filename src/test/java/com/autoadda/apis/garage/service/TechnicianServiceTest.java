@@ -398,7 +398,7 @@ class TechnicianServiceTest {
         assertEquals ( "+1234567890", result.getMobileNumber ( ) );
         assertEquals ( "784-1234-5678901-1", result.getEmiratesId ( ) );
         assertEquals ( "123456789", result.getVatNumber ( ) );
-        assertEquals ( "ACTIVE", result.getStatus ( ) );
-        assertEquals ( "SUPERVISOR", result.getEmployeeRole ( ) );
+        assertEquals ( Status.ACTIVE, result.getStatus ( ) );
+        assertEquals ( EMPLOYEE_ROLE.SUPERVISOR, result.getEmployeeRole ( ) );
     }
 }

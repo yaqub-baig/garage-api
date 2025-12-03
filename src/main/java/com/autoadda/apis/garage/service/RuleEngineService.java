@@ -5,7 +5,7 @@ import com.autoadda.apis.garage.entity.VehicleDetails;
 import com.autoadda.apis.garage.repository.MaintenanceScheduleRuleRepository;
 import com.autoadda.apis.garage.util.IntervalType;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,10 +13,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class RuleEngineService {
 
-    @Autowired
-    private MaintenanceScheduleRuleRepository ruleRepo;
+    private final MaintenanceScheduleRuleRepository ruleRepo;
 
     /**
      * Finds the applicable maintenance schedule rule for a given vehicle.
@@ -26,18 +26,18 @@ public class RuleEngineService {
      */
     @Transactional
     public Optional<MaintenanceScheduleRule> findApplicableRule(VehicleDetails vehicle) {
-        return ruleRepo.findByMakeAndModelAndIsActiveTrue ( vehicle.getMake ( ), vehicle.getModel ( ) );
+        return ruleRepo.findByMakeAndModelAndIsActiveTrue(vehicle.getMake(), vehicle.getModel());
     }
 
     @Transactional
     public LocalDate calculateNextServiceDate(VehicleDetails vehicle, MaintenanceScheduleRule rule) {
-        if ( rule.getIntervalType ( ) == IntervalType.TIME ) {
-            return vehicle.getLastServiceDate ( ).plusMonths ( rule.getIntervalValue ( ) );
+        if (rule.getIntervalType() == IntervalType.TIME) {
+            return vehicle.getLastServiceDate().plusMonths(rule.getIntervalValue());
         } else {
-            int mileageGap = rule.getIntervalValue ( );
+            int mileageGap = rule.getIntervalValue();
             int avgKmPerDay = 40; // configurable
             int daysToNextService = mileageGap / avgKmPerDay;
-            return vehicle.getLastServiceDate ( ).plusDays ( daysToNextService );
+            return vehicle.getLastServiceDate().plusDays(daysToNextService);
         }
     }
 
@@ -51,8 +51,8 @@ public class RuleEngineService {
      */
     @Transactional
     public Integer estimateMileageAtDate(VehicleDetails vehicle, LocalDate date) {
-        int days = (int) ChronoUnit.DAYS.between ( vehicle.getLastServiceDate ( ), date );
+        int days = (int) ChronoUnit.DAYS.between(vehicle.getLastServiceDate(), date);
         int avgKmPerDay = 40; // configurable
-        return vehicle.getLastServiceMileage ( ) + (avgKmPerDay * days);
+        return vehicle.getLastServiceMileage() + (avgKmPerDay * days);
     }
 }

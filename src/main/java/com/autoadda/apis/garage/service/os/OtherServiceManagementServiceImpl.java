@@ -35,6 +35,8 @@ import static java.lang.Boolean.TRUE;
 @RequiredArgsConstructor
 public class OtherServiceManagementServiceImpl implements OtherServiceManagementService {
 
+    public static final String FILE_NOT_FOUND = "File not found";
+    public static final String MEDIA_FILE_NOT_FOUND_WITH_ID = "Media file not found with id: ";
     private final OtherServiceRepository otherServiceRepository;
     private final OsAvailableServiceRepository availableServiceRepository;
     private final LocationService locationService;
@@ -76,14 +78,14 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         otherService.setCompanyOwner(Integer.parseInt(autoAddaId));
 
         // Handle company logo
-        MediaFile logo = mediaFileRepository.findById(otherServiceRequest.getLogoId()).orElseThrow(() -> new EntityNotFoundException("Media file not found with id: " + otherServiceRequest.getLogoId()));
+        MediaFile logo = mediaFileRepository.findById(otherServiceRequest.getLogoId()).orElseThrow(() -> new EntityNotFoundException(MEDIA_FILE_NOT_FOUND_WITH_ID + otherServiceRequest.getLogoId()));
         otherService.setCompanyLogo(logo);
 
         // Handle VAT certificates
         if (otherServiceRequest.getVatCertificateIds() != null && !otherServiceRequest.getVatCertificateIds().isEmpty()) {
             otherServiceRequest.getVatCertificateIds().forEach(id -> {
                 MediaFile mediaFile = mediaFileRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Media file not found with id: " + id));
+                        .orElseThrow(() -> new EntityNotFoundException(MEDIA_FILE_NOT_FOUND_WITH_ID + id));
                 otherService.getVatCertificate().add(mediaFile);
             });
         }
@@ -92,7 +94,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         if (otherServiceRequest.getTradeLicenseAttachmentIds() != null && !otherServiceRequest.getTradeLicenseAttachmentIds().isEmpty()) {
             otherServiceRequest.getTradeLicenseAttachmentIds().forEach(id -> {
                 MediaFile mediaFile = mediaFileRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Media file not found with id: " + id));
+                        .orElseThrow(() -> new EntityNotFoundException(MEDIA_FILE_NOT_FOUND_WITH_ID + id));
                 otherService.getTradeLicenseAttachment().add(mediaFile);
             });
         }
@@ -102,7 +104,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         if (otherServiceRequest.getCompanyImagesIds() != null && !otherServiceRequest.getCompanyImagesIds().isEmpty()) {
             otherServiceRequest.getCompanyImagesIds().forEach(id -> {
                 MediaFile mediaFile = mediaFileRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Media file not found with id: " + id));
+                        .orElseThrow(() -> new EntityNotFoundException(MEDIA_FILE_NOT_FOUND_WITH_ID + id));
                 otherService.getCompanyImages().add(mediaFile);
             });
         }
@@ -110,12 +112,12 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
         OtherService save = otherServiceRepository.save(otherService);
         List<OtherServiceBridge> garageServices = new ArrayList<>();
         if (otherServiceRequest.getOsServiceIds() != null && !otherServiceRequest.getOsServiceIds().isEmpty()) {
-            otherServiceRequest.getOsServiceIds().forEach(sId -> {
-                availableServiceRepository.findById(sId)
-                        .map(availableService -> otherServiceBridgeManagementService.createOtherServiceBridge(
-                                new GarageServiceRequest(save.getId(), availableService.getId(), TRUE))).map(garageServices::add)
-                        .orElseThrow(() -> new ResourceNotFoundException("invalid id for available service"));
-            });
+            otherServiceRequest.getOsServiceIds().forEach(sId ->
+                    availableServiceRepository.findById(sId)
+                            .map(availableService -> otherServiceBridgeManagementService.createOtherServiceBridge(
+                                    new GarageServiceRequest(save.getId(), availableService.getId(), TRUE))).map(garageServices::add)
+                            .orElseThrow(() -> new ResourceNotFoundException("invalid id for available service"))
+            );
 
         }
 
@@ -208,7 +210,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
                 mediaFileCleanupService.scheduleCleanup(Collections.singletonList(existing.getCompanyLogo().getId()));
             }
             // Upload and set new logo
-            MediaFile mediaFile = mediaFileRepository.findById(request.getLogoId()).orElseThrow(() -> new ResourceNotFoundException("File not found"));
+            MediaFile mediaFile = mediaFileRepository.findById(request.getLogoId()).orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
             existing.setCompanyLogo(mediaFile);
         }
 
@@ -225,7 +227,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
             // Upload and set new VAT certificates
             existing.getVatCertificate().clear();
             request.getVatCertificateIds().forEach(vid -> {
-                MediaFile mediaFile = mediaFileRepository.findById(vid).orElseThrow(() -> new ResourceNotFoundException("File not found"));
+                MediaFile mediaFile = mediaFileRepository.findById(vid).orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
                 existing.getVatCertificate().add(mediaFile);
             });
 
@@ -243,7 +245,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
 
             existing.getTradeLicenseAttachment().clear();
             request.getTradeLicenseAttachmentIds().forEach(tid -> {
-                MediaFile mediaFile = mediaFileRepository.findById(tid).orElseThrow(() -> new ResourceNotFoundException("File not found"));
+                MediaFile mediaFile = mediaFileRepository.findById(tid).orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
                 existing.getTradeLicenseAttachment().add(mediaFile);
             });
         }
@@ -261,7 +263,7 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
             // Upload and set new company images
             existing.getCompanyImages().clear();
             request.getCompanyImagesIds().forEach(cid -> {
-                MediaFile mediaFile = mediaFileRepository.findById(cid).orElseThrow(() -> new ResourceNotFoundException("File not found"));
+                MediaFile mediaFile = mediaFileRepository.findById(cid).orElseThrow(() -> new ResourceNotFoundException(FILE_NOT_FOUND));
                 existing.getCompanyImages().add(mediaFile);
             });
         }
@@ -287,12 +289,12 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
     private List<OtherServiceBridge> handleGarageService(OtherServiceRequest otherServiceRequest, OtherService save) {
         List<OtherServiceBridge> garageServices = new ArrayList<>();
         if (otherServiceRequest.getOsServiceIds() != null && !otherServiceRequest.getOsServiceIds().isEmpty()) {
-            otherServiceRequest.getOsServiceIds().forEach(sId -> {
-                availableServiceRepository.findById(sId)
-                        .map(availableService -> otherServiceBridgeManagementService.createOtherServiceBridge(
-                                new GarageServiceRequest(save.getId(), availableService.getId(), TRUE))).map(garageServices::add)
-                        .orElseThrow(() -> new ResourceNotFoundException("invalid id for available service"));
-            });
+            otherServiceRequest.getOsServiceIds().forEach(sId ->
+                    availableServiceRepository.findById(sId)
+                            .map(availableService -> otherServiceBridgeManagementService.createOtherServiceBridge(
+                                    new GarageServiceRequest(save.getId(), availableService.getId(), TRUE))).map(garageServices::add)
+                            .orElseThrow(() -> new ResourceNotFoundException("invalid id for available service"))
+            );
         }
         return garageServices;
     }
@@ -367,9 +369,8 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
             boolean cityCheck = true;
             boolean nameCheck = true;
             boolean zipCheck = true;
-            boolean brandCheck = true;
             boolean serviceCheck = true;
-            boolean modelCheck = true;
+
             log.info(" 2  enabledGarages -> " + garages.size());
             log.info("   currentGarage -> " + garage.getName());
 
@@ -390,8 +391,8 @@ public class OtherServiceManagementServiceImpl implements OtherServiceManagement
             }
 
             if (StringUtils.isNotEmpty(garageName) && !garage.getName().toLowerCase().contains(garageName.toLowerCase())) {
-                    nameCheck = false;
-                }
+                nameCheck = false;
+            }
 
 
             if (availableServiceIds != null && !availableServiceIds.isEmpty()) {
