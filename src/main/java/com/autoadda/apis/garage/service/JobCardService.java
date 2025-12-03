@@ -240,12 +240,7 @@ public class JobCardService {
         }
     }
 
-    /**
-     * Retrieves a job card by its ID.
-     *
-     * @param jobCardId the ID of the job card
-     * @return the JobCard if found
-     */
+
     @Transactional(readOnly = true)
     public List<JobCardResponse> getTechnicianJobCards(Integer technicianId, JobCardStatus status) throws MemberNotFoundException {
         validator.validateTechnician ( technicianId );

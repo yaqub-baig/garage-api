@@ -43,15 +43,13 @@ public class OsAppointmentController {
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
                                              @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
                                              @RequestParam(required = false) String selectedOtherServiceIds) {
-        try {
+
             LocalDate date = time.toLocalDate ( );
             LocalTime timestamp = time.toLocalTime ( );
             OsAppointmentDetailResponse booking = appointmentSlotService.bookSlot ( serviceId, vehicleId, date, timestamp, autoAddaId, selectedOtherServiceIds );
             return ResponseEntity.ok ( booking );
-        }
-        catch ( IllegalStateException e ) {
-            return ResponseEntity.status ( HttpStatus.CONFLICT ).body ( e.getMessage ( ) );
-        }
+
+
     }
 
 

@@ -59,7 +59,7 @@ public class SlotGenerationService {
         }
 
         int maxBookings = garage.getConcurrentAppointmentCapacity ( ) != null ? garage.getConcurrentAppointmentCapacity ( ) : 0;
-        int slotDuration = workingHours.getSlotDurationMinutes ( );
+        int slotDuration = workingHours.getSlotDurationMinutes();
 
         LocalTime currentTime = workingHours.getOpenTime ( );
         LocalTime closeTime = workingHours.getCloseTime ( );
