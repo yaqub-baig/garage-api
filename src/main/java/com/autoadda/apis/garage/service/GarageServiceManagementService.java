@@ -78,9 +78,9 @@ public class GarageServiceManagementService {
     @Transactional
     public GarageService updateGarageService(Integer id, GarageServiceUpdateRequest updated) {
         return garageServiceRepository.findById ( id ).map ( existing -> {
-            existing.setIsActive ( updated.getIsActive ( ) );
-            existing.setLabourPrice ( updated.getLabourPrice ( ) );
-            existing.setPrice ( updated.getPrice ( ) );
+            existing.setIsActive ( updated.getIsActive ( )!=null ? updated.getIsActive ( ) : existing.getIsActive ( ) );
+            existing.setLabourPrice ( updated.getLabourPrice ( )!=null? updated.getLabourPrice() : existing.getLabourPrice() );
+            existing.setPrice ( updated.getPrice ( )!=null? updated.getPrice() : existing.getPrice() );
             return garageServiceRepository.save ( existing );
         } ).orElseThrow ( () -> new RuntimeException ( "Garage service not found with ID: " + id ) );
     }

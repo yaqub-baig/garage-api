@@ -180,7 +180,7 @@ public class GarageSubscriptionService {
             log.info ( " 4 enabledGarages -> " );
             if ( StringUtils.isNotEmpty ( city ) ) {
                 log.info ( " 5 enabledGarages -> " );
-                if ( ! address.getCity ( ).toLowerCase ( ).equalsIgnoreCase ( city.toLowerCase ( ) ) ) {
+                if ( ! address.getState ( ).toLowerCase ( ).equalsIgnoreCase ( city.toLowerCase ( ) ) ) {
                     cityCheck = false;
                 }
             }

@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.response;
 
+import com.autoadda.apis.garage.entity.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +23,7 @@ public class GarageSubscriptionResponse {
     private String brands;
     private Map<Integer, Integer> serviceQuantity;
     private List<AvailableServiceResponse> services;
+    private Location garageLocation;
+    private String garageName;
     private Boolean isActive;
 }

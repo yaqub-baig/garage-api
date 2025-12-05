@@ -674,7 +674,9 @@ public class GarageManagementService {
         }
 
         List<Integer> garageServiceIds = garage.getServices().stream()
+                .filter(GarageService::getIsActive)
                 .map(GarageService::getAvailableService)
+                .filter(Objects::nonNull)
                 .map(AvailableService::getId)
                 .toList();
 
