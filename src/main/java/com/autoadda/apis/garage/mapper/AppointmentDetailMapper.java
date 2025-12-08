@@ -5,6 +5,7 @@ import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.repository.GarageServiceRepository;
+import com.autoadda.apis.garage.repository.GarageSubscriptionRepository;
 import com.autoadda.apis.garage.response.AppointmentDetailResponse;
 import com.autoadda.apis.garage.response.GarageServiceResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,10 @@ public class AppointmentDetailMapper {
     private final SlotMapper appointmentSlotMapper;
     private final GarageMapper garageMapper;
     private final VehicleClient vehicleClient;
-    private final AvailableServiceMapper availableServiceMapper;
-    private final AvailableServiceRepository availableServiceRepository;
+private final GarageSubscriptionMapper garageSubscriptionMapper;
     private final GarageServiceRepository garageServiceRepository;
     private final GarageServiceMapper garageServiceMapper;
+    private final GarageSubscriptionRepository garageSubscriptionRepository;
 
     public AppointmentDetailResponse entityToResponse(AppointmentDetails appointmentDetail) {
         AppointmentDetailResponse appointmentDetailResponse = new AppointmentDetailResponse ( );
@@ -48,6 +49,23 @@ public class AppointmentDetailMapper {
         appointmentDetailResponse.setSelectedGarageServiceIds ( appointmentDetail.getSelectedGarageServiceIds ( ) );
 
         appointmentDetailResponse.setGarageSubscriptionPlanId ( appointmentDetail.getGarageSubscriptionPlanId ( ) );
+
+        // Populate subscription details if present
+        if (appointmentDetail.getGarageSubscriptionPlanId() != null) {
+            appointmentDetailResponse.setIsSubscriptionUsed(true);
+            try {
+                Integer subscriptionPlanId = Integer.parseInt(appointmentDetail.getGarageSubscriptionPlanId());
+                garageSubscriptionRepository.findById(subscriptionPlanId).ifPresent(plan ->{
+                        appointmentDetailResponse.setGarageSubscription(garageSubscriptionMapper.toResponse(plan));
+                        appointmentDetailResponse.setSubscriptionPlanName(plan.getName());
+            });
+            } catch (NumberFormatException e) {
+                log.warn("Invalid subscription plan ID: {}", appointmentDetail.getGarageSubscriptionPlanId());
+            }
+        } else {
+            appointmentDetailResponse.setIsSubscriptionUsed(false);
+        }
+
         appointmentDetailResponse.setVehicleId ( appointmentDetail.getVehicleId ( ) );
         log.info ( "-------------->19" );
 

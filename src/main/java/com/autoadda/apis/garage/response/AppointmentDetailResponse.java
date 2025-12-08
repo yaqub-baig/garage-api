@@ -27,7 +27,10 @@ public class AppointmentDetailResponse {
     private GarageResponse garage;
     private String selectedGarageServiceIds;
     private List<GarageServiceResponse> garageServicesResponse;
+    private GarageSubscriptionResponse garageSubscription;
     private String garageSubscriptionPlanId;
+    private String subscriptionPlanName;
+    private Boolean isSubscriptionUsed;
     private Integer customerId;
     private Integer vehicleId;
     private AppointmentSlotResponse slot;

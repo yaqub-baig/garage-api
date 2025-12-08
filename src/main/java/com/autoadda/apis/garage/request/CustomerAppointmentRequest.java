@@ -23,6 +23,7 @@ public class CustomerAppointmentRequest {
     private String comments;
     private Integer memberId;
     private String memberType;
+    private Integer vehicleOwnerSubscriptionId; // Optional: ID of active subscription to use
 
 
 }

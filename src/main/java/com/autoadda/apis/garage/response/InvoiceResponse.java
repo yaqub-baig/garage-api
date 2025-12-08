@@ -21,10 +21,15 @@ public class InvoiceResponse {
     private Integer jobCardId;
     private List<InvoiceLineItemResponse> lineItems;
 
+    private Double subtotal;
     private Double totalAmount;
     private Double taxRate;
     private Double taxAmount;
+    private Double subscriptionDiscount;
     private Double amountPaid;
+
+    private Integer subscriptionPlanId;
+    private String subscriptionPlanName;
 
     private Integer loyaltyPointsUsed;
     private Integer loyaltyPointsEarned;

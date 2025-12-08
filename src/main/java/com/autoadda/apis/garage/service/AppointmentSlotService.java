@@ -37,6 +37,7 @@ public class AppointmentSlotService {
     private final GarageServiceRepository garageServiceRepository;
     private final AppointmentServiceRepository appointmentServiceRepository;
     private final VehicleBookingValidationService vehicleBookingValidationService;
+    private final SubscriptionValidationService subscriptionValidationService;
 
     /**
      * Retrieves available time slots for a garage on a specific date.
@@ -110,10 +111,11 @@ public class AppointmentSlotService {
      * @param garageId                 The ID of the garage.
      * @param date                     The date for which to retrieve all slots.
      * @param selectedGarageServiceIds garage
+     * @param vehicleOwnerSubscriptionId Optional subscription ID to use for this booking
      * @return A list of LocalTime slots.
      */
     @Transactional
-    public AppointmentDetailResponse bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId, String selectedGarageServiceIds) {
+    public AppointmentDetailResponse bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId, String selectedGarageServiceIds, Integer vehicleOwnerSubscriptionId) {
 
         Integer userId = Integer.parseInt ( autoAddaId );
 
@@ -131,6 +133,17 @@ public class AppointmentSlotService {
         // Validate vehicle is not already booked at this date/time
         vehicleBookingValidationService.validateVehicleAvailability ( vehicleId, date, time );
 
+        // Validate and apply subscription if provided
+        VehicleOwnerSubscription subscription = null;
+        if (vehicleOwnerSubscriptionId != null) {
+            subscription = subscriptionValidationService.validateSubscriptionForBooking(
+                    vehicleOwnerSubscriptionId,
+                    userId,
+                    garageId,
+                    selectedGarageServiceIds
+            );
+        }
+
         // Increment bookings immediately within the same transaction
         slot.setCurrentBookings ( slot.getCurrentBookings ( ) + 1 );
         slotRepository.save ( slot );
@@ -142,6 +155,7 @@ public class AppointmentSlotService {
                 .selectedGarageServiceIds ( selectedGarageServiceIds )
                 .appointmentReferenceId ( appointmentService.generateAppointmentCode ( ) )
                 .slot ( slot )
+                .garageSubscriptionPlanId ( subscription != null ? subscription.getGarageSubscription().getId().toString() : null )
                 .insertTms ( DateHelper.dbDate ( ) ).build ( );
 
         AppointmentDetails save = bookingRepo.save ( appointment );

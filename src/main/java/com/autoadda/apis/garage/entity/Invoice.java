@@ -29,9 +29,11 @@ public class Invoice {
     private List<InvoiceLineItem> lineItems = new ArrayList<> ( );
 
     private Double totalAmount;
+    private Double subtotal;
 
     private Double taxRate; // e.g., 10.0 means 10%
     private Double taxAmount;
+    private Double subscriptionDiscount; // Discount applied from subscription
     private Double amountPaid;
 
     private int loyaltyPointsUsed;

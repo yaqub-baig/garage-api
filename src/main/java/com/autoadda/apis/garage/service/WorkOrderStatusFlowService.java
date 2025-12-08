@@ -98,6 +98,7 @@ public class WorkOrderStatusFlowService {
     );
     private final WorkOrderRepository workOrderRepository;
     private final JobCardStatusFlowService jobCardStatusFlowService;
+    private final SubscriptionUsageTrackingService subscriptionUsageTrackingService;
 
     public boolean isValidTransition(WorkOrderStatus currentStatus, WorkOrderStatus newStatus) {
         List<WorkOrderStatus> validNextStates = VALID_TRANSITIONS.get ( currentStatus );
@@ -129,6 +130,15 @@ public class WorkOrderStatusFlowService {
             workOrder.updateStatus ( WorkOrderStatus.JOB_COMPLETED );
             workOrder.setWorkCompletedDate ( LocalDateTime.now ( ) );
             workOrderRepository.save ( workOrder );
+
+            // Track subscription usage when work is completed
+            if (workOrder.getAppointment() != null) {
+                JobCard firstJobCard = jobCards.isEmpty() ? null : jobCards.get(0);
+                subscriptionUsageTrackingService.trackSubscriptionUsage(
+                        workOrder.getAppointment(),
+                        firstJobCard
+                );
+            }
         } else if ( anyInProgress && workOrder.getStatus ( ) == WorkOrderStatus.ASSIGNED ) {
             workOrder.updateStatus ( WorkOrderStatus.WORK_IN_PROGRESS );
             workOrderRepository.save ( workOrder );

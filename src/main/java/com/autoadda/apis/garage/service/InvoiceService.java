@@ -48,6 +48,8 @@ public class InvoiceService {
     private final InvoiceLineItemGeneratorService lineItemGenerator;
     private final AuthClient authClient;
     private final VehicleClient vehicleClient;
+    private final GarageSubscriptionRepository garageSubscriptionRepository;
+    private final AppointmentServiceRepository appointmentServiceRepository;
 
     /**
      * Prepares an invoice for a given appointment and garage.
@@ -272,9 +274,19 @@ public class InvoiceService {
                 .mapToDouble ( item -> item.getPrice ( ) * item.getQuantity ( ) )
                 .sum ( );
 
-        double taxAmount = subtotal * (request.getTaxRate ( ) != null ? request.getTaxRate ( ) / 100.0 : 0.0);
-        double totalAmount = subtotal + taxAmount;
+        // Calculate subscription discount if applicable
+        double subscriptionDiscount = 0.0;
+        if (workOrder.getAppointment() != null) {
+            subscriptionDiscount = calculateSubscriptionDiscount(workOrder.getAppointment());
+        }
 
+        // Adjust total amount with subscription discount
+        double adjustedSubtotal = subtotal - subscriptionDiscount;
+        double taxAmount = adjustedSubtotal * (request.getTaxRate ( ) != null ? request.getTaxRate ( ) / 100.0 : 0.0);
+        double totalAmount = adjustedSubtotal + taxAmount;
+
+        invoice.setSubtotal ( subtotal );
+        invoice.setSubscriptionDiscount ( subscriptionDiscount );
         invoice.setTotalAmount ( totalAmount );
         invoice.setTaxAmount ( taxAmount );
 
@@ -437,5 +449,59 @@ public class InvoiceService {
         return message.toString ( );
     }
 
+    /**
+     * Calculate discount amount based on subscription.
+     * If appointment used subscription, services are free or discounted.
+     *
+     * @param appointment The appointment with subscription
+     * @return Discount amount
+     */
+    private double calculateSubscriptionDiscount(AppointmentDetails appointment) {
+        if (appointment.getGarageSubscriptionPlanId() == null) {
+            return 0.0;
+        }
+
+        // Fetch subscription plan details
+        GarageSubscription plan;
+        try {
+            plan = garageSubscriptionRepository
+                    .findById(Integer.parseInt(appointment.getGarageSubscriptionPlanId()))
+                    .orElse(null);
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+
+        if (plan == null) {
+            return 0.0;
+        }
+
+        // Get appointment services
+        List<AppointmentServices> services = appointmentServiceRepository
+                .findByAppointmentId(appointment.getId());
+
+        double discount = 0.0;
+
+        for (AppointmentServices service : services) {
+            if (service.getService() == null || service.getService().getAvailableService() == null) {
+                continue;
+            }
+
+            Integer serviceId = service.getService().getAvailableService().getId();
+
+            // Check if service is included in subscription
+            boolean isIncluded = plan.getServicesIncluded().stream()
+                    .anyMatch(s -> s.getId().equals(serviceId));
+
+            if (isIncluded) {
+                // Service is free under subscription
+                double labourPrice = service.getLabourPrice() != null ? service.getLabourPrice() : 0.0;
+                double price = service.getPrice() != null ? service.getPrice() : 0.0;
+                double serviceTotal = labourPrice + price;
+                discount += serviceTotal;
+            }
+        }
+
+        return discount;
+    }
 
 }

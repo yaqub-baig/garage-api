@@ -23,6 +23,7 @@ public class GarageSubscriptionMapper {
         garageSubscriptionResponse.setServiceQuantity ( garageSubscription.getServiceQuantity ( ) );
         garageSubscriptionResponse.setServices ( garageSubscription.getServicesIncluded ( ).stream ( ).map ( availableServiceMapper::toResponse ).toList ( ) );
         garageSubscriptionResponse.setGarageLocation ( garageSubscription.getGarage ( ).getGarageLocation() );
+        garageSubscriptionResponse.setGarageId(garageSubscription.getGarage().getId());
         garageSubscriptionResponse.setIsActive ( garageSubscription.getIsActive ( ) );
         garageSubscriptionResponse.setGarageName ( garageSubscription.getGarage ( ).getName ( ) );
         return garageSubscriptionResponse;

@@ -21,6 +21,8 @@ public class VehicleSubscriptionController {
 
     private final VehicleOwnerSubscriptionService ownerSubscriptionService;
     private final GarageSubscriptionService garageSubscriptionService;
+    private final com.autoadda.apis.garage.service.SubscriptionValidationService subscriptionValidationService;
+    private final com.autoadda.apis.garage.mapper.VehicleOwnerSubscriptionMapper vehicleOwnerSubscriptionMapper;
 
     @PostMapping("/subscribe")
     ResponseEntity<VehicleOwnerSubscription> subscribeToPlan(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId
@@ -67,6 +69,28 @@ public class VehicleSubscriptionController {
     @GetMapping("/active")
     public List<VehicleOwnerSubscriptionResponse> getActiveSubscriptions() {
         return ownerSubscriptionService.getActiveSubscriptions ( );
+    }
+
+    /**
+     * Get active subscriptions for a specific customer at a specific garage.
+     * Used by frontend to show available subscriptions during booking.
+     */
+    @GetMapping("/garage/{garageId}/active")
+    public ResponseEntity<List<VehicleOwnerSubscriptionResponse>> getActiveSubscriptionsForGarage(
+            @PathVariable Integer garageId,
+            @RequestHeader(value = "X-Auto-Adda-Id") String customerId) {
+
+        List<com.autoadda.apis.garage.entity.VehicleOwnerSubscription> subscriptions =
+                subscriptionValidationService.getActiveSubscriptionsForGarage(
+                        Integer.parseInt(customerId),
+                        garageId
+                );
+
+        List<VehicleOwnerSubscriptionResponse> responses = subscriptions.stream()
+                .map(vehicleOwnerSubscriptionMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/by-date-range/{ownerId}/{startDate}/{endDate}")
