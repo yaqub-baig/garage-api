@@ -96,6 +96,12 @@ public class GarageManagementService {
         Optional.ofNullable(request.getClosingTime())
                 .map(LocalTime::toString)
                 .ifPresent(garage::setClosingTime);
+        Optional.ofNullable(request.getOpeningHours2())
+                .map(LocalTime::toString)
+                .ifPresent(garage::setOpeningTime2);
+        Optional.ofNullable(request.getClosingHours2())
+                .map(LocalTime::toString)
+                .ifPresent(garage::setClosingTime2);
         Optional.ofNullable(request.getBreakStartTime())
                 .map(LocalTime::toString)
                 .ifPresent(garage::setBreakStartTime);
@@ -328,6 +334,12 @@ public class GarageManagementService {
         Optional.ofNullable(request.getClosingTime())
                 .map(LocalTime::toString)
                 .ifPresent(existing::setClosingTime);
+        Optional.ofNullable(request.getOpeningHours2())
+                .map(LocalTime::toString)
+                .ifPresent(existing::setOpeningTime2);
+        Optional.ofNullable(request.getClosingHours2())
+                .map(LocalTime::toString)
+                .ifPresent(existing::setClosingTime2);
         Optional.ofNullable(request.getBreakStartTime())
                 .map(LocalTime::toString)
                 .ifPresent(existing::setBreakStartTime);

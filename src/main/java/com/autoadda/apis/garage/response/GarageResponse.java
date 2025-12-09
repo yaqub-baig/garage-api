@@ -21,6 +21,8 @@ public class GarageResponse {
     private String tradeLicenceNumber;
     private String openingTime;
     private String closingTime;
+    private String closingHours2;
+    private String openingHours2;
     private String breakStartTime;
     private String breakEndTime;
     private String workingDays;

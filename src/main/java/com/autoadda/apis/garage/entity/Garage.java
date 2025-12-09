@@ -40,6 +40,12 @@ public class Garage {
     @Column(name = "closing_time")
     private String closingTime;
 
+    @Column(name = "opening_time_2")
+    private String openingTime2;
+
+    @Column(name = "closing_time_2")
+    private String closingTime2;
+
     @Column(name = "break_start_time")
     private String breakStartTime;
 

@@ -27,6 +27,10 @@ public class GarageRequest {
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime closingTime;
     @DateTimeFormat(pattern = "HH:mm:ss")
+    private LocalTime openingHours2;
+    @DateTimeFormat(pattern = "HH:mm:ss")
+    private LocalTime closingHours2;
+    @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime breakStartTime;
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime breakEndTime;

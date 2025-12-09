@@ -21,6 +21,8 @@ public class GarageMapper {
         garageResponse.setOpeningTime ( garage.getOpeningTime ( ) != null ? garage.getOpeningTime ( ) : null );
         garageResponse.setClosingTime ( garage.getClosingTime ( ) != null ? garage.getClosingTime ( ) : null );
         garageResponse.setWorkingDays ( garage.getWorkingDays ( ) != null ? garage.getWorkingDays ( ) : null );
+        garageResponse.setOpeningHours2 ( garage.getOpeningTime2 ( ) != null ? garage.getOpeningTime2 ( ) : null );
+        garageResponse.setClosingHours2 ( garage.getClosingTime2 ( ) != null ? garage.getClosingTime2 ( ) : null );
         garageResponse.setTrnNumber ( garage.getTrnNumber ( ) != null ? garage.getTrnNumber ( ) : null );
         garageResponse.setWebsite( garage.getWebsite( ) != null ? garage.getWebsite( ) : null );
         garageResponse.setEmail ( garage.getEmail ( ) != null ? garage.getEmail ( ) : null );
