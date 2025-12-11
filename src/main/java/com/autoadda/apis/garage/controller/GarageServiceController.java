@@ -22,32 +22,32 @@ public class GarageServiceController {
 
     @PostMapping
     public ResponseEntity<GarageService> create(@RequestBody GarageServiceRequest garageService) {
-        return ResponseEntity.ok ( garageServiceService.createGarageService ( garageService ) );
+        return ResponseEntity.ok(garageServiceService.createGarageService(garageService));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<GarageService>> getById(@PathVariable Integer id) {
-        return ResponseEntity.ok ( garageServiceService.getGarageServiceById ( id ) );
+        return ResponseEntity.ok(garageServiceService.getGarageServiceById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<GarageService> update(@PathVariable Integer id, @RequestBody GarageServiceUpdateRequest updated) {
-        return ResponseEntity.ok ( garageServiceService.updateGarageService ( id, updated ) );
+        return ResponseEntity.ok(garageServiceService.updateGarageService(id, updated));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        garageServiceService.deleteGarageService ( id );
-        return ResponseEntity.noContent ( ).build ( );
+        garageServiceService.deleteGarageService(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<GarageService>> getAll() {
-        return ResponseEntity.ok ( garageServiceService.getAllGarageServices ( ) );
+        return ResponseEntity.ok(garageServiceService.getAllGarageServices());
     }
 
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<List<GarageServiceResponse>> getByGarage(@PathVariable Integer garageId) {
-        return ResponseEntity.ok ( garageServiceService.getByGarageId ( garageId ) );
+        return ResponseEntity.ok(garageServiceService.getByGarageId(garageId));
     }
 }

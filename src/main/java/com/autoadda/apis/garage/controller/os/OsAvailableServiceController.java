@@ -30,6 +30,7 @@ public class OsAvailableServiceController {
         OsAvailableService osAvailableService = service.create(request);
         return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse("OS Available service created", osAvailableService));
     }
+
     // Get one service by ID
     @GetMapping("/{id}")
     public ResponseEntity<OsAvailableService> getById(@PathVariable Integer id) {

@@ -57,9 +57,9 @@ public class GarageInventoryService {
                     // Auto-populate fields from Part API
                     request.setInventoryPartId(product.getId());
                     request.setPartName(product.getName());
-                    request.setSku(product.getSku());
+
                     request.setDescription(product.getDescription());
-                    request.setCategory(product.getCategory());
+                    request.setCategory(product.getCategoryName());
                     request.setManufacturer(product.getManufacturer());
 
                     // Use Part API price if not provided by user
@@ -107,6 +107,7 @@ public class GarageInventoryService {
                 .partNumber(request.getPartNumber())
                 .sku(request.getSku())
                 .unitPrice(request.getUnitPrice())
+                .productCondition(request.getProductCondition())
                 .quantityInStock(0)
                 .minimumStockLevel(request.getMinimumStockLevel())
                 .maximumStockLevel(request.getMaximumStockLevel())
@@ -165,6 +166,9 @@ public class GarageInventoryService {
         }
         if (request.getNotes() != null) {
             item.setNotes(request.getNotes());
+        }
+        if (request.getProductCondition() != null) {
+            item.setProductCondition(request.getProductCondition());
         }
 
         // Validate threshold levels

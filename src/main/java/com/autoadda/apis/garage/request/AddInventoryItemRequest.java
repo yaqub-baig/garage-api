@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.request;
 
+import com.autoadda.apis.garage.util.ProductCondition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class AddInventoryItemRequest {
     private Double unitPrice;
 
     // Garage-specific settings (always required)
+    private ProductCondition productCondition;
     private Integer minimumStockLevel;
     private Integer maximumStockLevel;
     private Integer reorderQuantity;

@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.response;
 
+import com.autoadda.apis.garage.util.ProductCondition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,5 +33,6 @@ public class GarageInventoryItemResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastRestockedAt;
+    private ProductCondition productCondition;
     private String notes;
 }

@@ -38,6 +38,7 @@ public class GarageInventoryMapper {
                 .totalValue(totalValue)
                 .isLowStock(item.isLowStock())
                 .isOutOfStock(item.getQuantityInStock() != null && item.getQuantityInStock() == 0)
+                .productCondition(item.getProductCondition())
                 .isOverStock(item.isOverStock())
                 .createdAt(item.getCreatedAt())
                 .updatedAt(item.getUpdatedAt())

@@ -18,11 +18,11 @@ public class VehicleFavoriteController {
 
     @PostMapping("/vehicle")
     public ResponseEntity<VehicleFavorite> addFavoriteVehicle(@RequestParam Integer ownerId, @RequestParam Integer favVehicleId) {
-        return ResponseEntity.ok ( favoriteService.addFavoriteVehicle ( ownerId, favVehicleId ) );
+        return ResponseEntity.ok(favoriteService.addFavoriteVehicle(ownerId, favVehicleId));
     }
 
     @GetMapping("/vehicle/{ownerId}")
     public ResponseEntity<List<VehicleFavorite>> getFavoriteVehicles(@PathVariable Integer ownerId) {
-        return ResponseEntity.ok ( favoriteService.getFavoriteVehicles ( ownerId ) );
+        return ResponseEntity.ok(favoriteService.getFavoriteVehicles(ownerId));
     }
 }

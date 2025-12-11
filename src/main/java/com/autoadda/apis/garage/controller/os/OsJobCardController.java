@@ -35,14 +35,14 @@ public class OsJobCardController {
 
     @GetMapping("/technician/{technicianId}")
     public ResponseEntity<OsGenericResponse> getTechnicianJobCards(@PathVariable Integer technicianId,
-                                                                 @RequestParam(required = false) Status status) throws MemberNotFoundException {
+                                                                   @RequestParam(required = false) Status status) throws MemberNotFoundException {
         List<OsJobCard> jobCards = jobCardService.getTechnicianJobCards(technicianId, status);
         return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse(jobCards));
     }
 
     @GetMapping("/other-service/{otherServiceId}")
     public ResponseEntity<OsGenericResponse> getOtherServiceJobCards(@PathVariable Integer otherServiceId,
-                                                             @RequestParam(required = false) Status status) {
+                                                                     @RequestParam(required = false) Status status) {
         List<OsJobCard> jobCards = jobCardService.getGarageJobCards(otherServiceId, status);
         return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse(jobCards));
     }

@@ -1,6 +1,5 @@
 package com.autoadda.apis.garage.clients;
 
-import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.ProductResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

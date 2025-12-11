@@ -23,22 +23,21 @@ public class FileStorageConfig implements WebMvcConfigurer {
     @PostConstruct
     public void init() {
         try {
-            Path uploadPath = Paths.get ( uploadDir );
-            Files.createDirectories ( uploadPath.resolve ( "photos" ) );
-            Files.createDirectories ( uploadPath.resolve ( "docs" ) );
-            Files.createDirectories ( uploadPath.resolve ( "pdfs" ) );
-            log.info ( "Created directories at: " + uploadPath.toAbsolutePath ( ) );
-        }
-        catch ( IOException e ) {
-            log.error ( "Could not initialize storage directories", e );
-            throw new FileStorageException( "Could not initialize storage directories", e );
+            Path uploadPath = Paths.get(uploadDir);
+            Files.createDirectories(uploadPath.resolve("photos"));
+            Files.createDirectories(uploadPath.resolve("docs"));
+            Files.createDirectories(uploadPath.resolve("pdfs"));
+            log.info("Created directories at: " + uploadPath.toAbsolutePath());
+        } catch (IOException e) {
+            log.error("Could not initialize storage directories", e);
+            throw new FileStorageException("Could not initialize storage directories", e);
         }
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        Path uploadPath = Paths.get ( uploadDir ).toAbsolutePath ( ).normalize ( );
-        registry.addResourceHandler ( "/uploads/**" )
-                .addResourceLocations ( "file:" + uploadPath.toString ( ) + "/" );
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + uploadPath.toString() + "/");
     }
 }

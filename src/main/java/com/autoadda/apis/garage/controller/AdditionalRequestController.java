@@ -7,6 +7,7 @@ import com.autoadda.apis.garage.service.AdditionalRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/additional-requests")
@@ -17,14 +18,14 @@ public class AdditionalRequestController {
 
     @PostMapping
     public ResponseEntity<GenericResponse> createRequest(@RequestBody JobCardAdditionalAPIRequest request) {
-        JobCardAdditionalRequest result = additionalRequestService.createAdditionalRequest ( request );
-        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Additional request created", result ) );
+        JobCardAdditionalRequest result = additionalRequestService.createAdditionalRequest(request);
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Additional request created", result));
     }
 
 
     @PutMapping
     public ResponseEntity<GenericResponse> updateRequest(@RequestBody JobCardAdditionalAPIRequest request) {
-        JobCardAdditionalRequest result = additionalRequestService.updateAdditionalRequest ( request );
-        return ResponseEntity.ok ( GenericResponse.makeSuccessResponse( "Additional request updated", result ) );
+        JobCardAdditionalRequest result = additionalRequestService.updateAdditionalRequest(request);
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Additional request updated", result));
     }
 }

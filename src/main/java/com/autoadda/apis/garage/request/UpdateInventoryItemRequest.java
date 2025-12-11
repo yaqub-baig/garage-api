@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.request;
 
+import com.autoadda.apis.garage.util.ProductCondition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class UpdateInventoryItemRequest {
     private Integer reorderQuantity;
     private String shelfLocation;
     private String binLocation;
+    private ProductCondition productCondition;
     private String notes;
 }

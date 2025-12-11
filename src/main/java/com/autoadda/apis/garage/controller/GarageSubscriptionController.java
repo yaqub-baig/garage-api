@@ -20,48 +20,48 @@ public class GarageSubscriptionController {
 
     @PostMapping
     public ResponseEntity<List<GarageSubscriptionResponse>> createPlan(@RequestBody GarageSubscriptionRequest plan) {
-        if ( plan.getGarageIds ( ) == null || plan.getGarageIds ( ).isEmpty ( ) ) {
-            return ResponseEntity.badRequest ( ).body ( null );
+        if (plan.getGarageIds() == null || plan.getGarageIds().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
         }
-        return ResponseEntity.ok ( garageSubscriptionService.createPlan ( plan ) );
+        return ResponseEntity.ok(garageSubscriptionService.createPlan(plan));
     }
 
     @GetMapping("/garage/{garageId}")
     public List<GarageSubscriptionResponse> getPlansByGarage(@PathVariable Integer garageId) {
-        return garageSubscriptionService.getPlansByGarage ( garageId );
+        return garageSubscriptionService.getPlansByGarage(garageId);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<GarageSubscriptionResponse> getPlanById(@PathVariable Integer id) {
-        return ResponseEntity.ok ( garageSubscriptionService.getPlanById ( id ) );
+        return ResponseEntity.ok(garageSubscriptionService.getPlanById(id));
     }
 
     @PostMapping("/{id}/update")
     public ResponseEntity<GarageSubscriptionResponse> updatePlan(@PathVariable Integer id,
-                                                         @RequestBody GarageSubscription updatedPlan) {
-        return ResponseEntity.ok ( garageSubscriptionService.updatePlan ( id, updatedPlan ) );
+                                                                 @RequestBody GarageSubscription updatedPlan) {
+        return ResponseEntity.ok(garageSubscriptionService.updatePlan(id, updatedPlan));
     }
 
     @PutMapping("/{id}/status")
     public ResponseEntity<GarageSubscriptionResponse> activatePlan(@PathVariable Integer id) {
-        return ResponseEntity.ok ( garageSubscriptionService.changeStatus ( id ) );
+        return ResponseEntity.ok(garageSubscriptionService.changeStatus(id));
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<Object> deletePlan(@PathVariable Integer id) {
-        garageSubscriptionService.deletePlan ( id );
-        return ResponseEntity.noContent ( ).build ( );
+        garageSubscriptionService.deletePlan(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
     public List<GarageSubscriptionResponse> searchPlans(@RequestParam(required = false) String brand, @RequestParam(required = false) String city, @RequestParam(required = false) String garageName) {
-        return garageSubscriptionService.searchPlans ( brand, city, garageName );
+        return garageSubscriptionService.searchPlans(brand, city, garageName);
     }
 
     @GetMapping("/all")
     public List<GarageSubscriptionResponse> getAllPlans() {
-        return garageSubscriptionService.getAllPlans ( );
+        return garageSubscriptionService.getAllPlans();
     }
 
 }

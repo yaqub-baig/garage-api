@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/vehicle-received")
@@ -17,26 +18,26 @@ public class VehicleReceivedController {
 
     @PostMapping
     public ResponseEntity<VehicleRecievedResponse> recievedVehicle(@RequestBody VehicleReceivedRequest request) {
-        VehicleRecievedResponse response = vehicleReceivedService.receiveVehicle ( request );
-        return ResponseEntity.ok ( response );
+        VehicleRecievedResponse response = vehicleReceivedService.receiveVehicle(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{carRecievedId}")
     public ResponseEntity<VehicleRecievedResponse> getVehicleReceivedDetails(@PathVariable Integer carRecievedId) {
-        VehicleRecievedResponse response = vehicleReceivedService.getVehicleReceivedDetails ( carRecievedId );
-        return ResponseEntity.ok ( response );
+        VehicleRecievedResponse response = vehicleReceivedService.getVehicleReceivedDetails(carRecievedId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<List<VehicleRecievedResponse>> getVehicleReceivedByAppointmentId(@PathVariable Integer garageId) {
-        List<VehicleRecievedResponse> response = vehicleReceivedService.getAllRecievedCarByGarageId ( garageId );
-        return ResponseEntity.ok ( response );
+        List<VehicleRecievedResponse> response = vehicleReceivedService.getAllRecievedCarByGarageId(garageId);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/update/{vehicleRecievedId}")
     public ResponseEntity<VehicleRecievedResponse> updateVehicleRecieved(@PathVariable Integer vehicleRecievedId, @RequestBody VehicleReceivedRequest request) {
-        VehicleRecievedResponse response = vehicleReceivedService.updateVehicleReceived ( vehicleRecievedId, request );
-        return ResponseEntity.ok ( response );
+        VehicleRecievedResponse response = vehicleReceivedService.updateVehicleReceived(vehicleRecievedId, request);
+        return ResponseEntity.ok(response);
     }
 
 }

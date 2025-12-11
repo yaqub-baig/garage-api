@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/technicians")
@@ -18,64 +19,64 @@ public class TechnicianController {
 
     @PostMapping
     public ResponseEntity<TechnicianResponse> addTechnician(@RequestBody TechnicianRequest request) {
-        TechnicianResponse created = technicianService.onboardTechnician ( request );
-        return ResponseEntity.status ( HttpStatus.CREATED ).body ( created );
+        TechnicianResponse created = technicianService.onboardTechnician(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/garage/{garageId}")
     public ResponseEntity<List<TechnicianResponse>> getByGarage(@PathVariable Integer garageId) {
-        return ResponseEntity.ok ( technicianService.getTechniciansByGarage ( garageId ) );
+        return ResponseEntity.ok(technicianService.getTechniciansByGarage(garageId));
     }
 
     @GetMapping("/email/{email}")
     public ResponseEntity<TechnicianResponse> getByEmail(@PathVariable String email) {
-        return technicianService.findByEmail ( email )
-                .map ( ResponseEntity::ok )
-                .orElse ( ResponseEntity.notFound ( ).build ( ) );
+        return technicianService.findByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/skill/{skillId}")
     public ResponseEntity<List<TechnicianResponse>> getBySkill(@PathVariable Integer skillId) {
-        List<TechnicianResponse> technicians = technicianService.findBySkillSet ( skillId );
-        if ( technicians.isEmpty ( ) ) {
-            return ResponseEntity.notFound ( ).build ( );
+        List<TechnicianResponse> technicians = technicianService.findBySkillSet(skillId);
+        if (technicians.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok ( technicians );
+        return ResponseEntity.ok(technicians);
     }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<TechnicianResponse>> getByStatus(@PathVariable String status) {
-        List<TechnicianResponse> technicians = technicianService.findByStatus ( status );
-        if ( technicians.isEmpty ( ) ) {
-            return ResponseEntity.notFound ( ).build ( );
+        List<TechnicianResponse> technicians = technicianService.findByStatus(status);
+        if (technicians.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok ( technicians );
+        return ResponseEntity.ok(technicians);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TechnicianResponse> getById(@PathVariable Integer id) {
-        return technicianService.findById ( id )
-                .map ( ResponseEntity::ok )
-                .orElse ( ResponseEntity.notFound ( ).build ( ) );
+        return technicianService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<Void> deleteTechnician(@PathVariable Integer id) {
-        technicianService.deleteTechnician ( id );
-        return ResponseEntity.noContent ( ).build ( );
+        technicianService.deleteTechnician(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/update")
     public ResponseEntity<TechnicianResponse> updateTechnician(@PathVariable Integer id, @RequestBody TechnicianRequest request) {
-        return new ResponseEntity<> ( technicianService.updateTechnician ( id, request ), HttpStatus.OK );
+        return new ResponseEntity<>(technicianService.updateTechnician(id, request), HttpStatus.OK);
 
     }
 
     @GetMapping("/autoadda-id/{autoAddaId}")
     public ResponseEntity<TechnicianResponse> findByAutoAddaId(@PathVariable Integer autoAddaId) {
-        return technicianService.findByAutoAddaId ( autoAddaId )
-                .map ( ResponseEntity::ok )
-                .orElse ( ResponseEntity.notFound ( ).build ( ) );
+        return technicianService.findByAutoAddaId(autoAddaId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Additional endpoints can be added as needed

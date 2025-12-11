@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalTime;
 import java.util.List;
+
 @CrossOrigin("*")
 @RestController
 @RequiredArgsConstructor
@@ -20,39 +21,39 @@ public class SlotController {
 
     @PostMapping
     public ResponseEntity<AppointmentSlotResponse> createSlot(@RequestBody AppointmentSlotRequest request) {
-        return ResponseEntity.ok ( appointmentSlotService.createSlot ( request ) );
+        return ResponseEntity.ok(appointmentSlotService.createSlot(request));
     }
 
     @GetMapping
     public ResponseEntity<List<AppointmentSlotResponse>> getAllSlots() {
-        return ResponseEntity.ok ( appointmentSlotService.getAllSlots ( ) );
+        return ResponseEntity.ok(appointmentSlotService.getAllSlots());
     }
 
     @GetMapping("/available-slots")
     public ResponseEntity<List<AppointmentSlotResponse>> getAvailableSlots(@RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime startTime,
                                                                            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime endTime) {
-        return ResponseEntity.ok ( appointmentSlotService.getAvailableSlots ( startTime, endTime ) );
+        return ResponseEntity.ok(appointmentSlotService.getAvailableSlots(startTime, endTime));
     }
 
     @GetMapping("/available-slots/{garageId}")
     public ResponseEntity<List<AppointmentSlotResponse>> getAvailableSlots(@PathVariable Integer garageId) {
-        return ResponseEntity.ok ( appointmentSlotService.getAvailableSlots ( garageId ) );
+        return ResponseEntity.ok(appointmentSlotService.getAvailableSlots(garageId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentSlotResponse> getSlotById(@PathVariable Integer id) {
-        return ResponseEntity.ok ( appointmentSlotService.getSlotById ( id ) );
+        return ResponseEntity.ok(appointmentSlotService.getSlotById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AppointmentSlotResponse> updateSlot(@PathVariable Integer id, @RequestBody AppointmentSlotRequest request) {
-        return ResponseEntity.ok ( appointmentSlotService.updateSlot ( id, request ) );
+        return ResponseEntity.ok(appointmentSlotService.updateSlot(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSlot(@PathVariable Integer id) {
-        appointmentSlotService.deleteSlot ( id );
-        return ResponseEntity.ok ( "Slot deleted successfully." );
+        appointmentSlotService.deleteSlot(id);
+        return ResponseEntity.ok("Slot deleted successfully.");
     }
 
     @GetMapping("/{garageId}/availability")
@@ -60,7 +61,7 @@ public class SlotController {
             @PathVariable Integer garageId) {
 
         MonthlyAvailabilityResponse response = appointmentSlotService
-                .getMonthlyAvailability ( garageId );
-        return ResponseEntity.ok ( response );
+                .getMonthlyAvailability(garageId);
+        return ResponseEntity.ok(response);
     }
 }

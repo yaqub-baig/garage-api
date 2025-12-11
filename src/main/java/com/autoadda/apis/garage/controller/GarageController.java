@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @CrossOrigin("*")
 @Slf4j
 @RestController
@@ -29,45 +30,45 @@ public class GarageController {
             @RequestBody @Valid GarageRequest garage
     ) {
         //fall back params
-        log.info ( "Content-Length: {}", request.getHeader ( "Content-Length" ) );
-        log.info ( "Content-Type: {}", request.getContentType ( ) );
+        log.info("Content-Length: {}", request.getHeader("Content-Length"));
+        log.info("Content-Type: {}", request.getContentType());
 
-        return ResponseEntity.status ( HttpStatus.CREATED ).body ( garageService.createGarage ( garage, autoAddaId ) );
+        return ResponseEntity.status(HttpStatus.CREATED).body(garageService.createGarage(garage, autoAddaId));
     }
 
     @GetMapping("all")
     public ResponseEntity<List<GarageResponse>> getAllGarages() {
-        return ResponseEntity.ok ( garageService.getAllGarages ( ) );
+        return ResponseEntity.ok(garageService.getAllGarages());
     }
 
     @GetMapping
     public ResponseEntity<List<GarageResponse>> getAllGaragesByOwnerId(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
-        return ResponseEntity.ok ( garageService.getAllGaragesByOwnerId ( autoAddaId ) );
+        return ResponseEntity.ok(garageService.getAllGaragesByOwnerId(autoAddaId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GarageResponse> getGarageById(@PathVariable Integer id) {
-        return garageService.getGarageById ( id ).map ( ResponseEntity::ok ).orElse ( ResponseEntity.notFound ( ).build ( ) );
+        return garageService.getGarageById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<GarageResponse> updateGarage(@PathVariable Integer id,
                                                        @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
-                                                       @RequestBody GarageRequest garage){
+                                                       @RequestBody GarageRequest garage) {
 
-        return ResponseEntity.ok ( garageService.updateGarage ( id, garage ) );
+        return ResponseEntity.ok(garageService.updateGarage(id, garage));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateGarageVerification(@PathVariable Integer id) {
-        garageService.updateGarageVerification ( id );
-        return ResponseEntity.noContent ( ).build ( );
+        garageService.updateGarageVerification(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGarage(@PathVariable Integer id) {
-        garageService.deleteGarage ( id );
-        return ResponseEntity.noContent ( ).build ( );
+        garageService.deleteGarage(id);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -86,12 +87,12 @@ public class GarageController {
 
     @GetMapping("/brandname/{name}")
     public ResponseEntity<List<GarageResponse>> searchByLegalName(@PathVariable String name) {
-        return ResponseEntity.ok ( garageService.findGaragesByLegalName ( name ) );
+        return ResponseEntity.ok(garageService.findGaragesByLegalName(name));
     }
 
     @GetMapping("/service/{serviceId}")
     public ResponseEntity<List<GarageResponse>> getGaragesByService(@PathVariable Integer serviceId) {
-        return ResponseEntity.ok ( garageService.findGaragesOfferingAvailableService ( serviceId ) );
+        return ResponseEntity.ok(garageService.findGaragesOfferingAvailableService(serviceId));
     }
 
     //search garage based on  city,postal code,available services ,brand, garage name

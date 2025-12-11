@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.entity;
 
+import com.autoadda.apis.garage.util.ProductCondition;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,9 @@ public class GarageInventoryItem {
 
     @Column(name = "maximum_stock_level")
     private Integer maximumStockLevel;
+
+    @Enumerated(EnumType.STRING)
+    private ProductCondition productCondition;
 
     @Column(name = "reorder_quantity")
     private Integer reorderQuantity;  // Suggested quantity to order

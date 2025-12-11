@@ -19,27 +19,27 @@ public class AvailableServiceController {
 
     @PostMapping
     public ResponseEntity<AvailableService> create(@RequestBody AvailableServiceRequest availableService) {
-        return ResponseEntity.ok ( availableServiceService.createService ( availableService ) );
+        return ResponseEntity.ok(availableServiceService.createService(availableService));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<AvailableService>> getById(@PathVariable Integer id) {
-        return ResponseEntity.ok ( availableServiceService.getServiceById ( id ) );
+        return ResponseEntity.ok(availableServiceService.getServiceById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AvailableService> update(@PathVariable Integer id, @RequestBody AvailableService updated) {
-        return ResponseEntity.ok ( availableServiceService.updateService ( id, updated ) );
+        return ResponseEntity.ok(availableServiceService.updateService(id, updated));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        availableServiceService.deleteService ( id );
-        return ResponseEntity.noContent ( ).build ( );
+        availableServiceService.deleteService(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     public ResponseEntity<List<AvailableService>> getAll() {
-        return ResponseEntity.ok ( availableServiceService.getAllServices ( ) );
+        return ResponseEntity.ok(availableServiceService.getAllServices());
     }
 }
