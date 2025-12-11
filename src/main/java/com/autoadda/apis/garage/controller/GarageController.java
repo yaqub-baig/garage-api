@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
+import com.autoadda.apis.garage.response.UserResponse;
 import com.autoadda.apis.garage.service.GarageManagementService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -115,6 +116,12 @@ public class GarageController {
 
         // Otherwise use existing specific parameter search
         return ResponseEntity.ok(garageService.searchGarages(brand, city, zip, garageName, availableServiceIds, model));
+    }
+
+    @GetMapping("/{garageId}/customers")
+    public ResponseEntity<List<UserResponse>> getCustomersByGarageId(@PathVariable Integer garageId) {
+        List<UserResponse> customers = garageService.getUniqueCustomersByGarageId(garageId);
+        return ResponseEntity.ok(customers);
     }
 
 

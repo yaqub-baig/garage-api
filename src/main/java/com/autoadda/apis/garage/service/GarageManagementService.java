@@ -53,6 +53,7 @@ public class GarageManagementService {
     private final AuthClient authClient;
     private final TechnicianService technicianService;
     private final MediaFileCleanupService mediaFileCleanupService;
+    private final AppointmentDetailsRepository appointmentDetailsRepository;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage();
@@ -1177,6 +1178,33 @@ public class GarageManagementService {
         List<Garage> garages = garageRepository.findByRejectedBy(adminId);
         return garages.stream()
                 .map(garageMapper::entityToResponse)
+                .toList();
+    }
+
+    /**
+     * Get all unique customers who have appointments with a specific garage
+     * Fetches customer data from authentication service
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUniqueCustomersByGarageId(Integer garageId) {
+        // Validate garage exists
+        garageRepository.findById(garageId)
+                .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND_WITH_ID + garageId));
+
+        // Get unique customer IDs from appointments
+        List<Integer> customerIds = appointmentDetailsRepository.findDistinctCustomerIdsByGarageId(garageId);
+
+        // Fetch user data from auth service for each customer ID
+        return customerIds.stream()
+                .map(customerId -> {
+                    try {
+                        return authClient.getUser(customerId);
+                    } catch (Exception e) {
+                        log.warn("Failed to fetch user data for customer ID: {}. Error: {}", customerId, e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(user -> user != null)  // Remove nulls from failed auth calls
                 .toList();
     }
 }

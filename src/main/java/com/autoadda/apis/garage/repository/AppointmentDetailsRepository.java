@@ -70,4 +70,7 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
             @Param("status") Status status,
             @Param("appointmentId") Integer appointmentId
     );
+
+    @Query("SELECT DISTINCT a.customerId FROM AppointmentDetails a WHERE a.garage.id = :garageId")
+    List<Integer> findDistinctCustomerIdsByGarageId(@Param("garageId") Integer garageId);
 }

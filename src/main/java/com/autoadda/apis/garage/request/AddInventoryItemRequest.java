@@ -28,6 +28,7 @@ public class AddInventoryItemRequest {
     // Garage-specific settings (always required)
     private ProductCondition productCondition;
     private Integer minimumStockLevel;
+    private Integer quantityInStock;
     private Integer maximumStockLevel;
     private Integer reorderQuantity;
     private String shelfLocation;

@@ -14,6 +14,7 @@ public class UpdateInventoryItemRequest {
     private Double unitPrice;
     private Integer minimumStockLevel;
     private Integer maximumStockLevel;
+    private Integer quantityInStock;
     private Integer reorderQuantity;
     private String shelfLocation;
     private String binLocation;

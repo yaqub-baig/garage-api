@@ -33,6 +33,7 @@ public class GarageInventoryService {
     private final TechnicianRepository technicianRepo;
     private final GarageInventoryMapper mapper;
     private final PartClient partClient;
+    private final MediaFileRepository mediaFileRepository;
 
     /**
      * Add a new part to garage inventory
@@ -43,6 +44,9 @@ public class GarageInventoryService {
 
         Garage garage = garageRepo.findById(request.getGarageId())
                 .orElseThrow(() -> new ResourceNotFoundException("Garage not found"));
+
+        // Declare partImage variable at method scope for later use in builder
+        MediaFile partImage = null;
 
         // NEW: If partNumber is provided, fetch from Part API
         if (request.getPartNumber() != null && !request.getPartNumber().trim().isEmpty()) {
@@ -65,6 +69,19 @@ public class GarageInventoryService {
                     // Use Part API price if not provided by user
                     if (request.getUnitPrice() == null) {
                         request.setUnitPrice(product.getUnitPrice());
+                    }
+
+                    // Process first/primary image from Part API response
+                    if (product.getImages() != null && !product.getImages().isEmpty()) {
+                        try {
+                            ProductDetailResponse.ProductImageResponse firstImage = product.getImages().get(0);
+                            partImage = createMediaFileFromApiImage(firstImage);
+                            log.info("Created MediaFile reference for part image: {}",
+                                    firstImage.getFileName());
+                        } catch (Exception e) {
+                            log.warn("Failed to create MediaFile for part image. Continuing without image. Error: {}",
+                                    e.getMessage());
+                        }
                     }
 
                     log.info("Successfully fetched part details from Part API for part number: {}",
@@ -108,13 +125,14 @@ public class GarageInventoryService {
                 .sku(request.getSku())
                 .unitPrice(request.getUnitPrice())
                 .productCondition(request.getProductCondition())
-                .quantityInStock(0)
+                .quantityInStock(request.getQuantityInStock()!=null?request.getQuantityInStock():0)
                 .minimumStockLevel(request.getMinimumStockLevel())
                 .maximumStockLevel(request.getMaximumStockLevel())
                 .reorderQuantity(request.getReorderQuantity())
                 .shelfLocation(request.getShelfLocation())
                 .binLocation(request.getBinLocation())
                 .notes(request.getNotes())
+                .partImage(partImage)
                 .build();
 
         item = inventoryItemRepo.save(item);
@@ -157,6 +175,9 @@ public class GarageInventoryService {
         }
         if (request.getReorderQuantity() != null) {
             item.setReorderQuantity(request.getReorderQuantity());
+        }
+        if (request.getQuantityInStock() != null) {
+            item.setQuantityInStock(request.getQuantityInStock());
         }
         if (request.getShelfLocation() != null) {
             item.setShelfLocation(request.getShelfLocation());
@@ -541,5 +562,24 @@ public class GarageInventoryService {
             log.error("Error calling Part API for part number: {}. Error: {}", partNumber, e.getMessage());
             throw new ResourceNotFoundException("Failed to search Part API: " + e.getMessage());
         }
+    }
+
+    /**
+     * Create MediaFile entity from Part API image response
+     * Does NOT upload file - images already exist in shared storage
+     */
+    private MediaFile createMediaFileFromApiImage(ProductDetailResponse.ProductImageResponse apiImage) {
+        if (apiImage == null) {
+            return null;
+        }
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setFileName(apiImage.getFileName());
+        mediaFile.setOriginalFileName(apiImage.getOriginalFileName());
+        mediaFile.setFilePath(apiImage.getFilePath());
+        mediaFile.setMediaType(apiImage.getMediaType());
+        mediaFile.setSize(apiImage.getSize());
+
+        return mediaFileRepository.save(mediaFile);
     }
 }

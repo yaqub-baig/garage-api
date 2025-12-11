@@ -79,6 +79,10 @@ public class GarageInventoryItem {
     @Column(name = "notes", length = 1000)
     private String notes;
 
+    @OneToOne
+    @JoinColumn(name = "part_image_id")
+    private MediaFile partImage;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

@@ -35,4 +35,9 @@ public class GarageInventoryItemResponse {
     private LocalDateTime lastRestockedAt;
     private ProductCondition productCondition;
     private String notes;
+
+    // Part image information
+    private Long partImageId;
+    private String partImageUrl;
+    private String partImageFileName;
 }

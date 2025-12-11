@@ -6,10 +6,14 @@ import com.autoadda.apis.garage.entity.InventoryTransaction;
 import com.autoadda.apis.garage.response.GarageInventoryItemResponse;
 import com.autoadda.apis.garage.response.InventoryAlertResponse;
 import com.autoadda.apis.garage.response.InventoryTransactionResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GarageInventoryMapper {
+
+    @Value("${file.base-url}")
+    private String baseUrl;
 
     public GarageInventoryItemResponse entityToResponse(GarageInventoryItem item) {
         if (item == null) {
@@ -44,6 +48,12 @@ public class GarageInventoryMapper {
                 .updatedAt(item.getUpdatedAt())
                 .lastRestockedAt(item.getLastRestockedAt())
                 .notes(item.getNotes())
+                // Add part image information
+                .partImageId(item.getPartImage() != null ? item.getPartImage().getId() : null)
+                .partImageUrl(item.getPartImage() != null ?
+                        item.getPartImage().getFilePath() : null)
+                .partImageFileName(item.getPartImage() != null ?
+                        item.getPartImage().getFileName() : null)
                 .build();
     }
 
@@ -104,5 +114,15 @@ public class GarageInventoryMapper {
                         alert.getResolvedBy().getFirstName() : null)
                 .resolutionNotes(alert.getResolutionNotes())
                 .build();
+    }
+
+    /**
+     * Construct full URL for image file
+     */
+    private String constructImageUrl(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            return null;
+        }
+        return String.format("%s/uploads/%s", baseUrl, filePath);
     }
 }
