@@ -117,6 +117,9 @@ public class AppointmentSlotService {
     @Transactional
     public AppointmentDetailResponse bookSlot(Integer garageId, Integer vehicleId, LocalDate date, LocalTime time, String autoAddaId, String selectedGarageServiceIds, Integer vehicleOwnerSubscriptionId) {
 
+        // Validate vehicle is not already booked at this date/time
+        vehicleBookingValidationService.validateVehicleAvailability ( vehicleId, date, time );
+
         Integer userId = Integer.parseInt ( autoAddaId );
 
         // Fetch slot with pessimistic write lock to prevent concurrent bookings
@@ -130,8 +133,6 @@ public class AppointmentSlotService {
 
         Garage garage = garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) );
 
-        // Validate vehicle is not already booked at this date/time
-        vehicleBookingValidationService.validateVehicleAvailability ( vehicleId, date, time );
 
         // Validate and apply subscription if provided
         VehicleOwnerSubscription subscription = null;

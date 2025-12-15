@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.*;
+import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.WorkOrderMapper;
 import com.autoadda.apis.garage.repository.*;
@@ -56,7 +57,7 @@ public class WorkOrderService {
     }
 
     public WorkOrderResponse createWorkOrder(WorkOrderRequest request) {
-
+        checkAppointmentAlreadyExists(request.getAppointmentId());
         WorkOrder workOrder = new WorkOrder ( );
         workOrder.setStatus ( WorkOrderStatus.CREATED );
         workOrder.setCreatedDate ( LocalDateTime.now ( ) );
@@ -82,6 +83,12 @@ public class WorkOrderService {
         log.info ( genericResponse.getStatus ( ) );
         return workOrderResponse;
 
+    }
+
+    private void checkAppointmentAlreadyExists(Integer appointmentId) {
+        if (workOrderRepository.existsByAppointmentId ( appointmentId )) {
+            throw new AlreadyExistsException( "work order with this appointment Id :: " + appointmentId + " alreadyExist" );
+        }
     }
 
     /**

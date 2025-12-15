@@ -13,6 +13,7 @@ import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.request.TechnicianRequest;
 import com.autoadda.apis.garage.response.TechnicianResponse;
 import com.autoadda.apis.garage.response.UserResponse;
+import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.ERole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class TechnicianService {
                 .emiratesId ( technicianRequest.getEmiratesId ( ) )
                 .mobileNumber ( technicianRequest.getMobileNumber ( ) )
                 .status ( technicianRequest.getStatus ( ) )
-                .employeeRole ( technicianRequest.getEmployeeRole ( ) )
+                .employeeRole ( technicianRequest.getEmployeeRole ( )!=null?technicianRequest.getEmployeeRole (): EMPLOYEE_ROLE.TECHNICIAN )
                 .build ( );
     }
 
@@ -68,9 +69,11 @@ public class TechnicianService {
     public TechnicianResponse onboardTechnician(TechnicianRequest technician) {
         // Check if technician with the same mobile number already exists
 
-        Garage garage = garageRepo.findById ( technician.getGarageId ( ) )
-
-                .orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) );
+        Garage garage = null;
+        if (technician.getGarageId() != null) {
+            garage = garageRepo.findById ( technician.getGarageId ( ) )
+                    .orElseThrow ( () -> new ResourceNotFoundException( "Garage not found" ) );
+        }
 
         Technician garageTechnician = mapToEntity ( technician );
         Optional<Technician> existingTechnician = technicianRepository.findByMobileNumber ( technician.getMobileNumber ( ) );
@@ -91,7 +94,7 @@ public class TechnicianService {
             log.error ( "User not found in auth service with phone number: {}", garageTechnician.getMobileNumber ( ) );
             throw new ResourceNotFoundException ( "User not found in auth service with phone number: " + garageTechnician.getMobileNumber ( ) );
         }
-        if ( garage.getGarageOwner ( ).equals ( userDetails.getBody ( ).getId ( ) ) ) {
+        if ( garage != null && garage.getGarageOwner ( ).equals ( userDetails.getBody ( ).getId ( ) ) ) {
             throw new ResourceNotFoundException ( "Garage owner cannot be added as technician" );
         }
         garageTechnician.setAutoAddaId ( userDetails.getBody ( ).getId ( ) );
@@ -138,7 +141,7 @@ public class TechnicianService {
     /**
      * Finds technicians by their skill set.
      *
-     * @param skill the skill to search for
+     * @param skillId the skill to search for
      * @return a list of technicians with the specified skill
      */
     @Transactional

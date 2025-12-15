@@ -17,4 +17,6 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Integer> {
     List<WorkOrder> findByAppointmentCustomerId(Integer customerId);
 
     List<WorkOrder> findByAppointmentVehicleId(Integer vehicleId);
+
+    boolean existsByAppointmentId(Integer appointmentId);
 }

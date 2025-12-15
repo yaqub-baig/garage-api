@@ -25,7 +25,7 @@ public class TechnicianMapper {
         technicianResponse.setSkillSet ( technician.getSkillSet ( ).stream ( ).map ( availableServiceMapper::toResponse ).toList ( ) );
         technicianResponse.setStatus ( technician.getStatus ( ) );
         technicianResponse.setEmployeeRole ( technician.getEmployeeRole ( ) );
-        technicianResponse.setGarage ( garageMapper.entityToResponse ( technician.getGarage ( ) ) );
+        technicianResponse.setGarage ( technician.getGarage()!=null?garageMapper.entityToResponse ( technician.getGarage ( ) ):null);
         technicianResponse.setAutoAddaUser ( authClient.getUser ( technician.getAutoAddaId ( ) ) );
         return technicianResponse;
     }
