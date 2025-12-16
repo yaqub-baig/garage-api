@@ -3,6 +3,8 @@ package com.autoadda.apis.garage.repository;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.util.GarageVerificationStatus;
 import com.autoadda.apis.garage.util.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -96,6 +98,18 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
             "LEFT JOIN FETCH s.availableService " +
             "WHERE g.accountStatus = 'APPROVED'")
     Set<Garage> findAllWithLocationAndServices();
+
+    // Paginated version - finds all approved garages with pagination
+    @Query("SELECT DISTINCT g FROM Garage g " +
+           "LEFT JOIN FETCH g.garageLocation " +
+           "LEFT JOIN FETCH g.services s " +
+           "LEFT JOIN FETCH s.availableService " +
+           "WHERE g.accountStatus = 'APPROVED'")
+    Page<Garage> findAllApprovedWithPagination(Pageable pageable);
+
+    // Count query for pagination (required for Page)
+    @Query("SELECT COUNT(DISTINCT g) FROM Garage g WHERE g.accountStatus = 'APPROVED'")
+    long countAllApproved();
 
     // ====================================================================================
     // GARAGE VERIFICATION QUERY METHODS (for future admin features)

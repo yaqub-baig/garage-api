@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
+import com.autoadda.apis.garage.response.PagedResponse;
 import com.autoadda.apis.garage.response.UserResponse;
 import com.autoadda.apis.garage.service.GarageManagementService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -111,11 +112,37 @@ public class GarageController {
 
         // If query parameter provided, use universal search
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(query)) {
-            return ResponseEntity.ok(garageService.universalSearch(query, availableServiceIds));
+            return ResponseEntity.ok(garageService.universalSearchViaHelper(query, availableServiceIds));
         }
 
         // Otherwise use existing specific parameter search
         return ResponseEntity.ok(garageService.searchGarages(brand, city, zip, garageName, availableServiceIds, model));
+    }
+
+    /**
+     * Paginated garage search endpoint
+     * GET /garages/search/paginated
+     * Supports both universal search (query param) and specific filters
+     */
+    @GetMapping("/search/paginated")
+    public ResponseEntity<PagedResponse<GarageResponse>> searchGaragesPaginated(
+            @RequestParam(required = false) String query,              // Universal search parameter
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String zip,
+            @RequestParam(required = false) String garageName,
+            @RequestParam(required = false) List<Integer> availableServiceIds,
+            @RequestParam(required = false) String model,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+
+        PagedResponse<GarageResponse> response = garageService.searchGaragesPaginated(
+                query, brand, city, zip, garageName, availableServiceIds, model,
+                page, size, sortBy, sortDirection);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{garageId}/customers")

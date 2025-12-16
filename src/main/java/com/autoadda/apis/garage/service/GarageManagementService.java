@@ -11,6 +11,7 @@ import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
+import com.autoadda.apis.garage.response.PagedResponse;
 import com.autoadda.apis.garage.response.UserResponse;
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.ERole;
@@ -20,6 +21,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +59,7 @@ public class GarageManagementService {
     private final TechnicianService technicianService;
     private final MediaFileCleanupService mediaFileCleanupService;
     private final AppointmentDetailsRepository appointmentDetailsRepository;
+    private final GarageSearchHelper garageSearchHelper;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage();
@@ -607,6 +613,175 @@ public class GarageManagementService {
     }
 
     /**
+     * Paginated search for garages with specific filters or universal query
+     */
+    @Transactional(readOnly = true)
+    public PagedResponse<GarageResponse> searchGaragesPaginated(
+            String query, String brand, String city, String zip, String garageName,
+            List<Integer> availableServiceIds, String model,
+            int page, int size, String sortBy, String sortDirection) {
+
+        log.info("Paginated search - query: '{}', page: {}, size: {}, sortBy: {}, sortDir: {}",
+                query, page, size, sortBy, sortDirection);
+
+        // If query parameter provided, use universal search with pagination
+        if (StringUtils.isNotEmpty(query)) {
+            List<GarageResponse> universalResults = garageSearchHelper.universalSearch(query, availableServiceIds);
+            return paginateGarageResponses(universalResults, page, size, sortBy, sortDirection);
+        }
+
+        // Create Sort object
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection)
+            ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(direction, sortBy);
+
+        // Create Pageable
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // APPROACH 1: If no filters, use database pagination directly
+        if (hasNoFilters(brand, city, zip, garageName, availableServiceIds, model)) {
+            Page<Garage> garagePage = garageRepository.findAllApprovedWithPagination(pageable);
+            return convertToPagedResponse(garagePage);
+        }
+
+        // APPROACH 2: With filters, load all and filter in-memory (not ideal but matches current behavior)
+        Set<Garage> allGarages = garageRepository.findAllWithLocationAndServices();
+        List<Garage> filtered = allGarages.stream()
+                .filter(garage -> matchesSearchCriteria(garage, brand, city, zip, garageName, availableServiceIds, model))
+                .sorted(getGarageComparator(sortBy, direction))
+                .toList();
+
+        log.info("Filtered {} garages from {} total", filtered.size(), allGarages.size());
+
+        // Manual pagination on filtered results
+        return paginateList(filtered, page, size);
+    }
+
+    private boolean hasNoFilters(String brand, String city, String zip, String garageName,
+                                 List<Integer> serviceIds, String model) {
+        return (brand == null || brand.isEmpty()) &&
+               (city == null || city.isEmpty()) &&
+               (zip == null || zip.isEmpty()) &&
+               (garageName == null || garageName.isEmpty()) &&
+               (serviceIds == null || serviceIds.isEmpty()) &&
+               (model == null || model.isEmpty());
+    }
+
+    private Comparator<Garage> getGarageComparator(String sortBy, Sort.Direction direction) {
+        Comparator<Garage> comparator = switch (sortBy) {
+            case "name" -> Comparator.comparing(Garage::getName, Comparator.nullsLast(String::compareToIgnoreCase));
+            case "createdAt" -> Comparator.comparing(Garage::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "id" -> Comparator.comparing(Garage::getId);
+            default -> Comparator.comparing(Garage::getId); // Default sort by ID
+        };
+
+        return direction == Sort.Direction.DESC ? comparator.reversed() : comparator;
+    }
+
+    private PagedResponse<GarageResponse> paginateList(List<Garage> allItems, int page, int size) {
+        int totalElements = allItems.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        // Calculate start and end indices
+        int start = page * size;
+        int end = Math.min(start + size, totalElements);
+
+        // Get sublist for current page
+        List<Garage> pageContent = (start < totalElements)
+            ? allItems.subList(start, end)
+            : Collections.emptyList();
+
+        // Convert to response DTOs
+        List<GarageResponse> content = pageContent.stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+
+        return PagedResponse.<GarageResponse>builder()
+                .content(content)
+                .pageNumber(page)
+                .pageSize(size)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .first(page == 0)
+                .last(page >= totalPages - 1)
+                .empty(content.isEmpty())
+                .numberOfElements(content.size())
+                .build();
+    }
+
+    private PagedResponse<GarageResponse> convertToPagedResponse(Page<Garage> garagePage) {
+        List<GarageResponse> content = garagePage.getContent().stream()
+                .map(garageMapper::entityToResponse)
+                .toList();
+
+        return PagedResponse.<GarageResponse>builder()
+                .content(content)
+                .pageNumber(garagePage.getNumber())
+                .pageSize(garagePage.getSize())
+                .totalElements(garagePage.getTotalElements())
+                .totalPages(garagePage.getTotalPages())
+                .first(garagePage.isFirst())
+                .last(garagePage.isLast())
+                .empty(garagePage.isEmpty())
+                .numberOfElements(garagePage.getNumberOfElements())
+                .build();
+    }
+
+    /**
+     * Paginate already-converted GarageResponse objects (used for universal search)
+     */
+    private PagedResponse<GarageResponse> paginateGarageResponses(
+            List<GarageResponse> allResults, int page, int size,
+            String sortBy, String sortDirection) {
+
+        // Sort results
+        Comparator<GarageResponse> comparator = switch (sortBy) {
+            case "name" -> Comparator.comparing(
+                    gr -> gr.getName() != null ? gr.getName() : "",
+                    String.CASE_INSENSITIVE_ORDER);
+            case "createdAt" -> Comparator.comparing(
+                    gr -> gr.getCreatedAt() != null ? gr.getCreatedAt() : LocalDateTime.MIN);
+            case "id" -> Comparator.comparing(
+                    gr -> gr.getId() != null ? gr.getId() : 0);
+            default -> Comparator.comparing(
+                    gr -> gr.getId() != null ? gr.getId() : 0);
+        };
+
+        if ("desc".equalsIgnoreCase(sortDirection)) {
+            comparator = comparator.reversed();
+        }
+
+        List<GarageResponse> sortedResults = allResults.stream()
+                .sorted(comparator)
+                .toList();
+
+        // Paginate
+        int totalElements = sortedResults.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        int start = page * size;
+        int end = Math.min(start + size, totalElements);
+
+        List<GarageResponse> pageContent = (start < totalElements)
+                ? sortedResults.subList(start, end)
+                : Collections.emptyList();
+
+        return PagedResponse.<GarageResponse>builder()
+                .content(pageContent)
+                .pageNumber(page)
+                .pageSize(size)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .first(page == 0)
+                .last(page >= totalPages - 1)
+                .empty(pageContent.isEmpty())
+                .numberOfElements(pageContent.size())
+                .build();
+    }
+
+
+
+
+    /**
      * Checks if a garage matches all provided search criteria.
      * Empty/null criteria are ignored (match all).
      *
@@ -697,156 +872,15 @@ public class GarageManagementService {
     }
 
     /**
-     * Universal search method that searches across multiple fields in priority order.
-     * Returns results from the first field that produces matches (cascade search).
+     * Universal search method - delegates to GarageSearchHelper to avoid self-invocation issues.
+     * This resolves SonarQube warning about calling @Transactional methods via 'this'.
      *
      * @param query      Generic search term to match across multiple fields
      * @param serviceIds Optional service IDs filter
      * @return List of matching garages
      */
-    @Transactional(readOnly = true)
-    public List<GarageResponse> universalSearch(String query, List<Integer> serviceIds) {
-        Set<Garage> allGarages = garageRepository.findAllWithLocationAndServices();
-
-        log.info("Universal search for query: '{}' across {} garages", query, allGarages.size());
-
-        // Try cascade search in priority order - stop at first non-empty result
-        List<Garage> results = searchByName(allGarages, query);
-        if (!results.isEmpty()) {
-            log.info("Found {} matches in garage names", results.size());
-            return filterAndMapResults(results, serviceIds);
-        }
-
-        results = searchByBrand(allGarages, query);
-        if (!results.isEmpty()) {
-            log.info("Found {} matches in brands", results.size());
-            return filterAndMapResults(results, serviceIds);
-        }
-
-        results = searchByModel(allGarages, query);
-        if (!results.isEmpty()) {
-            log.info("Found {} matches in models", results.size());
-            return filterAndMapResults(results, serviceIds);
-        }
-
-        results = searchByServiceName(allGarages, query);
-        if (!results.isEmpty()) {
-            log.info("Found {} matches in service names", results.size());
-            return filterAndMapResults(results, serviceIds);
-        }
-
-        results = searchByCity(allGarages, query);
-        if (!results.isEmpty()) {
-            log.info("Found {} matches in cities", results.size());
-            return filterAndMapResults(results, serviceIds);
-        }
-
-        results = searchByZip(allGarages, query);
-        if (!results.isEmpty()) {
-            log.info("Found {} matches in zip codes", results.size());
-            return filterAndMapResults(results, serviceIds);
-        }
-
-        log.info("No matches found for query: '{}'", query);
-        return Collections.emptyList();
-    }
-
-    /**
-     * Search garages by name.
-     */
-    private List<Garage> searchByName(Set<Garage> garages, String query) {
-        return garages.stream()
-                .filter(g -> g.getName() != null &&
-                        g.getName().toLowerCase().contains(query.toLowerCase()))
-                .toList();
-    }
-
-    /**
-     * Search garages by vehicle brand.
-     */
-    private List<Garage> searchByBrand(Set<Garage> garages, String query) {
-        return garages.stream()
-                .filter(g -> g.getBrands() != null &&
-                        g.getBrands().toLowerCase().contains(query.toLowerCase()))
-                .toList();
-    }
-
-    /**
-     * Search garages by vehicle model.
-     */
-    private List<Garage> searchByModel(Set<Garage> garages, String query) {
-        return garages.stream()
-                .filter(g -> g.getModels() != null &&
-                        g.getModels().toLowerCase().contains(query.toLowerCase()))
-                .toList();
-    }
-
-    /**
-     * Search garages by service name.
-     */
-    private List<Garage> searchByServiceName(Set<Garage> garages, String query) {
-        return garages.stream()
-                .filter(g -> hasServiceMatchingQuery(g, query))
-                .toList();
-    }
-
-    /**
-     * Check if garage has any service matching the query.
-     */
-    private boolean hasServiceMatchingQuery(Garage garage, String query) {
-        return garage.getServices().stream()
-                .map(GarageService::getAvailableService)
-                .filter(Objects::nonNull)
-                .anyMatch(service -> service.getName() != null &&
-                        service.getName().toLowerCase().contains(query.toLowerCase()));
-    }
-
-    /**
-     * Search garages by city or state.
-     */
-    private List<Garage> searchByCity(Set<Garage> garages, String query) {
-        return garages.stream()
-                .filter(g -> {
-                    Location loc = g.getGarageLocation();
-                    if (loc == null) return false;
-
-                    // Check both city and state fields
-                    boolean cityMatch = loc.getCity() != null &&
-                            loc.getCity().toLowerCase().contains(query.toLowerCase());
-                    boolean stateMatch = loc.getState() != null &&
-                            loc.getState().toLowerCase().contains(query.toLowerCase());
-
-                    return cityMatch || stateMatch;
-                })
-                .toList();
-    }
-
-    /**
-     * Search garages by postal code.
-     */
-    private List<Garage> searchByZip(Set<Garage> garages, String query) {
-        return garages.stream()
-                .filter(g -> {
-                    Location loc = g.getGarageLocation();
-                    return loc != null &&
-                            loc.getPostalCode() != null &&
-                            loc.getPostalCode().toLowerCase().contains(query.toLowerCase());
-                })
-                .toList();
-    }
-
-    /**
-     * Apply service filter if provided, then map to response DTOs.
-     */
-    private List<GarageResponse> filterAndMapResults(List<Garage> garages, List<Integer> serviceIds) {
-        Stream<Garage> stream = garages.stream();
-
-        // Apply service filter if provided
-        if (serviceIds != null && !serviceIds.isEmpty()) {
-            stream = stream.filter(g -> matchesServiceFilter(g, serviceIds));
-        }
-
-        return stream.map(garageMapper::entityToResponse).toList();
+    public List<GarageResponse> universalSearchViaHelper(String query, List<Integer> serviceIds) {
+        return garageSearchHelper.universalSearch(query, serviceIds);
     }
 
     @Transactional(readOnly = true)
@@ -1207,4 +1241,6 @@ public class GarageManagementService {
                 .filter(user -> user != null)  // Remove nulls from failed auth calls
                 .toList();
     }
+
+
 }
