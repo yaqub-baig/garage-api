@@ -68,7 +68,7 @@ class GarageWorkflowIntegrationTest {
         technician = new Technician();
         technician.setFirstName("John");
         technician.setMobileNumber("1234567890");
-        technician.setGarage(garage);
+        technician.setGarages(Set.of(garage));
         technicianRepository.save(technician);
     }
 

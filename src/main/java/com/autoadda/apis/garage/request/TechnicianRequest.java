@@ -27,10 +27,25 @@ public class TechnicianRequest {
 
     private Status status;
 
-    private Integer garageId;
+    @Deprecated
+    private Integer garageId;  // Deprecated: Use garageIds instead
+
+    private List<Integer> garageIds;  // Support for many-to-many garage relationship
 
     private EMPLOYEE_ROLE employeeRole;
 
     private String profileImg;
+
+    private String brand;
+
+    private String model;
+
+    private String description;
+
+    private Integer yearOfExperience;
+
+    private String city;
+
+    private Boolean isAvailableForService;
 
 }

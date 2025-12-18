@@ -7,7 +7,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -51,9 +53,32 @@ public class Technician {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @ManyToOne
-    @JoinColumn(name = "garage_id")
-    private Garage garage;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "technician_garage",
+            joinColumns = @JoinColumn(name = "technician_id"),
+            inverseJoinColumns = @JoinColumn(name = "garage_id")
+    )
+    private Set<Garage> garages = new HashSet<>();
+
+    @Column(name = "brand")
+    private String brand;
+
+    @Column(name = "model")
+    private String model;
+
+    @Column(name = "description", length = 1000)
+    private String description;
+
+    @Column(name = "year_of_experience")
+    private Integer yearOfExperience;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "is_available_for_service")
+    @Builder.Default
+    private Boolean isAvailableForService = true;
 
     @Column(name = "profile_img")
     private String profileImg;

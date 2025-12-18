@@ -43,4 +43,33 @@ public class Location {
     @Column(name = "type")
     private String type;
 
+    @Override
+    public String toString() {
+        StringBuilder address = new StringBuilder();
+
+        if (streetAddress1 != null && !streetAddress1.isBlank()) {
+            address.append(streetAddress1).append("\n");
+        }
+        if (streetAddress2 != null && !streetAddress2.isBlank()) {
+            address.append(streetAddress2).append("\n");
+        }
+        if (area != null && !area.isBlank()) {
+            address.append(area).append("\n");
+        }
+
+        address.append(city);
+
+        if (state != null && !state.isBlank()) {
+            address.append(", ").append(state);
+        }
+
+        if (postalCode != null && !postalCode.isBlank()) {
+            address.append(" - ").append(postalCode);
+        }
+
+        address.append("\n").append(country);
+
+        return address.toString();
+    }
+
 }

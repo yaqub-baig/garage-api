@@ -3,6 +3,7 @@ package com.autoadda.apis.garage.mapper;
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.response.JobCardResponse;
 import com.autoadda.apis.garage.response.JobCardStatusTimelineEntry;
+import com.autoadda.apis.garage.response.TechnicianWorkHistoryResponse;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,17 @@ public class JobCardMapper {
         response.setStatusTimeline ( generateStatusTimeline ( jobCard.getStatusTimestamps ( ) ) );
 
         return response;
+    }
+  public TechnicianWorkHistoryResponse entityToTechnicianWorkHistoryResponse(JobCard jobCard){
+        return TechnicianWorkHistoryResponse.builder()
+                .workOrderId(jobCard.getWorkOrder().getId())
+                .createdAt(jobCard.getCreatedAt())
+                .completedAt(jobCard.getCompletedAt())
+                .garageName(jobCard.getGarage().getName())
+                .garageLocation(jobCard.getGarage().getGarageLocation().toString())
+                .serviceName(jobCard.getService().getService().getAvailableService().getName())
+                .build();
+
     }
 
     private List<JobCardStatusTimelineEntry> generateStatusTimeline(Map<JobCardStatus, LocalDateTime> statusTimestamps) {

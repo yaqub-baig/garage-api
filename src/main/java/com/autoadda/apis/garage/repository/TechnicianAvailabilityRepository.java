@@ -3,8 +3,6 @@ package com.autoadda.apis.garage.repository;
 import com.autoadda.apis.garage.entity.TechnicianAvailability;
 import com.autoadda.apis.garage.util.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,6 +21,6 @@ public interface TechnicianAvailabilityRepository extends JpaRepository<Technici
 
     Optional<TechnicianAvailability> findById(Integer id);
 
-    @Query("SELECT ta.technician.id, SUM(ta.availableHours) FROM TechnicianAvailability ta WHERE ta.technician.garage.id = :garageId GROUP BY ta.technician.id")
-    List<Object[]> getAvailableHoursPerTechnician(@Param("garageId") Integer garageId);
+//    @Query("SELECT ta.technician.id, SUM(ta.availableHours) FROM TechnicianAvailability ta WHERE ta.technician.garage.id = :garageId GROUP BY ta.technician.id")
+//    List<Object[]> getAvailableHoursPerTechnician(@Param("garageId") Integer garageId);
 }

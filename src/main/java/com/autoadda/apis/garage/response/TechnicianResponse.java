@@ -24,7 +24,13 @@ public class TechnicianResponse {
     private String vatNumber;
     private List<AvailableServiceResponse> skillSet;
     private Status status;
-    private GarageResponse garage;
+    private List<GarageResponse> garages;  // Changed from singular to plural for many-to-many
     private String profileImg;
     private EMPLOYEE_ROLE employeeRole;
+    private String brand;
+    private String model;
+    private String description;
+    private Integer yearOfExperience;
+    private String city;
+    private Boolean isAvailableForService;
 }

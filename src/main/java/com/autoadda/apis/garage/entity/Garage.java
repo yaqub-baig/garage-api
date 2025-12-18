@@ -134,7 +134,7 @@ public class Garage {
     @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL)
     private List<GarageService> services = new ArrayList<>();
 
-    @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(mappedBy = "garages")
     @JsonIgnore
     private List<Technician> technicians = new ArrayList<>();
 

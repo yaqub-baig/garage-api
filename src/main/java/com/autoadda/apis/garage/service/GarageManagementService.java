@@ -570,7 +570,7 @@ public class GarageManagementService {
         technician.setFirstName(user.getName());
         technician.setEmailId(user.getEmail());
         technician.setStatus(Status.ACTIVE);
-        technician.setGarage(garage);
+        technician.setGarages(Set.of(garage));  // Changed to use garages set for many-to-many
         technician.setEmployeeRole(EMPLOYEE_ROLE.OWNER);
         return technicianRepository.save(technician);
     }

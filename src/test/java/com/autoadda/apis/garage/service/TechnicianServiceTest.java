@@ -88,7 +88,7 @@ class TechnicianServiceTest {
                 .vatNumber ( "123456789" )
                 .status ( Status.ACTIVE )
                 .employeeRole ( EMPLOYEE_ROLE.SUPERVISOR )
-                .garage ( garage )
+                .garages ( Set.of(garage) )
                 .autoAddaId ( 1001 )
                 .build ( );
 
@@ -114,7 +114,7 @@ class TechnicianServiceTest {
     void getTechniciansByGarage_ShouldReturnListOfTechnicians() {
         // Arrange
         List<Technician> technicians = Arrays.asList ( technician );
-        when ( technicianRepository.findByGarageId ( 1 ) ).thenReturn ( technicians );
+        when ( technicianRepository.findByGaragesContaining ( 1 ) ).thenReturn ( technicians );
         when ( technicianMapper.entityToResponse ( any ( Technician.class ) ) ).thenReturn ( technicianResponse );
 
         // Act
@@ -124,14 +124,14 @@ class TechnicianServiceTest {
         assertNotNull ( result );
         assertEquals ( 1, result.size ( ) );
         assertEquals ( "tech@example.com", result.get ( 0 ).getEmailId ( ) );
-        verify ( technicianRepository ).findByGarageId ( 1 );
+        verify ( technicianRepository ).findByGaragesContaining ( 1 );
         verify ( technicianMapper, times ( 1 ) ).entityToResponse ( any ( Technician.class ) );
     }
 
     @Test
     void getTechniciansByGarage_WhenNoTechnicians_ShouldReturnEmptyList() {
         // Arrange
-        when ( technicianRepository.findByGarageId ( 1 ) ).thenReturn ( Collections.emptyList ( ) );
+        when ( technicianRepository.findByGaragesContaining ( 1 ) ).thenReturn ( Collections.emptyList ( ) );
 
         // Act
         List<TechnicianResponse> result = technicianService.getTechniciansByGarage ( 1 );
@@ -139,7 +139,7 @@ class TechnicianServiceTest {
         // Assert
         assertNotNull ( result );
         assertTrue ( result.isEmpty ( ) );
-        verify ( technicianRepository ).findByGarageId ( 1 );
+        verify ( technicianRepository ).findByGaragesContaining ( 1 );
         verify ( technicianMapper, never ( ) ).entityToResponse ( any ( ) );
     }
 

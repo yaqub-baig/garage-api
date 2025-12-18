@@ -7,6 +7,8 @@ import com.autoadda.apis.garage.response.TechnicianResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
 @Component
 @RequiredArgsConstructor
 public class TechnicianMapper {
@@ -25,7 +27,23 @@ public class TechnicianMapper {
         technicianResponse.setSkillSet ( technician.getSkillSet ( ).stream ( ).map ( availableServiceMapper::toResponse ).toList ( ) );
         technicianResponse.setStatus ( technician.getStatus ( ) );
         technicianResponse.setEmployeeRole ( technician.getEmployeeRole ( ) );
-        technicianResponse.setGarage ( technician.getGarage()!=null?garageMapper.entityToResponse ( technician.getGarage ( ) ):null);
+
+        // Map many-to-many garages
+        technicianResponse.setGarages (
+            technician.getGarages() != null
+                ? technician.getGarages().stream()
+                    .map(garageMapper::entityToResponse)
+                    .toList()
+                : Collections.emptyList()
+        );
+
+        // Map new fields
+        technicianResponse.setBrand ( technician.getBrand ( ) );
+        technicianResponse.setModel ( technician.getModel ( ) );
+        technicianResponse.setDescription ( technician.getDescription ( ) );
+        technicianResponse.setYearOfExperience ( technician.getYearOfExperience ( ) );
+        technicianResponse.setCity ( technician.getCity ( ) );
+        technicianResponse.setIsAvailableForService ( technician.getIsAvailableForService ( ) );
         technicianResponse.setAutoAddaUser ( authClient.getUser ( technician.getAutoAddaId ( ) ) );
         return technicianResponse;
     }
@@ -45,6 +63,21 @@ public class TechnicianMapper {
             technician.setStatus ( technicianRequest.getStatus ( ) );
         if ( technicianRequest.getEmployeeRole ( ) != null )
             technician.setEmployeeRole ( technicianRequest.getEmployeeRole ( ) );
+
+        // Update new fields
+        if ( technicianRequest.getBrand ( ) != null )
+            technician.setBrand ( technicianRequest.getBrand ( ) );
+        if ( technicianRequest.getModel ( ) != null )
+            technician.setModel ( technicianRequest.getModel ( ) );
+        if ( technicianRequest.getDescription ( ) != null )
+            technician.setDescription ( technicianRequest.getDescription ( ) );
+        if ( technicianRequest.getYearOfExperience ( ) != null )
+            technician.setYearOfExperience ( technicianRequest.getYearOfExperience ( ) );
+        if ( technicianRequest.getCity ( ) != null )
+            technician.setCity ( technicianRequest.getCity ( ) );
+        if ( technicianRequest.getIsAvailableForService ( ) != null )
+            technician.setIsAvailableForService ( technicianRequest.getIsAvailableForService ( ) );
+
         return technician;
     }
 }

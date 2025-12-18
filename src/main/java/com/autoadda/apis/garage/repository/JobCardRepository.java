@@ -32,5 +32,6 @@ public interface JobCardRepository extends JpaRepository<JobCard, Integer> {
     @Query("SELECT COUNT(j) FROM JobCard j WHERE j.serviceEndTime BETWEEN :from AND :to")
     int countCompletedJobsBetween(LocalDateTime from, LocalDateTime to);
 
-
+    @Query("SELECT j FROM JobCard j WHERE j.technician.id = :id AND j.status = 'COMPLETED'")
+    List<JobCard> findJobCardHistoryByTechnicianId(Integer id);
 }

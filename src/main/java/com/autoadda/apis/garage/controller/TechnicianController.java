@@ -1,7 +1,7 @@
 package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.TechnicianRequest;
-import com.autoadda.apis.garage.response.TechnicianResponse;
+import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.service.TechnicianService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -79,5 +79,79 @@ public class TechnicianController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Additional endpoints can be added as needed
+    /**
+     * Universal and specific search endpoint for technicians (non-paginated)
+     * GET /technicians/search
+     *
+     * Examples:
+     * - Universal: /technicians/search?query=John
+     * - Specific: /technicians/search?name=John&city=Dubai&skillIds=1,2
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<TechnicianResponse>> searchTechnicians(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) List<Integer> skillIds,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String model) {
+
+        // If query parameter provided, use universal search
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(query)) {
+            return ResponseEntity.ok(technicianService.universalSearchViaHelper(query, skillIds));
+        }
+
+        // Otherwise use existing specific parameter search
+        return ResponseEntity.ok(technicianService.searchTechnicians(name, skillIds, city, brand, model));
+    }
+
+    /**
+     * Paginated technician search endpoint
+     * GET /technicians/search/paginated
+     * Supports both universal search (query param) and specific filters
+     *
+     * Examples:
+     * - Universal: /technicians/search/paginated?query=mechanic&page=0&size=10
+     * - Specific: /technicians/search/paginated?city=Dubai&skillIds=1,2&sortBy=yearOfExperience&sortDirection=desc
+     */
+    @GetMapping("/search/paginated")
+    public ResponseEntity<PagedResponse<TechnicianResponse>> searchTechniciansPaginated(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) List<Integer> skillIds,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String model,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+
+        PagedResponse<TechnicianResponse> response = technicianService.searchTechniciansPaginated(
+                query, name, skillIds, city, brand, model,
+                page, size, sortBy, sortDirection);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get technicians by availability status
+     * GET /technicians/available
+     */
+    @GetMapping("/available")
+    public ResponseEntity<List<TechnicianResponse>> getTechniciansByAvailability(
+            @RequestParam(defaultValue = "true") boolean isAvailable) {
+
+        List<TechnicianResponse> technicians = technicianService.findByAvailability(isAvailable);
+        return ResponseEntity.ok(technicians);
+    }
+    @GetMapping("/garagesByTechnicianId/{id}")
+    public ResponseEntity<List<GarageResponse>> getGaragesByTechnicianId(@PathVariable Integer id){
+        return ResponseEntity.ok(technicianService.getGaragesByTechnicianId(id));
+    }
+    @GetMapping("/jobCardHistoryByTechnicianId/{id}")
+    public ResponseEntity<List<TechnicianWorkHistoryResponse>> getJobCardHistoryByTechnicianId(@PathVariable Integer id){
+        return ResponseEntity.ok(technicianService.getJobCardHistoryByTechnicianId(id));
+    }
+
 }
