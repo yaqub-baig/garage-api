@@ -21,6 +21,4 @@ public interface TechnicianAvailabilityRepository extends JpaRepository<Technici
 
     Optional<TechnicianAvailability> findById(Integer id);
 
-//    @Query("SELECT ta.technician.id, SUM(ta.availableHours) FROM TechnicianAvailability ta WHERE ta.technician.garage.id = :garageId GROUP BY ta.technician.id")
-//    List<Object[]> getAvailableHoursPerTechnician(@Param("garageId") Integer garageId);
 }

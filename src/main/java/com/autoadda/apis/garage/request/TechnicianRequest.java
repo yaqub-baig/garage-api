@@ -27,7 +27,7 @@ public class TechnicianRequest {
 
     private Status status;
 
-    @Deprecated
+    @Deprecated(since = "1.0", forRemoval = true)
     private Integer garageId;  // Deprecated: Use garageIds instead
 
     private List<Integer> garageIds;  // Support for many-to-many garage relationship

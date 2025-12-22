@@ -1238,7 +1238,7 @@ public class GarageManagementService {
                         return null;
                     }
                 })
-                .filter(user -> user != null)  // Remove nulls from failed auth calls
+                .filter(Objects::nonNull)  // Remove nulls from failed auth calls
                 .toList();
     }
 

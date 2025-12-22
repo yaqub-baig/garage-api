@@ -116,13 +116,4 @@ public class GarageInventoryMapper {
                 .build();
     }
 
-    /**
-     * Construct full URL for image file
-     */
-    private String constructImageUrl(String filePath) {
-        if (filePath == null || filePath.isEmpty()) {
-            return null;
-        }
-        return String.format("%s/uploads/%s", baseUrl, filePath);
-    }
 }

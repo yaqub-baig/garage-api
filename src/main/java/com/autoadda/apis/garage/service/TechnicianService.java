@@ -35,6 +35,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class TechnicianService {
+    public static final String TECHNICIAN_NOT_FOUND_WITH_ID = "Technician not found with id: ";
     private final TechnicianMapper technicianMapper;
     private final TechnicianRepository technicianRepository;
     private final GarageRepository garageRepo;
@@ -127,12 +128,6 @@ public class TechnicianService {
                         : true
         );
 
-//        // Verify technician is not a garage owner in any assigned garage
-//        for (Garage garage : garages) {
-//            if (garage.getGarageOwner().equals(userDetails.getBody().getId())) {
-//                throw new ResourceNotFoundException("Garage owner cannot be added as technician to their own garage");
-//            }
-//        }
 
         garageTechnician.setAutoAddaId(userDetails.getBody().getId());
         authClient.updateRole(garageTechnician.getAutoAddaId(), ERole.GARAGE_TECH);
@@ -222,7 +217,7 @@ public class TechnicianService {
     @Transactional
     public TechnicianResponse updateTechnician(Integer id, TechnicianRequest technicianRequest) {
         Technician technician = technicianRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Technician not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(TECHNICIAN_NOT_FOUND_WITH_ID + id));
         if (technicianRequest.getGarageIds() != null) {
             technicianRequest.getGarageIds().forEach(garageId -> {
                 Garage garage = garageRepository.findById(garageId)
@@ -261,7 +256,7 @@ public class TechnicianService {
     @Transactional
     public Technician getTechnicianById(Integer id) {
         return technicianRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Technician not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException(TECHNICIAN_NOT_FOUND_WITH_ID + id));
     }
 
     public Optional<TechnicianResponse> findByAutoAddaId(Integer autoAddaId) {
@@ -504,7 +499,7 @@ public class TechnicianService {
 
     public List<GarageResponse> getGaragesByTechnicianId(Integer id) {
         return technicianRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Technician not found with id: " + id))
+                .orElseThrow(() -> new ResourceNotFoundException(TECHNICIAN_NOT_FOUND_WITH_ID + id))
                 .getGarages()
                 .stream()
                 .map(garageMapper::entityToResponse)

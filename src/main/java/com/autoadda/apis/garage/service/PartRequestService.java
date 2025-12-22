@@ -23,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class PartRequestService {
 
+    public static final String PART_REQUEST_NOT_FOUND = "Part request not found";
     private final PartRequestRepository partRequestRepo;
     private final PartRequestItemRepository partRequestItemRepo;
     private final CustomerPartResponseRepository customerPartResponseRepo;
@@ -125,7 +126,7 @@ public class PartRequestService {
 
         // Find part request
         PartRequest partRequest = partRequestRepo.findById(partRequestId)
-                .orElseThrow(() -> new ResourceNotFoundException("Part request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PART_REQUEST_NOT_FOUND));
 
         // Validate that customer hasn't responded yet (only allow updates before customer response)
         if (partRequest.getStatus() != PartRequestStatus.PENDING_CUSTOMER_RESPONSE) {
@@ -188,7 +189,7 @@ public class PartRequestService {
         log.info("Customer submitting response for part request: {}", partRequestId);
 
         PartRequest partRequest = partRequestRepo.findById(partRequestId)
-                .orElseThrow(() -> new ResourceNotFoundException("Part request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PART_REQUEST_NOT_FOUND));
 
         // Validate current status
         if (partRequest.getStatus() != PartRequestStatus.PENDING_CUSTOMER_RESPONSE) {
@@ -326,7 +327,7 @@ public class PartRequestService {
         log.info("Marking parts as received for part request: {}", partRequestId);
 
         PartRequest partRequest = partRequestRepo.findById(partRequestId)
-                .orElseThrow(() -> new ResourceNotFoundException("Part request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PART_REQUEST_NOT_FOUND));
 
         // Validate status
         if (partRequest.getStatus() != PartRequestStatus.WAITING_FOR_CUSTOMER_DELIVERY) {
@@ -398,7 +399,7 @@ public class PartRequestService {
      */
     public PartRequestResponse getPartRequestById(Integer id) {
         PartRequest partRequest = partRequestRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Part request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(PART_REQUEST_NOT_FOUND));
         return convertToResponse(partRequest);
     }
 
