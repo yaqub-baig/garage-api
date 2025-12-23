@@ -12,11 +12,14 @@ import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
 import com.autoadda.apis.garage.request.InvoicePayRequest;
 import com.autoadda.apis.garage.request.InvoiceRequest;
+import com.autoadda.apis.garage.request.NotificationContent;
 import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.response.AppointmentInvoiceResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.InvoiceResponse;
+import com.autoadda.apis.garage.response.NotificationResult;
 import com.autoadda.apis.garage.response.VehicleDetailResponse;
+import com.autoadda.apis.garage.util.NotificationType;
 import com.autoadda.apis.garage.util.InvoiceStatus;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.Status;
@@ -48,6 +51,8 @@ public class InvoiceService {
     private final InvoiceLineItemGeneratorService lineItemGenerator;
     private final AuthClient authClient;
     private final VehicleClient vehicleClient;
+    private final NotificationDispatchService notificationDispatchService;
+    private final NotificationMessageBuilder notificationMessageBuilder;
     private final GarageSubscriptionRepository garageSubscriptionRepository;
     private final AppointmentServiceRepository appointmentServiceRepository;
 
@@ -370,24 +375,31 @@ public class InvoiceService {
                 return GenericResponse.failed ( "Customer mobile number not found", null );
             }
 
-            String customerPhone = vehicleDetails.getOwner ( ).getMobileNumber ( );
+            // Send multi-channel notification with preference checking
+            Integer customerId = appointment.getCustomerId();
 
-            // Create SMS message with invoice details
-            String message = buildInvoiceMessage ( invoice, workOrder, vehicleDetails );
+            NotificationContent content = notificationMessageBuilder.buildInvoiceReady(
+                invoice,
+                vehicleDetails
+            );
 
-            // Send SMS
-            SmsRequest smsRequest = new SmsRequest ( customerPhone, message );
-            GenericResponse smsResponse = authClient.sendSms ( smsRequest );
+            NotificationResult result = notificationDispatchService.sendNotification(
+                customerId,
+                NotificationType.SERVICE_UPDATES,
+                content,
+                true,  // critical
+                "CUSTOMER"  // targetRole
+            );
 
-            if ( "SUCCESS".equalsIgnoreCase ( smsResponse.getStatus ( ) ) ) {
+            if ( result.hasAnySuccess() ) {
                 // Update WorkOrder status to INVOICED when invoice is successfully sent to customer
                 if ( workOrder.getStatus ( ) == WorkOrderStatus.INVOICE_INITIATED ) {
                     workOrder.updateStatus ( WorkOrderStatus.INVOICED );
                     workOrderRepository.save ( workOrder );
                 }
-                return GenericResponse.makeSuccessResponse( "Invoice sent to customer successfully", smsResponse );
+                return GenericResponse.makeSuccessResponse( "Invoice sent to customer successfully. " + result.getSummary(), result );
             } else {
-                return GenericResponse.failed ( "Failed to send invoice to customer", smsResponse );
+                return GenericResponse.failed ( "Failed to send invoice to customer", result );
             }
 
         }

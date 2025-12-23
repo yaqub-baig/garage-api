@@ -2,14 +2,17 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.*;
+import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.WorkOrderMapper;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
+import com.autoadda.apis.garage.request.NotificationContent;
 import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.request.WorkOrderRequest;
 import com.autoadda.apis.garage.response.*;
+import com.autoadda.apis.garage.util.NotificationType;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import com.autoadda.apis.garage.util.VehicleRecievedStatus;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
@@ -38,6 +41,8 @@ public class WorkOrderService {
     private final JobCardStatusFlowService statusFlowService;
     private final WorkOrderStatusFlowService workOrderStatusFlowService;
     private final InvoiceRepository invoiceRepository;
+    private final NotificationDispatchService notificationDispatchService;
+    private final NotificationMessageBuilder notificationMessageBuilder;
     private final VehicleDeliveryRepository vehicleDeliveryRepository;
 
 
@@ -75,12 +80,56 @@ public class WorkOrderService {
 
         WorkOrder finalWorkOrder = workOrder;
         list.forEach ( jobCard -> jobCard.setWorkOrder ( finalWorkOrder ) );
-        String vehicleOwnerNumber = workOrderResponse.getAppointmentDetail (
-        ).getVehicle ( ).getOwner ( ).getMobileNumber ( );
-        log.info("--------------------------------------> sms {}",vehicleOwnerNumber);
-        String message = "Your work order has been created with ID: " + workOrderResponse.getId ( ) + ". Please visit your auto adda dashboard to proceed with the services.";
-        GenericResponse genericResponse = authClient.sendSms ( new SmsRequest ( vehicleOwnerNumber, message ) );
-        log.info ( genericResponse.getStatus ( ) );
+
+        // Send multi-channel notification with preference checking
+        Integer customerId = workOrderResponse.getAppointmentDetail().getCustomerId();
+        String vehicleNumber = workOrderResponse.getAppointmentDetail().getVehicle().getNumber();
+        int serviceCount = workOrder.getJobCards().size();
+
+        NotificationContent content = notificationMessageBuilder.buildWorkOrderCreated(
+            workOrderResponse.getId(),
+            vehicleNumber,
+            serviceCount
+        );
+
+        NotificationResult result = notificationDispatchService.sendNotification(
+            customerId,
+            NotificationType.SERVICE_UPDATES,
+            content,
+            true,  // critical
+            "CUSTOMER"  // targetRole
+        );
+
+        log.info("Work order creation notification result: {}", result.getSummary());
+
+        // Send notification to garage owner about new work order
+        try {
+            Garage garage = workOrder.getGarage();
+            if (garage != null && garage.getGarageOwner() != null) {
+                NotificationContent ownerContent = notificationMessageBuilder
+                    .buildGarageOwnerWorkOrder(
+                        workOrderResponse.getId(),
+                        vehicleNumber,
+                        serviceCount,
+                        garage.getName()
+                    );
+
+                NotificationResult ownerResult = notificationDispatchService.sendNotification(
+                    garage.getGarageOwner(),
+                    NotificationType.SERVICE_UPDATES,
+                    ownerContent,
+                    false,  // Not critical for owner
+                    "GARAGE_OWNER"  // targetRole
+                );
+
+                log.info("Garage owner notification result: {}", ownerResult.getSummary());
+            } else {
+                log.warn("Cannot send garage owner notification: garage or garageOwner is null");
+            }
+        } catch (Exception e) {
+            log.error("Failed to send garage owner notification", e);
+        }
+
         return workOrderResponse;
 
     }
@@ -91,14 +140,6 @@ public class WorkOrderService {
         }
     }
 
-    /**
-     * Adds a job card to an existing work order.
-     *
-     * @param workOrderId The ID of the work order to which the job card will be
-     *                    added.
-     * @param jobCard     The JobCard object to be added.
-     * @return The updated WorkOrder object.
-     */
     @Transactional
     public WorkOrder getWorkOrderById(Integer id) {
         return workOrderRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException ( "WorkOrder not found" ) );

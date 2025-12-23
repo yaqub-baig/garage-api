@@ -13,8 +13,10 @@ import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
 import com.autoadda.apis.garage.request.CreatePartRequestRequest;
 import com.autoadda.apis.garage.request.JobCardStatusRequest;
+import com.autoadda.apis.garage.request.NotificationContent;
 import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.response.*;
+import com.autoadda.apis.garage.util.NotificationType;
 import com.autoadda.apis.garage.util.BusinessValidator;
 import com.autoadda.apis.garage.util.DateHelper;
 import com.autoadda.apis.garage.util.JobCardStatus;
@@ -52,6 +54,8 @@ public class JobCardService {
     private final WorkOrderRepository workOrderRepository;
     private final WorkOrderStatusFlowService workOrderStatusFlowService;
     private final PartRequestService partRequestService;
+    private final NotificationDispatchService notificationDispatchService;
+    private final NotificationMessageBuilder notificationMessageBuilder;
 
 
     @Transactional
@@ -100,6 +104,36 @@ public class JobCardService {
         service.setTechnician ( technician );
         appointmentServiceRepo.save ( service );
 
+        // Send notification to technician about new assignment
+        try {
+            if (technician.getAutoAddaId() != null) {
+                VehicleDetailResponse vehicleDetails = vehicleClient.getVehicleDetailsByIdResponse(appointment.getVehicleId());
+                String serviceName = service.getService().getAvailableService().getName();
+                String vehicleNumber = vehicleDetails != null ? vehicleDetails.getNumber() : "Unknown";
+
+                NotificationContent technicianContent = notificationMessageBuilder
+                    .buildTechnicianJobAssignment(
+                        serviceName,
+                        vehicleNumber,
+                        appointment.getId()
+                    );
+
+                NotificationResult techResult = notificationDispatchService.sendNotification(
+                    technician.getAutoAddaId(),
+                    NotificationType.SERVICE_UPDATES,
+                    technicianContent,
+                    false,  // Not critical for technician
+                    "GARAGE_TECH"  // targetRole
+                );
+
+                log.info("Technician notification result: {}", techResult.getSummary());
+            } else {
+                log.warn("Cannot send technician notification: autoAddaId is null for technician {}", technician.getId());
+            }
+        } catch (Exception e) {
+            log.error("Failed to send technician assignment notification", e);
+        }
+
         return jobCardMapper.entityToResponse ( jobCard );
     }
 
@@ -144,6 +178,36 @@ public class JobCardService {
         service.setTechnician ( technician );
         appointmentServiceRepo.save ( service );
 
+        // Send notification to technician about new assignment
+        try {
+            if (technician.getAutoAddaId() != null) {
+                VehicleDetailResponse vehicleDetails = vehicleClient.getVehicleDetailsByIdResponse(appointment.getVehicleId());
+                String serviceName = service.getService().getAvailableService().getName();
+                String vehicleNumber = vehicleDetails != null ? vehicleDetails.getNumber() : "Unknown";
+
+                NotificationContent technicianContent = notificationMessageBuilder
+                    .buildTechnicianJobAssignment(
+                        serviceName,
+                        vehicleNumber,
+                        appointment.getId()
+                    );
+
+                NotificationResult techResult = notificationDispatchService.sendNotification(
+                    technician.getAutoAddaId(),
+                    NotificationType.SERVICE_UPDATES,
+                    technicianContent,
+                    false,  // Not critical for technician
+                    "GARAGE_TECH"  // targetRole
+                );
+
+                log.info("Technician notification result: {}", techResult.getSummary());
+            } else {
+                log.warn("Cannot send technician notification: autoAddaId is null for technician {}", technician.getId());
+            }
+        } catch (Exception e) {
+            log.error("Failed to send technician assignment notification", e);
+        }
+
         return jobCard;
     }
 
@@ -162,20 +226,63 @@ public class JobCardService {
         Integer appointmentId = jobCard.getService ( ).getAppointmentId ( );
         AppointmentDetails appointmentDetails = appointmentRepo.findById ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException (APPOINTMENT_NOT_FOUND) );
         VehicleDetailResponse vehicleDetailsByIdResponse = vehicleClient.getVehicleDetailsByIdResponse ( appointmentDetails.getVehicleId ( ) );
-        String vehicleOwnerNumber = vehicleDetailsByIdResponse.getOwner ( ).getMobileNumber ( );
 
         if ( JobCardStatus.IN_PROGRESS.equals ( request ) ) {
             jobCard.setServiceStartTime ( DateHelper.dbTime ( ) );
-            String message = "Your work order service has started for " + jobCard.getService ( ).getService ( ).getAvailableService ( ).getName ( ) + "    at : " + LocalDateTime.now ( );
-            GenericResponse genericResponse = authClient.sendSms ( new SmsRequest ( vehicleOwnerNumber, message ) );
-            log.info ( genericResponse.getStatus ( ) );
+
+            // Send multi-channel notification with preference checking
+            Integer customerId = appointmentDetails.getCustomerId();
+            String serviceName = jobCard.getService().getService().getAvailableService().getName();
+            String vehicleNumber = vehicleDetailsByIdResponse.getNumber();
+
+            NotificationContent content = notificationMessageBuilder.buildJobCardStarted(
+                serviceName,
+                LocalDateTime.now(),
+                vehicleNumber
+            );
+
+            NotificationResult result = notificationDispatchService.sendNotification(
+                customerId,
+                NotificationType.SERVICE_UPDATES,
+                content,
+                true,  // critical
+                "CUSTOMER"  // targetRole
+            );
+
+            if (result.hasAnySuccess()) {
+                log.info("Job card started notification sent. Results: {}", result.getSummary());
+            } else {
+                log.error("Failed to send job card started notification: {}", result);
+            }
         }
         if ( JobCardStatus.COMPLETED.equals ( request ) ) {
             jobCard.setServiceEndTime ( DateHelper.dbTime ( ) );
             jobCard.setCompletedAt ( LocalDateTime.now () );
-            String message = "Your work order service has Completed for " + jobCard.getService ( ).getService ( ).getAvailableService ( ).getName ( ) + "    at : " + LocalDateTime.now ( );
-            GenericResponse genericResponse = authClient.sendSms ( new SmsRequest ( vehicleOwnerNumber, message ) );
-            log.info ( genericResponse.getStatus ( ) );
+
+            // Send multi-channel notification with preference checking
+            Integer customerId = appointmentDetails.getCustomerId();
+            String serviceName = jobCard.getService().getService().getAvailableService().getName();
+            String vehicleNumber = vehicleDetailsByIdResponse.getNumber();
+
+            NotificationContent content = notificationMessageBuilder.buildJobCardCompleted(
+                serviceName,
+                LocalDateTime.now(),
+                vehicleNumber
+            );
+
+            NotificationResult result = notificationDispatchService.sendNotification(
+                customerId,
+                NotificationType.SERVICE_UPDATES,
+                content,
+                true,  // critical
+                "CUSTOMER"  // targetRole
+            );
+
+            if (result.hasAnySuccess()) {
+                log.info("Job card completed notification sent. Results: {}", result.getSummary());
+            } else {
+                log.error("Failed to send job card completed notification: {}", result);
+            }
         }
         AppointmentServices service = jobCard.getService ( );
 

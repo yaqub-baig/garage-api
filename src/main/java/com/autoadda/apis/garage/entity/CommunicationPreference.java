@@ -35,6 +35,13 @@ public class CommunicationPreference {
     private Boolean emailOnQuotationRequests;
     private Boolean smsOnQuotationRequests;
 
+    // WebPush preferences (mirrors identity-api entity structure)
+    private Boolean webpushOnServiceUpdates;
+    private Boolean webpushOnAppointments;
+    private Boolean webpushOnReminders;
+    private Boolean webpushOnOffers;
+    private Boolean webpushOnQuotationRequests;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 

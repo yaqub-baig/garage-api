@@ -8,6 +8,7 @@ import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.*;
 import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.util.CustomerChoice;
+import com.autoadda.apis.garage.util.NotificationType;
 import com.autoadda.apis.garage.util.PartRequestStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,8 @@ public class PartRequestService {
     private final AuthClient authClient;
     private final InvoiceRepository invoiceRepo;
     private final InvoiceLineItemRepository invoiceLineItemRepo;
+    private final NotificationDispatchService notificationDispatchService;
+    private final NotificationMessageBuilder notificationMessageBuilder;
 
     /**
      * Create or update a part request when technician updates job status to WAITING_FOR_PARTS
@@ -451,40 +454,30 @@ public class PartRequestService {
             VehicleDetailResponse vehicleResponse = vehicleClient.getVehicleDetailsByIdResponse(
                     partRequest.getVehicleId());
 
-            if (vehicleResponse != null && vehicleResponse.getOwner() != null) {
-                String customerPhone = vehicleResponse.getOwner().getMobileNumber();
-                String serviceName = partRequest.getJobCard().getService().getService().getAvailableService().getName();
-
-                StringBuilder message = new StringBuilder();
-                message.append("🔧 PARTS REQUIRED - AutoAdda\n\n");
-                message.append("Service: ").append(serviceName).append("\n");
-                message.append("Vehicle: ").append(vehicleResponse.getBrand()).append(" ")
-                        .append(vehicleResponse.getModel()).append("\n");
-                message.append("Reg No: ").append(vehicleResponse.getNumber()).append("\n\n");
-                message.append("Parts needed:\n");
-
-                List<PartRequestItem> items = partRequestItemRepo.findByPartRequestId(partRequest.getId());
-                for (int i = 0; i < Math.min(items.size(), 3); i++) {
-                    PartRequestItem item = items.get(i);
-                    message.append("• ").append(item.getPartName())
-                            .append(" (Qty: ").append(item.getQuantity()).append(")\n");
-                }
-
-                if (items.size() > 3) {
-                    message.append("...and ").append(items.size() - 3).append(" more\n");
-                }
-
-                message.append("\nPlease open the AutoAdda app to choose:\n");
-                message.append("1. You'll provide the parts\n");
-                message.append("2. Garage should buy (genuine/used)");
-
-                SmsRequest smsRequest = new SmsRequest();
-                smsRequest.setPhoneNumber(customerPhone);
-                smsRequest.setMessage(message.toString());
-
-                authClient.sendSms(smsRequest);
-                log.info("Part request notification sent to customer: {}", customerPhone);
+            if (vehicleResponse == null || vehicleResponse.getOwner() == null) {
+                log.error("Cannot send notification: vehicle/owner not found");
+                return;
             }
+
+            Integer customerId = vehicleResponse.getOwner().getId();
+            List<PartRequestItem> items = partRequestItemRepo.findByPartRequestId(partRequest.getId());
+
+            NotificationContent content = notificationMessageBuilder.buildPartRequest(
+                partRequest,
+                vehicleResponse,
+                items
+            );
+
+            NotificationResult result = notificationDispatchService.sendNotification(
+                customerId,
+                NotificationType.QUOTATION_REQUESTS,
+                content,
+                true,  // critical
+                "CUSTOMER"  // targetRole
+            );
+
+            log.info("Part request notification result: {}", result.getSummary());
+
         } catch (Exception e) {
             log.error("Failed to send part request notification", e);
         }
@@ -498,32 +491,29 @@ public class PartRequestService {
             VehicleDetailResponse vehicleResponse = vehicleClient.getVehicleDetailsByIdResponse(
                     partRequest.getVehicleId());
 
-            if (vehicleResponse != null && vehicleResponse.getOwner() != null) {
-                String customerPhone = vehicleResponse.getOwner().getMobileNumber();
-                String serviceName = partRequest.getJobCard().getService().getService().getAvailableService().getName();
-
-                StringBuilder message = new StringBuilder();
-                message.append("✅ RESPONSE CONFIRMED - AutoAdda\n\n");
-                message.append("Service: ").append(serviceName).append("\n");
-                message.append("Your choice: ");
-
-                if (choice == CustomerChoice.SELF_PROVIDE) {
-                    message.append("You will provide the parts\n\n");
-                    message.append("Please deliver the parts to the garage soon.\n");
-                    message.append("Work will resume once parts are received.");
-                } else {
-                    message.append("Garage will purchase\n\n");
-                    message.append("The garage will procure the parts.\n");
-                    message.append("Part cost will be added to your invoice.");
-                }
-
-                SmsRequest smsRequest = new SmsRequest();
-                smsRequest.setPhoneNumber(customerPhone);
-                smsRequest.setMessage(message.toString());
-
-                authClient.sendSms(smsRequest);
-                log.info("Response confirmation sent to customer: {}", customerPhone);
+            if (vehicleResponse == null || vehicleResponse.getOwner() == null) {
+                log.error("Cannot send confirmation: vehicle/owner not found");
+                return;
             }
+
+            Integer customerId = vehicleResponse.getOwner().getId();
+
+            NotificationContent content = notificationMessageBuilder.buildPartResponseConfirmation(
+                partRequest,
+                vehicleResponse,
+                choice
+            );
+
+            NotificationResult result = notificationDispatchService.sendNotification(
+                customerId,
+                NotificationType.SERVICE_UPDATES,
+                content,
+                true,  // critical
+                "CUSTOMER"  // targetRole
+            );
+
+            log.info("Part response confirmation result: {}", result.getSummary());
+
         } catch (Exception e) {
             log.error("Failed to send response confirmation", e);
         }
