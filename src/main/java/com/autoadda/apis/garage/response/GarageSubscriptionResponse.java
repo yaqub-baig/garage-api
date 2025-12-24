@@ -23,6 +23,7 @@ public class GarageSubscriptionResponse {
     private String brands;
     private Map<Integer, Integer> serviceQuantity;
     private List<AvailableServiceResponse> services;
+    private List<GarageServiceResponse> garageServices;
     private Integer garageId;
     private Location garageLocation;
     private String garageName;
