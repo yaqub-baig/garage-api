@@ -39,9 +39,6 @@ public class Technician {
     @Column(name = "mobile_number", unique = true)
     private String mobileNumber;
 
-    @Column(name = "vat_number")
-    private String vatNumber;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "technician_skill_set",

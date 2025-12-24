@@ -21,7 +21,6 @@ public class TechnicianResponse {
     private String lastName;
     private String emailId;
     private String mobileNumber;
-    private String vatNumber;
     private List<AvailableServiceResponse> skillSet;
     private Status status;
     private List<GarageResponse> garages;  // Changed from singular to plural for many-to-many

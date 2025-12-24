@@ -64,7 +64,6 @@ class TechnicianServiceTest {
                 .firstName ( "John" )
                 .mobileNumber ( "+1234567890" )
                 .emiratesId ( "784-1234-5678901-1" )
-                .vatNumber ( "123456789" )
                 .status ( Status.ACTIVE )
                 .employeeRole ( EMPLOYEE_ROLE.SUPERVISOR )
                 .garageId ( 1 )
@@ -82,7 +81,6 @@ class TechnicianServiceTest {
                 .firstName ( "John" )
                 .mobileNumber ( "+1234567890" )
                 .emiratesId ( "784-1234-5678901-1" )
-                .vatNumber ( "123456789" )
                 .status ( Status.ACTIVE )
                 .employeeRole ( EMPLOYEE_ROLE.SUPERVISOR )
                 .garages ( Set.of(garage) )
@@ -394,7 +392,6 @@ class TechnicianServiceTest {
         assertEquals ( "John", result.getFirstName ( ) );
         assertEquals ( "+1234567890", result.getMobileNumber ( ) );
         assertEquals ( "784-1234-5678901-1", result.getEmiratesId ( ) );
-        assertEquals ( "123456789", result.getVatNumber ( ) );
         assertEquals ( Status.ACTIVE, result.getStatus ( ) );
         assertEquals ( EMPLOYEE_ROLE.SUPERVISOR, result.getEmployeeRole ( ) );
     }

@@ -63,7 +63,6 @@ public class TechnicianService {
         return Technician
                 .builder()
                 .emailId(technicianRequest.getEmailId())
-                .vatNumber(technicianRequest.getVatNumber())
                 .firstName(technicianRequest.getFirstName())
                 .emiratesId(technicianRequest.getEmiratesId())
                 .mobileNumber(technicianRequest.getMobileNumber())

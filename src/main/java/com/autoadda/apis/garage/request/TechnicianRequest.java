@@ -21,8 +21,6 @@ public class TechnicianRequest {
 
     private String mobileNumber;
 
-    private String vatNumber;
-
     private List<Integer> skillSetIds;
 
     private Status status;
