@@ -681,4 +681,195 @@ public class NotificationMessageBuilder {
             workOrderId, garageName, vehicleNumber, serviceCount, workOrderId
         );
     }
+
+    /**
+     * Build notification content for garage-technician collaboration request received
+     */
+    public NotificationContent buildCollaborationRequestReceived(
+            String senderName,
+            String senderType,
+            String description) {
+
+        String smsMessage = String.format(
+                "New collaboration request from %s (%s). %s Check AutoAdda app to accept or reject.",
+                senderName, senderType, description != null ? description + ". " : ""
+        );
+
+        String emailSubject = "New Collaboration Request - AutoAdda";
+        String emailBody = buildCollaborationRequestReceivedEmailHtml(senderName, senderType, description);
+
+        return NotificationContent.builder()
+                .smsMessage(smsMessage)
+                .emailSubject(emailSubject)
+                .emailBody(emailBody)
+                .emailIsHtml(true)
+                .webpushTitle("New Collaboration Request")
+                .webpushBody(String.format("%s wants to collaborate", senderName))
+                .webpushUrl("/collaboration-requests")
+                .build();
+    }
+
+    private String buildCollaborationRequestReceivedEmailHtml(
+            String senderName,
+            String senderType,
+            String description) {
+
+        String descriptionHtml = (description != null && !description.isBlank())
+                ? String.format("<p style='margin: 15px 0; padding: 15px; background-color: #f8f9fa; border-left: 3px solid #3498db;'><strong>Message:</strong> %s</p>", description)
+                : "";
+
+        return String.format("""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px;">
+                    <h2 style="color: #3498db; margin-top: 0;">New Collaboration Request</h2>
+                    <p style="font-size: 16px; color: #555;">You have received a collaboration request:</p>
+                    <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>From:</strong> %s</p>
+                        <p style="margin: 5px 0;"><strong>Type:</strong> %s</p>
+                    </div>
+                    %s
+                    <div style="background-color: #fff3cd; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                        <p style="margin: 0; font-weight: bold; color: #856404;">Action Required:</p>
+                        <p style="margin: 10px 0;">Please review this request and accept or reject it through your AutoAdda dashboard.</p>
+                    </div>
+                    <a href="https://autoadda.com/collaboration-requests"
+                       style="display: inline-block; margin-top: 20px; background-color: #3498db; color: white;
+                              padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        View Request
+                    </a>
+                    <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #888; margin-bottom: 0;">
+                        This is an automated notification from AutoAdda.
+                    </p>
+                </div>
+            </body>
+            </html>
+            """,
+            senderName,
+            senderType,
+            descriptionHtml
+        );
+    }
+
+    /**
+     * Build notification content for collaboration request approved
+     */
+    public NotificationContent buildCollaborationRequestApproved(
+            String approverName,
+            String approverType) {
+
+        String smsMessage = String.format(
+                "Great news! %s (%s) has accepted your collaboration request. You can now work together on AutoAdda.",
+                approverName, approverType
+        );
+
+        String emailSubject = "Collaboration Request Approved - AutoAdda";
+        String emailBody = buildCollaborationRequestApprovedEmailHtml(approverName, approverType);
+
+        return NotificationContent.builder()
+                .smsMessage(smsMessage)
+                .emailSubject(emailSubject)
+                .emailBody(emailBody)
+                .emailIsHtml(true)
+                .webpushTitle("Request Approved")
+                .webpushBody(String.format("%s accepted your request", approverName))
+                .webpushUrl("/collaboration-requests")
+                .build();
+    }
+
+    private String buildCollaborationRequestApprovedEmailHtml(
+            String approverName,
+            String approverType) {
+
+        return String.format("""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px;">
+                    <h2 style="color: #27ae60; margin-top: 0;">✓ Collaboration Request Approved</h2>
+                    <p style="font-size: 16px; color: #555;">Great news! Your collaboration request has been approved:</p>
+                    <div style="background-color: #d4edda; padding: 15px; border-left: 4px solid #27ae60; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Approved By:</strong> %s</p>
+                        <p style="margin: 5px 0;"><strong>Type:</strong> %s</p>
+                    </div>
+                    <p style="font-size: 16px; color: #555;">You can now collaborate and work together on the AutoAdda platform.</p>
+                    <a href="https://autoadda.com/collaboration-requests"
+                       style="display: inline-block; margin-top: 20px; background-color: #27ae60; color: white;
+                              padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        View Details
+                    </a>
+                    <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #888; margin-bottom: 0;">
+                        This is an automated notification from AutoAdda.
+                    </p>
+                </div>
+            </body>
+            </html>
+            """,
+            approverName,
+            approverType
+        );
+    }
+
+    /**
+     * Build notification content for collaboration request rejected
+     */
+    public NotificationContent buildCollaborationRequestRejected(
+            String rejecterName,
+            String rejecterType) {
+
+        String smsMessage = String.format(
+                "%s (%s) has declined your collaboration request on AutoAdda.",
+                rejecterName, rejecterType
+        );
+
+        String emailSubject = "Collaboration Request Declined - AutoAdda";
+        String emailBody = buildCollaborationRequestRejectedEmailHtml(rejecterName, rejecterType);
+
+        return NotificationContent.builder()
+                .smsMessage(smsMessage)
+                .emailSubject(emailSubject)
+                .emailBody(emailBody)
+                .emailIsHtml(true)
+                .webpushTitle("Request Declined")
+                .webpushBody(String.format("%s declined your request", rejecterName))
+                .webpushUrl("/collaboration-requests")
+                .build();
+    }
+
+    private String buildCollaborationRequestRejectedEmailHtml(
+            String rejecterName,
+            String rejecterType) {
+
+        return String.format("""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px;">
+                    <h2 style="color: #e74c3c; margin-top: 0;">Collaboration Request Declined</h2>
+                    <p style="font-size: 16px; color: #555;">Your collaboration request has been declined:</p>
+                    <div style="background-color: #f8d7da; padding: 15px; border-left: 4px solid #e74c3c; margin: 20px 0;">
+                        <p style="margin: 5px 0;"><strong>Declined By:</strong> %s</p>
+                        <p style="margin: 5px 0;"><strong>Type:</strong> %s</p>
+                    </div>
+                    <p style="font-size: 16px; color: #555;">You can search for other garages or technicians to collaborate with on the AutoAdda platform.</p>
+                    <a href="https://autoadda.com/search"
+                       style="display: inline-block; margin-top: 20px; background-color: #3498db; color: white;
+                              padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        Find Partners
+                    </a>
+                    <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #888; margin-bottom: 0;">
+                        This is an automated notification from AutoAdda.
+                    </p>
+                </div>
+            </body>
+            </html>
+            """,
+            rejecterName,
+            rejecterType
+        );
+    }
 }

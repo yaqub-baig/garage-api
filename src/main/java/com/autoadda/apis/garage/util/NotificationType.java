@@ -33,5 +33,12 @@ public enum NotificationType {
      * Quotation and part request notifications
      * Maps to: smsOnQuotationRequests, emailOnQuotationRequests, webpushOnQuotationRequests
      */
-    QUOTATION_REQUESTS
+    QUOTATION_REQUESTS,
+
+    /**
+     * Garage-Technician collaboration request notifications
+     * Maps to: smsOnServiceUpdates, emailOnServiceUpdates, webpushOnServiceUpdates
+     * (Uses SERVICE_UPDATES preferences for business-related communications)
+     */
+    COLLABORATION_REQUESTS
 }

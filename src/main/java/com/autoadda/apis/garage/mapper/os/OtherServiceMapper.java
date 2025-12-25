@@ -14,13 +14,7 @@ public class OtherServiceMapper {
     public OsResponse entityToResponse(OtherService osServices) {
         OsResponse otherServiceResponse = new OsResponse ( );
         otherServiceResponse.setId ( osServices.getId ( ) != null ? osServices.getId ( ) : null );
-        otherServiceResponse.setCompanyBrandName ( osServices.getCompanyBrandName ( ) != null ? osServices.getCompanyBrandName ( ) : null );
-        otherServiceResponse.setCompanyArabicName ( osServices.getCompanyArabicName ( ) != null ? osServices.getCompanyArabicName ( ) : null );
-        otherServiceResponse.setName ( osServices.getName ( ) != null ? osServices.getName ( ) : null );
-        otherServiceResponse.setTradeLicenceNumber ( osServices.getTradeLicenceNumber ( ) != null ? osServices.getTradeLicenceNumber ( ) : null );
-        otherServiceResponse.setOpeningTime ( osServices.getOpeningTime ( ) != null ? osServices.getOpeningTime ( ) : null );
-        otherServiceResponse.setClosingTime ( osServices.getClosingTime ( ) != null ? osServices.getClosingTime ( ) : null );
-        otherServiceResponse.setWorkingDays ( osServices.getWorkingDays ( ) != null ? osServices.getWorkingDays ( ) : null );
+        validateSomeField(osServices, otherServiceResponse);
         otherServiceResponse.setTrnNumber ( osServices.getTrnNumber ( ) != null ? osServices.getTrnNumber ( ) : null );
         otherServiceResponse.setWebSite ( osServices.getWebSite ( ) != null ? osServices.getWebSite ( ) : null );
         otherServiceResponse.setEmail ( osServices.getEmail ( ) != null ? osServices.getEmail ( ) : null );
@@ -28,6 +22,11 @@ public class OtherServiceMapper {
         otherServiceResponse.setMobileNumber ( osServices.getMobileNumber ( ) != null ? osServices.getMobileNumber ( ) : null );
         otherServiceResponse.setCompanyLogo ( osServices.getCompanyLogo ( ) != null ? osServices.getCompanyLogo ( ) : null );
         otherServiceResponse.setAccountStatus ( osServices.getAccountStatus ( ) != null ? osServices.getAccountStatus ( ) : null );
+        someOtherField(osServices, otherServiceResponse);
+        return otherServiceResponse;
+    }
+
+    private static void someOtherField(OtherService osServices, OsResponse otherServiceResponse) {
         otherServiceResponse.setCreatedAt ( osServices.getCreatedAt ( ) != null ? osServices.getCreatedAt ( ) : null );
         otherServiceResponse.setCompanyOwnerId ( osServices.getCompanyOwner ( ) != null ? osServices.getCompanyOwner ( ) : null );
         otherServiceResponse.setIsActive ( osServices.isActive ( ) );
@@ -35,7 +34,16 @@ public class OtherServiceMapper {
         otherServiceResponse.setTradeLicenseAttachment ( osServices.getTradeLicenseAttachment ( ) != null ? osServices.getTradeLicenseAttachment ( ) : null );
         otherServiceResponse.setVatCertificate ( osServices.getVatCertificate ( ) != null ? osServices.getVatCertificate ( ) : null );
         otherServiceResponse.setCompnayLocation ( osServices.getCompanyLocation ( ) != null ? osServices.getCompanyLocation ( ) : null );
-        return otherServiceResponse;
+    }
+
+    private static void validateSomeField(OtherService osServices, OsResponse otherServiceResponse) {
+        otherServiceResponse.setCompanyBrandName ( osServices.getCompanyBrandName ( ) != null ? osServices.getCompanyBrandName ( ) : null );
+        otherServiceResponse.setCompanyArabicName ( osServices.getCompanyArabicName ( ) != null ? osServices.getCompanyArabicName ( ) : null );
+        otherServiceResponse.setName ( osServices.getName ( ) != null ? osServices.getName ( ) : null );
+        otherServiceResponse.setTradeLicenceNumber ( osServices.getTradeLicenceNumber ( ) != null ? osServices.getTradeLicenceNumber ( ) : null );
+        otherServiceResponse.setOpeningTime ( osServices.getOpeningTime ( ) != null ? osServices.getOpeningTime ( ) : null );
+        otherServiceResponse.setClosingTime ( osServices.getClosingTime ( ) != null ? osServices.getClosingTime ( ) : null );
+        otherServiceResponse.setWorkingDays ( osServices.getWorkingDays ( ) != null ? osServices.getWorkingDays ( ) : null );
     }
 
 }

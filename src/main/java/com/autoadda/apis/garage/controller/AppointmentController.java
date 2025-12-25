@@ -104,8 +104,9 @@ public class AppointmentController {
                                                                      @RequestParam Integer appointmentId,
                                                                      @RequestParam(required = false) Status status,
                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime time,
+                                                                     @RequestParam(required = false) String selectedGarageServiceIds,
                                                                      @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId) {
-        return appointmentSlotService.editBooking(garageId, vehicleId, appointmentId, time, autoAddaId, status);
+        return appointmentSlotService.editBooking(garageId, vehicleId, appointmentId, time, autoAddaId, status, selectedGarageServiceIds);
     }
 
 }
