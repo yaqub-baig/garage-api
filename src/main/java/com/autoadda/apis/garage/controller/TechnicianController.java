@@ -86,23 +86,29 @@ public class TechnicianController {
      * Examples:
      * - Universal: /technicians/search?query=John
      * - Specific: /technicians/search?name=John&city=Dubai&skillIds=1,2
+     * - Expertise: /technicians/search?expertiseCategories=ENGINE_SYSTEMS,TRANSMISSION&expertiseLevels=L4,L3
+     * - Combined: /technicians/search?city=Dubai&expertiseCategories=ENGINE_SYSTEMS&expertiseLevels=L4&skillIds=1
      */
     @GetMapping("/search")
     public ResponseEntity<List<TechnicianResponse>> searchTechnicians(
             @RequestParam(required = false) String query,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) List<Integer> skillIds,
+            @RequestParam(required = false) List<String> expertiseCategories,
+            @RequestParam(required = false) List<String> expertiseLevels,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String model) {
 
         // If query parameter provided, use universal search
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(query)) {
-            return ResponseEntity.ok(technicianService.universalSearchViaHelper(query, skillIds));
+            return ResponseEntity.ok(technicianService.universalSearchViaHelper(
+                query, skillIds, expertiseCategories, expertiseLevels));
         }
 
         // Otherwise use existing specific parameter search
-        return ResponseEntity.ok(technicianService.searchTechnicians(name, skillIds, city, brand, model));
+        return ResponseEntity.ok(technicianService.searchTechnicians(
+            name, skillIds, expertiseCategories, expertiseLevels, city, brand, model));
     }
 
     /**
@@ -113,12 +119,16 @@ public class TechnicianController {
      * Examples:
      * - Universal: /technicians/search/paginated?query=mechanic&page=0&size=10
      * - Specific: /technicians/search/paginated?city=Dubai&skillIds=1,2&sortBy=yearOfExperience&sortDirection=desc
+     * - Expertise: /technicians/search/paginated?expertiseCategories=ENGINE_SYSTEMS,TRANSMISSION&expertiseLevels=L4,L3&page=0&size=10
+     * - Combined: /technicians/search/paginated?city=Dubai&expertiseCategories=ENGINE_SYSTEMS&expertiseLevels=L4&sortBy=yearOfExperience&sortDirection=desc
      */
     @GetMapping("/search/paginated")
     public ResponseEntity<PagedResponse<TechnicianResponse>> searchTechniciansPaginated(
             @RequestParam(required = false) String query,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) List<Integer> skillIds,
+            @RequestParam(required = false) List<String> expertiseCategories,
+            @RequestParam(required = false) List<String> expertiseLevels,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String model,
@@ -128,8 +138,8 @@ public class TechnicianController {
             @RequestParam(defaultValue = "asc") String sortDirection) {
 
         PagedResponse<TechnicianResponse> response = technicianService.searchTechniciansPaginated(
-                query, name, skillIds, city, brand, model,
-                page, size, sortBy, sortDirection);
+                query, name, skillIds, expertiseCategories, expertiseLevels,
+                city, brand, model, page, size, sortBy, sortDirection);
 
         return ResponseEntity.ok(response);
     }

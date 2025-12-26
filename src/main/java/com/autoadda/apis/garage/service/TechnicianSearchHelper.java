@@ -5,11 +5,14 @@ import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.mapper.TechnicianMapper;
 import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.response.TechnicianResponse;
+import com.autoadda.apis.garage.util.ExpertiseCategory;
+import com.autoadda.apis.garage.util.ExpertiseLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -39,12 +42,16 @@ public class TechnicianSearchHelper {
      * Universal search method that searches across multiple fields in priority order.
      * Returns results from the first field that produces matches (cascade search).
      *
-     * @param query      Generic search term to match across multiple fields
-     * @param skillIds   Optional skill/service IDs filter
+     * @param query               Generic search term to match across multiple fields
+     * @param skillIds            Optional skill/service IDs filter
+     * @param expertiseCategories Optional expertise category filters
+     * @param expertiseLevels     Optional expertise level filters (paired with categories)
      * @return List of matching technicians
      */
     @Transactional(readOnly = true)
-    public List<TechnicianResponse> universalSearch(String query, List<Integer> skillIds) {
+    public List<TechnicianResponse> universalSearch(String query, List<Integer> skillIds,
+                                                    List<String> expertiseCategories,
+                                                    List<String> expertiseLevels) {
         Set<Technician> allTechnicians = technicianRepository.findAllActiveWithEagerLoading();
 
         log.info("Universal search for query: '{}' across {} technicians", query, allTechnicians.size());
@@ -53,31 +60,38 @@ public class TechnicianSearchHelper {
         List<Technician> results = searchByName(allTechnicians, query);
         if (!results.isEmpty()) {
             log.info("Found {} matches in technician names", results.size());
-            return filterAndMapResults(results, skillIds);
+            return filterAndMapResults(results, skillIds, expertiseCategories, expertiseLevels);
         }
 
         results = searchBySkills(allTechnicians, query);
         if (!results.isEmpty()) {
             log.info("Found {} matches in skills", results.size());
-            return filterAndMapResults(results, skillIds);
+            return filterAndMapResults(results, skillIds, expertiseCategories, expertiseLevels);
+        }
+
+        // NEW: Expertise search
+        results = searchByExpertise(allTechnicians, query);
+        if (!results.isEmpty()) {
+            log.info("Found {} matches in expertise categories", results.size());
+            return filterAndMapResults(results, skillIds, expertiseCategories, expertiseLevels);
         }
 
         results = searchByBrand(allTechnicians, query);
         if (!results.isEmpty()) {
             log.info("Found {} matches in brand specialization", results.size());
-            return filterAndMapResults(results, skillIds);
+            return filterAndMapResults(results, skillIds, expertiseCategories, expertiseLevels);
         }
 
         results = searchByModel(allTechnicians, query);
         if (!results.isEmpty()) {
             log.info("Found {} matches in model specialization", results.size());
-            return filterAndMapResults(results, skillIds);
+            return filterAndMapResults(results, skillIds, expertiseCategories, expertiseLevels);
         }
 
         results = searchByCity(allTechnicians, query);
         if (!results.isEmpty()) {
             log.info("Found {} matches in cities", results.size());
-            return filterAndMapResults(results, skillIds);
+            return filterAndMapResults(results, skillIds, expertiseCategories, expertiseLevels);
         }
 
         log.info("No matches found for query: '{}'", query);
@@ -114,6 +128,32 @@ public class TechnicianSearchHelper {
     }
 
     /**
+     * Search technicians by expertise category names.
+     * Matches against enum name (e.g., "ENGINE" matches ENGINE_SYSTEMS).
+     */
+    private List<Technician> searchByExpertise(Set<Technician> technicians, String query) {
+        return technicians.stream()
+                .filter(t -> hasExpertiseMatchingQuery(t, query))
+                .toList();
+    }
+
+    /**
+     * Check if technician has expertise category matching query.
+     * Case-insensitive partial match on enum name.
+     */
+    private boolean hasExpertiseMatchingQuery(Technician technician, String query) {
+        if (technician.getExpertise() == null || technician.getExpertise().isEmpty()) {
+            return false;
+        }
+
+        return technician.getExpertise().stream()
+                .filter(Objects::nonNull)
+                .anyMatch(exp -> exp.getExpertiseCategory() != null &&
+                        exp.getExpertiseCategory().name().toLowerCase()
+                           .contains(query.toLowerCase()));
+    }
+
+    /**
      * Search technicians by brand specialization.
      */
     private List<Technician> searchByBrand(Set<Technician> technicians, String query) {
@@ -144,14 +184,24 @@ public class TechnicianSearchHelper {
     }
 
     /**
-     * Apply skill filter if provided, then map to response DTOs.
+     * Apply skill and expertise filters if provided, then map to response DTOs.
      */
-    private List<TechnicianResponse> filterAndMapResults(List<Technician> technicians, List<Integer> skillIds) {
+    private List<TechnicianResponse> filterAndMapResults(
+            List<Technician> technicians, List<Integer> skillIds,
+            List<String> expertiseCategories, List<String> expertiseLevels) {
+
         Stream<Technician> stream = technicians.stream();
 
         // Apply skill filter if provided
         if (skillIds != null && !skillIds.isEmpty()) {
             stream = stream.filter(t -> matchesSkillFilter(t, skillIds));
+        }
+
+        // Apply expertise filter if provided
+        List<ExpertisePair> expertisePairs = parseExpertiseFilters(
+            expertiseCategories, expertiseLevels);
+        if (!expertisePairs.isEmpty()) {
+            stream = stream.filter(t -> matchesExpertiseFilter(t, expertisePairs));
         }
 
         return stream.map(technicianMapper::entityToResponse).toList();
@@ -171,5 +221,78 @@ public class TechnicianSearchHelper {
                 .toList();
 
         return skillIds.stream().anyMatch(technicianSkillIds::contains);
+    }
+
+    /**
+     * Represents a category-level pair for expertise filtering.
+     */
+    private record ExpertisePair(ExpertiseCategory category, ExpertiseLevel level) {}
+
+    /**
+     * Validates and parses expertise filter parameters.
+     * Position-based pairing: categories[i] pairs with levels[i].
+     *
+     * @param categories List of expertise category strings
+     * @param levels List of expertise level strings
+     * @return List of valid category-level pairs, or empty list if invalid
+     */
+    private List<ExpertisePair> parseExpertiseFilters(
+            List<String> categories, List<String> levels) {
+
+        if (categories == null || categories.isEmpty() ||
+            levels == null || levels.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (categories.size() != levels.size()) {
+            log.warn("Expertise filter size mismatch: {} categories, {} levels",
+                     categories.size(), levels.size());
+            return Collections.emptyList();
+        }
+
+        List<ExpertisePair> pairs = new ArrayList<>();
+        for (int i = 0; i < categories.size(); i++) {
+            try {
+                ExpertiseCategory category = ExpertiseCategory.valueOf(
+                    categories.get(i).toUpperCase());
+                ExpertiseLevel level = ExpertiseLevel.valueOf(
+                    levels.get(i).toUpperCase());
+                pairs.add(new ExpertisePair(category, level));
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid expertise filter: category={}, level={}",
+                         categories.get(i), levels.get(i));
+                // Skip invalid pairs, continue processing
+            }
+        }
+
+        return pairs;
+    }
+
+    /**
+     * Checks if technician has ANY of the specified expertise pairs.
+     * OR logic - returns true if any pair matches exactly.
+     *
+     * @param technician The technician to check
+     * @param expertisePairs List of category-level pairs to match
+     * @return true if technician has at least one matching expertise, false otherwise
+     */
+    private boolean matchesExpertiseFilter(Technician technician,
+                                           List<ExpertisePair> expertisePairs) {
+        if (expertisePairs == null || expertisePairs.isEmpty()) {
+            return true; // No filter applied
+        }
+
+        if (technician.getExpertise() == null || technician.getExpertise().isEmpty()) {
+            return false; // No expertise, cannot match
+        }
+
+        return expertisePairs.stream().anyMatch(pair ->
+            technician.getExpertise().stream()
+                .filter(Objects::nonNull)
+                .anyMatch(exp ->
+                    exp.getExpertiseCategory() == pair.category() &&
+                    exp.getExpertiseLevel() == pair.level()
+                )
+        );
     }
 }

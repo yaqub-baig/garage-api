@@ -58,7 +58,7 @@ public class NotificationResult {
         return results.entrySet().stream()
                 .filter(e -> !e.getValue().isSuccess())
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

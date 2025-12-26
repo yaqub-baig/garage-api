@@ -7,7 +7,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
@@ -122,25 +121,5 @@ public class CommunicationPreferenceService {
      * @param now  The current LocalTime to check against.
      * @return true if communication is allowed, false if within DND period.
      */
-//    public boolean isWithinAllowedTime(CommunicationPreference pref, LocalTime now) {
-//        if (pref.getDoNotDisturbStart() == null || pref.getDoNotDisturbEnd() == null) {
-//            return true; // No DND restriction
-//        }
-//
-//        LocalTime start = pref.getDoNotDisturbStart();
-//        LocalTime end = pref.getDoNotDisturbEnd();
-//
-//        if (start.equals(end)) {
-//            return false; // Full-day DND
-//        }
-//
-//        if (start.isBefore(end)) {
-//            // Same-day DND window
-//            return now.isBefore(start) || now.isAfter(end);
-//        } else {
-//            // Cross-midnight DND window (e.g., 9PM–7AM)
-//            return !(now.isAfter(start) || now.isBefore(end));
-//        }
-//    }
 
 }

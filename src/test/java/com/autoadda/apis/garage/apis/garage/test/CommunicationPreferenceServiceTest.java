@@ -1,23 +1,21 @@
 package com.autoadda.apis.garage.apis.garage.test;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalTime;
-import java.util.Optional;
-
+import com.autoadda.apis.garage.entity.CommunicationPreference;
+import com.autoadda.apis.garage.repository.CommunicationPreferenceRepository;
+import com.autoadda.apis.garage.request.CommunicationPreferenceRequest;
+import com.autoadda.apis.garage.service.CommunicationPreferenceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.autoadda.apis.garage.entity.CommunicationPreference;
-import com.autoadda.apis.garage.repository.CommunicationPreferenceRepository;
-import com.autoadda.apis.garage.request.CommunicationPreferenceRequest;
-import com.autoadda.apis.garage.service.CommunicationPreferenceService;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
  class CommunicationPreferenceServiceTest {
@@ -67,16 +65,6 @@ import com.autoadda.apis.garage.service.CommunicationPreferenceService;
 		Optional<CommunicationPreference> result = service.getPreference(1);
 		assertTrue(result.isPresent());
 	}
-//
-//	@Test
-//	 void testWithinAllowedTime() {
-//		CommunicationPreference pref = new CommunicationPreference();
-//		pref.setDoNotDisturbStart(LocalTime.of(21, 0));
-//		pref.setDoNotDisturbEnd(LocalTime.of(7, 0));
-////
-////		assertFalse(service.isWithinAllowedTime(pref, LocalTime.of(22, 0))); // within DND
-////		assertTrue(service.isWithinAllowedTime(pref, LocalTime.of(10, 0))); // outside DND
-//	}
 
 	@Test
 	 void testDeletePreference() {

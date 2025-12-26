@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.request;
 
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.Status;
+import jakarta.validation.Valid;
 import lombok.*;
 
 import java.util.List;
@@ -45,5 +46,8 @@ public class TechnicianRequest {
     private String city;
 
     private Boolean isAvailableForService;
+
+    @Valid
+    private List<TechnicianExpertiseRequest> expertise;
 
 }

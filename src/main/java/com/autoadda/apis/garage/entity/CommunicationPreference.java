@@ -4,8 +4,6 @@ import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalTime;
-
 @Entity
 @Getter
 @Setter

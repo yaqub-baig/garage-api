@@ -32,4 +32,5 @@ public class TechnicianResponse {
     private Integer yearOfExperience;
     private String city;
     private Boolean isAvailableForService;
+    private List<TechnicianExpertiseResponse> expertise;
 }

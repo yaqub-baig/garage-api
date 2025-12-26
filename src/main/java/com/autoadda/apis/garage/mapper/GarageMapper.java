@@ -12,46 +12,71 @@ public class GarageMapper {
     private final GarageServiceMapper garageServiceMapper;
 
     public GarageResponse entityToResponse(Garage garage) {
-        GarageResponse garageResponse = new GarageResponse ( );
-        garageResponse.setId ( garage.getId ( ) != null ? garage.getId ( ) : null );
-        garageResponse.setGarageBrandName ( garage.getGarageBrandName ( ) != null ? garage.getGarageBrandName ( ) : null );
-        garageResponse.setGarageArabicName ( garage.getGarageArabicName ( ) != null ? garage.getGarageArabicName ( ) : null );
-        garageResponse.setName ( garage.getName ( ) != null ? garage.getName ( ) : null );
-        garageResponse.setTradeLicenceNumber ( garage.getTradeLicenceNumber ( ) != null ? garage.getTradeLicenceNumber ( ) : null );
-        garageResponse.setOpeningTime ( garage.getOpeningTime ( ) != null ? garage.getOpeningTime ( ) : null );
-        garageResponse.setClosingTime ( garage.getClosingTime ( ) != null ? garage.getClosingTime ( ) : null );
-        garageResponse.setWorkingDays ( garage.getWorkingDays ( ) != null ? garage.getWorkingDays ( ) : null );
-        garageResponse.setOpeningHours2 ( garage.getOpeningTime2 ( ) != null ? garage.getOpeningTime2 ( ) : null );
-        garageResponse.setClosingHours2 ( garage.getClosingTime2 ( ) != null ? garage.getClosingTime2 ( ) : null );
-        garageResponse.setTrnNumber ( garage.getTrnNumber ( ) != null ? garage.getTrnNumber ( ) : null );
-        garageResponse.setWebsite( garage.getWebsite( ) != null ? garage.getWebsite( ) : null );
-        garageResponse.setEmail ( garage.getEmail ( ) != null ? garage.getEmail ( ) : null );
-        garageResponse.setPhoneNumber ( garage.getPhoneNumber ( ) != null ? garage.getPhoneNumber ( ) : null );
-        garageResponse.setMobileNumber ( garage.getMobileNumber ( ) != null ? garage.getMobileNumber ( ) : null );
-        garageResponse.setGarageLogo ( garage.getGarageLogo ( ) != null ? garage.getGarageLogo ( ) : null );
-        garageResponse.setAccountStatus ( garage.getAccountStatus ( ) != null ? garage.getAccountStatus ( ) : null );
-        garageResponse.setApprovedBy ( garage.getApprovedBy ( ) != null ? garage.getApprovedBy ( ) : null );
-        garageResponse.setApprovedAt ( garage.getApprovedAt ( ) != null ? garage.getApprovedAt ( ) : null );
-        garageResponse.setRejectedBy ( garage.getRejectedBy ( ) != null ? garage.getRejectedBy ( ) : null );
-        garageResponse.setRejectedAt ( garage.getRejectedAt ( ) != null ? garage.getRejectedAt ( ) : null );
-        garageResponse.setRejectionReason ( garage.getRejectionReason ( ) != null ? garage.getRejectionReason ( ) : null );
-        garageResponse.setResubmissionCount ( garage.getResubmissionCount ( ) != null ? garage.getResubmissionCount ( ) : 0 );
-        garageResponse.setLastReviewedBy ( garage.getLastReviewedBy ( ) != null ? garage.getLastReviewedBy ( ) : null );
-        garageResponse.setLastReviewedAt ( garage.getLastReviewedAt ( ) != null ? garage.getLastReviewedAt ( ) : null );
-        garageResponse.setCreatedAt ( garage.getCreatedAt ( ) != null ? garage.getCreatedAt ( ) : null );
-        garageResponse.setBrands ( garage.getBrands ( ) != null ? garage.getBrands ( ) : null );
-        garageResponse.setModels ( garage.getModels ( ) != null ? garage.getModels ( ) : null );
-        garageResponse.setGarageOwnerId ( garage.getGarageOwner ( ) != null ? garage.getGarageOwner ( ) : null );
-        garageResponse.setIsActive ( garage.isActive ( ) );
-        garageResponse.setConcurrentAppointmentCapacity ( garage.getConcurrentAppointmentCapacity ( ) != null ? garage.getConcurrentAppointmentCapacity ( ) : null );
-        garageResponse.setServices ( garage.getServices ( ) != null ? garage.getServices ( ).stream ( ).map ( garageServiceMapper::entityToResponse ).toList ( ) : null );
-        garageResponse.setGarageImages ( garage.getGarageImages ( ) != null ? garage.getGarageImages ( ) : null );
-        garageResponse.setTradeLicenseAttachment ( garage.getTradeLicenseAttachment ( ) != null ? garage.getTradeLicenseAttachment ( ) : null );
-        garageResponse.setVatCertificate ( garage.getVatCertificate ( ) != null ? garage.getVatCertificate ( ) : null );
-        garageResponse.setLocation ( garage.getGarageLocation ( ) != null ? garage.getGarageLocation ( ) : null );
-        garageResponse.setBreakStartTime ( garage.getBreakStartTime ( ) != null ? garage.getBreakStartTime ( ) : null );
-        garageResponse.setBreakEndTime ( garage.getBreakEndTime ( ) != null ? garage.getBreakEndTime ( ) : null );
+        GarageResponse garageResponse = new GarageResponse();
+
+        mapField(garage.getId(), garageResponse::setId);
+        mapField(garage.getGarageBrandName(), garageResponse::setGarageBrandName);
+        mapField(garage.getGarageArabicName(), garageResponse::setGarageArabicName);
+        mapField(garage.getName(), garageResponse::setName);
+        mapField(garage.getTradeLicenceNumber(), garageResponse::setTradeLicenceNumber);
+        mapField(garage.getOpeningTime(), garageResponse::setOpeningTime);
+        mapField(garage.getClosingTime(), garageResponse::setClosingTime);
+        mapField(garage.getWorkingDays(), garageResponse::setWorkingDays);
+        mapField(garage.getOpeningTime2(), garageResponse::setOpeningHours2);
+        mapField(garage.getClosingTime2(), garageResponse::setClosingHours2);
+        mapField(garage.getTrnNumber(), garageResponse::setTrnNumber);
+        mapField(garage.getWebsite(), garageResponse::setWebsite);
+        mapField(garage.getEmail(), garageResponse::setEmail);
+        mapField(garage.getPhoneNumber(), garageResponse::setPhoneNumber);
+        mapField(garage.getMobileNumber(), garageResponse::setMobileNumber);
+        mapField(garage.getGarageLogo(), garageResponse::setGarageLogo);
+        mapField(garage.getAccountStatus(), garageResponse::setAccountStatus);
+        mapField(garage.getApprovedBy(), garageResponse::setApprovedBy);
+        mapField(garage.getApprovedAt(), garageResponse::setApprovedAt);
+        mapField(garage.getRejectedBy(), garageResponse::setRejectedBy);
+        mapField(garage.getRejectedAt(), garageResponse::setRejectedAt);
+        mapField(garage.getRejectionReason(), garageResponse::setRejectionReason);
+        mapField(garage.getLastReviewedBy(), garageResponse::setLastReviewedBy);
+        mapField(garage.getLastReviewedAt(), garageResponse::setLastReviewedAt);
+        mapField(garage.getCreatedAt(), garageResponse::setCreatedAt);
+        mapField(garage.getBrands(), garageResponse::setBrands);
+        mapField(garage.getModels(), garageResponse::setModels);
+        mapField(garage.getGarageOwner(), garageResponse::setGarageOwnerId);
+        mapField(garage.getConcurrentAppointmentCapacity(), garageResponse::setConcurrentAppointmentCapacity);
+        mapField(garage.getGarageImages(), garageResponse::setGarageImages);
+        mapField(garage.getTradeLicenseAttachment(), garageResponse::setTradeLicenseAttachment);
+        mapField(garage.getVatCertificate(), garageResponse::setVatCertificate);
+        mapField(garage.getGarageLocation(), garageResponse::setLocation);
+        mapField(garage.getBreakStartTime(), garageResponse::setBreakStartTime);
+        mapField(garage.getBreakEndTime(), garageResponse::setBreakEndTime);
+
+        // Primitive boolean - no null check needed
+        garageResponse.setIsActive(garage.isActive());
+
+        // Field with default value
+        garageResponse.setResubmissionCount(
+            garage.getResubmissionCount() != null ? garage.getResubmissionCount() : 0);
+
+        // Field with transformation
+        mapField(garage.getServices(),
+            services -> garageResponse.setServices(
+                services.stream().map(garageServiceMapper::entityToResponse).toList()));
+
         return garageResponse;
+    }
+
+    /**
+     * Helper method to map a field with null safety.
+     * Only sets the value if source is not null.
+     *
+     * @param source The source value (may be null)
+     * @param setter The setter method to call if source is not null
+     * @param <T> The type of the field
+     */
+    private <T> void mapField(T source, java.util.function.Consumer<T> setter) {
+        if (source != null) {
+            setter.accept(source);
+        }
     }
 
 }

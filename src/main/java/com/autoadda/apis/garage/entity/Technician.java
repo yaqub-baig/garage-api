@@ -47,6 +47,10 @@ public class Technician {
     )
     private List<AvailableService> skillSet = new ArrayList<> ( );
 
+    @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<TechnicianExpertise> expertise = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     private Status status;
 

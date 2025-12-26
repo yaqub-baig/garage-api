@@ -29,11 +29,12 @@ public interface TechnicianRepository extends JpaRepository<Technician, Integer>
     /**
      * Fetch all active (non-deleted) technicians with eager loading of relationships
      * to avoid N+1 query problems during search operations.
-     * Uses LEFT JOIN FETCH for garages and skillSet associations.
+     * Uses LEFT JOIN FETCH for garages, skillSet, and expertise associations.
      */
     @Query("SELECT DISTINCT t FROM Technician t " +
            "LEFT JOIN FETCH t.garages " +
            "LEFT JOIN FETCH t.skillSet " +
+           "LEFT JOIN FETCH t.expertise " +
            "WHERE t.isDeleted = false AND t.status = 'ACTIVE'")
     Set<Technician> findAllActiveWithEagerLoading();
 
@@ -44,6 +45,7 @@ public interface TechnicianRepository extends JpaRepository<Technician, Integer>
     @Query("SELECT DISTINCT t FROM Technician t " +
            "LEFT JOIN FETCH t.garages " +
            "LEFT JOIN FETCH t.skillSet " +
+           "LEFT JOIN FETCH t.expertise " +
            "WHERE t.isDeleted = false AND t.status = 'ACTIVE'")
     Page<Technician> findAllActiveWithPagination(Pageable pageable);
 

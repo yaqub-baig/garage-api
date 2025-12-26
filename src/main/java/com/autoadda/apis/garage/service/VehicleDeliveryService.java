@@ -336,116 +336,88 @@ public class VehicleDeliveryService {
     private List<String> findMismatches(VehicleReceived received, VehicleDelivery delivery) {
         List<String> mismatches = new ArrayList<>();
 
-        if (!Boolean.TRUE.equals(received.getIsMainKeyReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsMainKeyReturned())) {
-            mismatches.add("Main Key: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsMainKeyReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsMainKeyReturned())) {
-            mismatches.add("Main Key: Received but not being returned");
-        }
+        checkItemMismatch("Main Key",
+                received.getIsMainKeyReceived(),
+                delivery.getIsMainKeyReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsSpareKeyReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsSpareKeyReturned())) {
-            mismatches.add("Spare Key: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsSpareKeyReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsSpareKeyReturned())) {
-            mismatches.add("Spare Key: Received but not being returned");
-        }
+        checkItemMismatch("Spare Key",
+                received.getIsSpareKeyReceived(),
+                delivery.getIsSpareKeyReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsToolKitReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsToolKitReturned())) {
-            mismatches.add("Tool Kit: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsToolKitReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsToolKitReturned())) {
-            mismatches.add("Tool Kit: Received but not being returned");
-        }
+        checkItemMismatch("Tool Kit",
+                received.getIsToolKitReceived(),
+                delivery.getIsToolKitReturned(),
+                mismatches);
 
-        // Continue for all 12 items...
-        if (!Boolean.TRUE.equals(received.getIsJackReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsJackReturned())) {
-            mismatches.add("Jack: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsJackReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsJackReturned())) {
-            mismatches.add("Jack: Received but not being returned");
-        }
+        checkItemMismatch("Jack",
+                received.getIsJackReceived(),
+                delivery.getIsJackReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsWheelSpannerReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsWheelSpannerReturned())) {
-            mismatches.add("Wheel Spanner: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsWheelSpannerReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsWheelSpannerReturned())) {
-            mismatches.add("Wheel Spanner: Received but not being returned");
-        }
+        checkItemMismatch("Wheel Spanner",
+                received.getIsWheelSpannerReceived(),
+                delivery.getIsWheelSpannerReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsSpareTyreReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsSpareTyreReturned())) {
-            mismatches.add("Spare Tyre: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsSpareTyreReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsSpareTyreReturned())) {
-            mismatches.add("Spare Tyre: Received but not being returned");
-        }
+        checkItemMismatch("Spare Tyre",
+                received.getIsSpareTyreReceived(),
+                delivery.getIsSpareTyreReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsFireExtinguisherReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsFireExtinguisherReturned())) {
-            mismatches.add("Fire Extinguisher: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsFireExtinguisherReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsFireExtinguisherReturned())) {
-            mismatches.add("Fire Extinguisher: Received but not being returned");
-        }
+        checkItemMismatch("Fire Extinguisher",
+                received.getIsFireExtinguisherReceived(),
+                delivery.getIsFireExtinguisherReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsFirstAidKitReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsFirstAidKitReturned())) {
-            mismatches.add("First Aid Kit: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsFirstAidKitReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsFirstAidKitReturned())) {
-            mismatches.add("First Aid Kit: Received but not being returned");
-        }
+        checkItemMismatch("First Aid Kit",
+                received.getIsFirstAidKitReceived(),
+                delivery.getIsFirstAidKitReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsCentralLockRemoteReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsCentralLockRemoteReturned())) {
-            mismatches.add("Central Lock Remote: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsCentralLockRemoteReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsCentralLockRemoteReturned())) {
-            mismatches.add("Central Lock Remote: Received but not being returned");
-        }
+        checkItemMismatch("Central Lock Remote",
+                received.getIsCentralLockRemoteReceived(),
+                delivery.getIsCentralLockRemoteReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsRCBookReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsRCBookReturned())) {
-            mismatches.add("RC Book: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsRCBookReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsRCBookReturned())) {
-            mismatches.add("RC Book: Received but not being returned");
-        }
+        checkItemMismatch("RC Book",
+                received.getIsRCBookReceived(),
+                delivery.getIsRCBookReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsInsuranceCopyReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsInsuranceCopyReturned())) {
-            mismatches.add("Insurance Copy: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsInsuranceCopyReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsInsuranceCopyReturned())) {
-            mismatches.add("Insurance Copy: Received but not being returned");
-        }
+        checkItemMismatch("Insurance Copy",
+                received.getIsInsuranceCopyReceived(),
+                delivery.getIsInsuranceCopyReturned(),
+                mismatches);
 
-        if (!Boolean.TRUE.equals(received.getIsPUCReceived()) &&
-                Boolean.TRUE.equals(delivery.getIsPUCReturned())) {
-            mismatches.add("PUC: Not received but being returned");
-        }
-        if (Boolean.TRUE.equals(received.getIsPUCReceived()) &&
-                !Boolean.TRUE.equals(delivery.getIsPUCReturned())) {
-            mismatches.add("PUC: Received but not being returned");
-        }
+        checkItemMismatch("PUC",
+                received.getIsPUCReceived(),
+                delivery.getIsPUCReturned(),
+                mismatches);
 
         return mismatches;
+    }
+
+    /**
+     * Checks for mismatches between received and returned status of a vehicle item.
+     * Adds mismatch messages to the list if:
+     * 1. Item not received but being returned
+     * 2. Item received but not being returned
+     *
+     * @param itemName The display name of the item
+     * @param received Whether the item was received (from VehicleReceived)
+     * @param returned Whether the item is being returned (from VehicleDelivery)
+     * @param mismatches The list to add mismatch messages to
+     */
+    private void checkItemMismatch(String itemName, Boolean received, Boolean returned,
+                                   List<String> mismatches) {
+        if (!Boolean.TRUE.equals(received) && Boolean.TRUE.equals(returned)) {
+            mismatches.add(itemName + ": Not received but being returned");
+        }
+        if (Boolean.TRUE.equals(received) && !Boolean.TRUE.equals(returned)) {
+            mismatches.add(itemName + ": Received but not being returned");
+        }
     }
 
     /**

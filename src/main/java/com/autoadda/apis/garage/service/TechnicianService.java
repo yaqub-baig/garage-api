@@ -4,6 +4,7 @@ import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.AvailableService;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.Technician;
+import com.autoadda.apis.garage.entity.TechnicianExpertise;
 import com.autoadda.apis.garage.exception.AlreadyExistsException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.GarageMapper;
@@ -17,6 +18,8 @@ import com.autoadda.apis.garage.request.TechnicianRequest;
 import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.ERole;
+import com.autoadda.apis.garage.util.ExpertiseCategory;
+import com.autoadda.apis.garage.util.ExpertiseLevel;
 import com.autoadda.apis.garage.util.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +49,7 @@ public class TechnicianService {
     private final GarageMapper garageMapper;
     private final JobCardRepository jobCardRepository;
     private final JobCardMapper jobCardMapper;
+    private final com.autoadda.apis.garage.mapper.TechnicianExpertiseMapper technicianExpertiseMapper;
 
     /**
      * Retrieves a list of technicians associated with a specific garage.
@@ -127,6 +131,15 @@ public class TechnicianService {
                         : true
         );
 
+        // Handle expertise
+        if (technician.getExpertise() != null && !technician.getExpertise().isEmpty()) {
+            final Technician finalTechnician = garageTechnician;
+            List<TechnicianExpertise> expertiseList = technician.getExpertise().stream()
+                    .map(technicianExpertiseMapper::toEntity)
+                    .peek(expertise -> expertise.setTechnician(finalTechnician))
+                    .toList();
+            garageTechnician.setExpertise(expertiseList);
+        }
 
         garageTechnician.setAutoAddaId(userDetails.getBody().getId());
         authClient.updateRole(garageTechnician.getAutoAddaId(), ERole.GARAGE_TECH);
@@ -232,6 +245,24 @@ public class TechnicianService {
             garageTechnician.getSkillSet().addAll(availableServiceRepository.findAllById(technicianRequest.getSkillSetIds()));
             log.info("Updating 3 skill set for technician id {}: {}", id, garageTechnician.getSkillSet().stream().map(AvailableService::getId).toList());
         }
+
+        // Update expertise (replace all pattern like skillSet)
+        if (technicianRequest.getExpertise() != null) {
+            log.info("Updating expertise for technician id {}", id);
+            garageTechnician.getExpertise().clear();
+
+            if (!technicianRequest.getExpertise().isEmpty()) {
+                final Technician finalTechnician = garageTechnician;
+                List<TechnicianExpertise> expertiseList = technicianRequest.getExpertise().stream()
+                        .map(technicianExpertiseMapper::toEntity)
+                        .peek(expertise -> expertise.setTechnician(finalTechnician))
+                        .toList();
+                garageTechnician.getExpertise().addAll(expertiseList);
+            }
+            log.info("Updated expertise for technician id {}: {} categories",
+                    id, garageTechnician.getExpertise().size());
+        }
+
         return technicianMapper.entityToResponse(technicianRepository.save(garageTechnician));
     }
 
@@ -267,8 +298,11 @@ public class TechnicianService {
      * Universal search wrapper - delegates to TechnicianSearchHelper
      * Resolves SonarQube warning about calling @Transactional methods via 'this'.
      */
-    public List<TechnicianResponse> universalSearchViaHelper(String query, List<Integer> skillIds) {
-        return technicianSearchHelper.universalSearch(query, skillIds);
+    public List<TechnicianResponse> universalSearchViaHelper(
+            String query, List<Integer> skillIds,
+            List<String> expertiseCategories, List<String> expertiseLevels) {
+        return technicianSearchHelper.universalSearch(query, skillIds,
+                                                      expertiseCategories, expertiseLevels);
     }
 
     /**
@@ -276,14 +310,23 @@ public class TechnicianService {
      */
     @Transactional(readOnly = true)
     public List<TechnicianResponse> searchTechnicians(
-            String name, List<Integer> skillIds, String city, String brand, String model) {
+            String name, List<Integer> skillIds,
+            List<String> expertiseCategories, List<String> expertiseLevels,
+            String city, String brand, String model) {
 
         Set<Technician> technicians = technicianRepository.findAllActiveWithEagerLoading();
-        log.info("Searching through {} technicians with filters - name: {}, city: {}, brand: {}, model: {}, skillIds: {}",
-                technicians.size(), name, city, brand, model, skillIds);
+
+        // Parse expertise filters
+        List<ExpertisePair> expertisePairs = parseExpertiseFilters(
+            expertiseCategories, expertiseLevels);
+
+        log.info("Searching through {} technicians with filters - name: {}, skillIds: {}, expertisePairs: {}, " +
+                 "city: {}, brand: {}, model: {}",
+                technicians.size(), name, skillIds, expertisePairs.size(), city, brand, model);
 
         List<Technician> searchResults = technicians.stream()
-                .filter(t -> matchesSearchCriteria(t, name, skillIds, city, brand, model))
+                .filter(t -> matchesSearchCriteria(t, name, skillIds, expertisePairs,
+                                                   city, brand, model))
                 .toList();
 
         log.info("Search found {} matching technicians", searchResults.size());
@@ -295,14 +338,17 @@ public class TechnicianService {
      */
     @Transactional(readOnly = true)
     public PagedResponse<TechnicianResponse> searchTechniciansPaginated(
-            String query, String name, List<Integer> skillIds, String city, String brand, String model,
+            String query, String name, List<Integer> skillIds,
+            List<String> expertiseCategories, List<String> expertiseLevels,
+            String city, String brand, String model,
             int page, int size, String sortBy, String sortDirection) {
 
         log.info("Paginated search - query: '{}', page: {}, size: {}, sortBy: {}, sortDir: {}",
                 query, page, size, sortBy, sortDirection);
 
         if (StringUtils.isNotEmpty(query)) {
-            List<TechnicianResponse> universalResults = technicianSearchHelper.universalSearch(query, skillIds);
+            List<TechnicianResponse> universalResults = technicianSearchHelper.universalSearch(
+                query, skillIds, expertiseCategories, expertiseLevels);
             return paginateTechnicianResponses(universalResults, page, size, sortBy, sortDirection);
         }
 
@@ -311,14 +357,20 @@ public class TechnicianService {
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        if (hasNoFilters(name, skillIds, city, brand, model)) {
+        if (hasNoFilters(name, skillIds, expertiseCategories, expertiseLevels,
+                         city, brand, model)) {
             Page<Technician> technicianPage = technicianRepository.findAllActiveWithPagination(pageable);
             return convertToPagedResponse(technicianPage);
         }
 
+        // Parse expertise filters
+        List<ExpertisePair> expertisePairs = parseExpertiseFilters(
+            expertiseCategories, expertiseLevels);
+
         Set<Technician> allTechnicians = technicianRepository.findAllActiveWithEagerLoading();
         List<Technician> filtered = allTechnicians.stream()
-                .filter(t -> matchesSearchCriteria(t, name, skillIds, city, brand, model))
+                .filter(t -> matchesSearchCriteria(t, name, skillIds, expertisePairs,
+                                                   city, brand, model))
                 .sorted(getTechnicianComparator(sortBy, direction))
                 .toList();
 
@@ -336,18 +388,25 @@ public class TechnicianService {
                 .toList();
     }
 
-    private boolean hasNoFilters(String name, List<Integer> skillIds, String city, String brand, String model) {
+    private boolean hasNoFilters(String name, List<Integer> skillIds,
+                                List<String> expertiseCategories,
+                                List<String> expertiseLevels,
+                                String city, String brand, String model) {
         return (name == null || name.isEmpty()) &&
                 (skillIds == null || skillIds.isEmpty()) &&
+                (expertiseCategories == null || expertiseCategories.isEmpty()) &&
+                (expertiseLevels == null || expertiseLevels.isEmpty()) &&
                 (city == null || city.isEmpty()) &&
                 (brand == null || brand.isEmpty()) &&
                 (model == null || model.isEmpty());
     }
 
     private boolean matchesSearchCriteria(Technician technician, String name, List<Integer> skillIds,
+                                          List<ExpertisePair> expertisePairs,
                                           String city, String brand, String model) {
         return matchesNameFilter(technician, name)
                 && matchesSkillFilter(technician, skillIds)
+                && matchesExpertiseFilter(technician, expertisePairs)
                 && matchesCityFilter(technician, city)
                 && matchesBrandFilter(technician, brand)
                 && matchesModelFilter(technician, model);
@@ -394,6 +453,79 @@ public class TechnicianService {
         }
         return technician.getModel() != null
                 && technician.getModel().toLowerCase().contains(model.toLowerCase());
+    }
+
+    /**
+     * Represents a category-level pair for expertise filtering.
+     */
+    private record ExpertisePair(ExpertiseCategory category, ExpertiseLevel level) {}
+
+    /**
+     * Validates and parses expertise filter parameters.
+     * Position-based pairing: categories[i] pairs with levels[i].
+     *
+     * @param categories List of expertise category strings
+     * @param levels List of expertise level strings
+     * @return List of valid category-level pairs, or empty list if invalid
+     */
+    private List<ExpertisePair> parseExpertiseFilters(
+            List<String> categories, List<String> levels) {
+
+        if (categories == null || categories.isEmpty() ||
+            levels == null || levels.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (categories.size() != levels.size()) {
+            log.warn("Expertise filter size mismatch: {} categories, {} levels",
+                     categories.size(), levels.size());
+            return Collections.emptyList();
+        }
+
+        List<ExpertisePair> pairs = new ArrayList<>();
+        for (int i = 0; i < categories.size(); i++) {
+            try {
+                ExpertiseCategory category = ExpertiseCategory.valueOf(
+                    categories.get(i).toUpperCase());
+                ExpertiseLevel level = ExpertiseLevel.valueOf(
+                    levels.get(i).toUpperCase());
+                pairs.add(new ExpertisePair(category, level));
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid expertise filter: category={}, level={}",
+                         categories.get(i), levels.get(i));
+                // Skip invalid pairs, continue processing
+            }
+        }
+
+        return pairs;
+    }
+
+    /**
+     * Checks if technician has ANY of the specified expertise pairs.
+     * OR logic - returns true if any pair matches exactly.
+     *
+     * @param technician The technician to check
+     * @param expertisePairs List of category-level pairs to match
+     * @return true if technician has at least one matching expertise, false otherwise
+     */
+    private boolean matchesExpertiseFilter(Technician technician,
+                                           List<ExpertisePair> expertisePairs) {
+        if (expertisePairs == null || expertisePairs.isEmpty()) {
+            return true; // No filter applied
+        }
+
+        if (technician.getExpertise() == null || technician.getExpertise().isEmpty()) {
+            return false; // No expertise, cannot match
+        }
+
+        return expertisePairs.stream().anyMatch(pair ->
+            technician.getExpertise().stream()
+                .filter(Objects::nonNull)
+                .anyMatch(exp ->
+                    exp.getExpertiseCategory() == pair.category() &&
+                    exp.getExpertiseLevel() == pair.level()
+                )
+        );
     }
 
     private Comparator<Technician> getTechnicianComparator(String sortBy, Sort.Direction direction) {

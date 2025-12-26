@@ -15,6 +15,7 @@ public class TechnicianMapper {
     private final GarageMapper garageMapper;
     private final AuthClient authClient;
     private final AvailableServiceMapper availableServiceMapper;
+    private final TechnicianExpertiseMapper technicianExpertiseMapper;
 
     public TechnicianResponse entityToResponse(Technician technician) {
         TechnicianResponse technicianResponse = new TechnicianResponse ( );
@@ -44,6 +45,16 @@ public class TechnicianMapper {
         technicianResponse.setYearOfExperience ( technician.getYearOfExperience ( ) );
         technicianResponse.setCity ( technician.getCity ( ) );
         technicianResponse.setIsAvailableForService ( technician.getIsAvailableForService ( ) );
+
+        // Map expertise
+        technicianResponse.setExpertise(
+            technician.getExpertise() != null
+                ? technician.getExpertise().stream()
+                    .map(technicianExpertiseMapper::toResponse)
+                    .toList()
+                : Collections.emptyList()
+        );
+
         technicianResponse.setAutoAddaUser ( authClient.getUser ( technician.getAutoAddaId ( ) ) );
         return technicianResponse;
     }
