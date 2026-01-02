@@ -86,7 +86,7 @@ public class NotificationDispatchService {
         } catch (Exception e) {
             log.error("Failed to send notification to customer {}: {}",
                       customerId, e.getMessage(), e);
-            return handleNotificationFailure(customerId, notificationType, content, isCritical, targetRole, e);
+            return handleNotificationFailure(customerId, content, isCritical, targetRole, e);
         }
     }
 
@@ -185,54 +185,60 @@ public class NotificationDispatchService {
         Set<Channel> enabledChannels = new HashSet<>();
 
         switch (type) {
-            case SERVICE_UPDATES:
-                if (Boolean.TRUE.equals(prefs.getSmsOnServiceUpdates()))
-                    enabledChannels.add(Channel.SMS);
-                if (Boolean.TRUE.equals(prefs.getEmailOnServiceUpdates()))
-                    enabledChannels.add(Channel.EMAIL);
-                if (Boolean.TRUE.equals(prefs.getWebpushOnServiceUpdates()))
-                    enabledChannels.add(Channel.WEBPUSH);
+            case SERVICE_UPDATES, COLLABORATION_REQUESTS:
+                // COLLABORATION_REQUESTS uses SERVICE_UPDATES preferences
+                addChannelsIfEnabled(enabledChannels,
+                        prefs.getSmsOnServiceUpdates(),
+                        prefs.getEmailOnServiceUpdates(),
+                        prefs.getWebpushOnServiceUpdates());
                 break;
 
             case APPOINTMENTS:
-                if (Boolean.TRUE.equals(prefs.getSmsOnAppointments()))
-                    enabledChannels.add(Channel.SMS);
-                if (Boolean.TRUE.equals(prefs.getEmailOnAppointments()))
-                    enabledChannels.add(Channel.EMAIL);
-                if (Boolean.TRUE.equals(prefs.getWebpushOnAppointments()))
-                    enabledChannels.add(Channel.WEBPUSH);
+                addChannelsIfEnabled(enabledChannels,
+                        prefs.getSmsOnAppointments(),
+                        prefs.getEmailOnAppointments(),
+                        prefs.getWebpushOnAppointments());
                 break;
 
             case REMINDERS:
-                if (Boolean.TRUE.equals(prefs.getSmsOnReminders()))
-                    enabledChannels.add(Channel.SMS);
-                if (Boolean.TRUE.equals(prefs.getEmailOnReminders()))
-                    enabledChannels.add(Channel.EMAIL);
-                if (Boolean.TRUE.equals(prefs.getWebpushOnReminders()))
-                    enabledChannels.add(Channel.WEBPUSH);
+                addChannelsIfEnabled(enabledChannels,
+                        prefs.getSmsOnReminders(),
+                        prefs.getEmailOnReminders(),
+                        prefs.getWebpushOnReminders());
                 break;
 
             case OFFERS:
-                if (Boolean.TRUE.equals(prefs.getSmsOnOffers()))
-                    enabledChannels.add(Channel.SMS);
-                if (Boolean.TRUE.equals(prefs.getEmailOnOffers()))
-                    enabledChannels.add(Channel.EMAIL);
-                if (Boolean.TRUE.equals(prefs.getWebpushOnOffers()))
-                    enabledChannels.add(Channel.WEBPUSH);
+                addChannelsIfEnabled(enabledChannels,
+                        prefs.getSmsOnOffers(),
+                        prefs.getEmailOnOffers(),
+                        prefs.getWebpushOnOffers());
                 break;
 
             case QUOTATION_REQUESTS:
-                if (Boolean.TRUE.equals(prefs.getSmsOnQuotationRequests()))
-                    enabledChannels.add(Channel.SMS);
-                if (Boolean.TRUE.equals(prefs.getEmailOnQuotationRequests()))
-                    enabledChannels.add(Channel.EMAIL);
-                if (Boolean.TRUE.equals(prefs.getWebpushOnQuotationRequests()))
-                    enabledChannels.add(Channel.WEBPUSH);
+                addChannelsIfEnabled(enabledChannels,
+                        prefs.getSmsOnQuotationRequests(),
+                        prefs.getEmailOnQuotationRequests(),
+                        prefs.getWebpushOnQuotationRequests());
                 break;
         }
 
         log.debug("Enabled channels for {}: {}", type, enabledChannels);
         return enabledChannels;
+    }
+
+    /**
+     * Helper method to add channels to the set if their preferences are enabled
+     */
+    private void addChannelsIfEnabled(Set<Channel> channels, Boolean smsEnabled, Boolean emailEnabled, Boolean webpushEnabled) {
+        if (Boolean.TRUE.equals(smsEnabled)) {
+            channels.add(Channel.SMS);
+        }
+        if (Boolean.TRUE.equals(emailEnabled)) {
+            channels.add(Channel.EMAIL);
+        }
+        if (Boolean.TRUE.equals(webpushEnabled)) {
+            channels.add(Channel.WEBPUSH);
+        }
     }
 
     /**
@@ -286,85 +292,98 @@ public class NotificationDispatchService {
         NotificationResult result = new NotificationResult();
 
         for (Channel channel : channels) {
-            try {
-                switch (channel) {
-                    case SMS:
-                        if (contactInfo.getPhoneNumber() == null ||
-                            contactInfo.getPhoneNumber().isBlank()) {
-                            log.warn("Skipping SMS channel: no phone number for customer {}",
-                                     contactInfo.getUserId());
-                            result.addResult(channel,
-                                new ChannelResult(false, "NO_PHONE_NUMBER"));
-                            continue;
-                        }
-
-                        GenericResponse smsResult = authClient.sendSms(
-                                new SmsRequest(contactInfo.getPhoneNumber(), content.getSmsMessage())
-                        );
-                        result.addResult(channel,
-                                new ChannelResult("SUCCESS".equalsIgnoreCase(smsResult.getStatus()),
-                                        smsResult.getMessage()));
-                        break;
-
-                    case EMAIL:
-                        if (contactInfo.getEmail() == null || contactInfo.getEmail().isBlank()) {
-                            log.warn("Skipping EMAIL channel: no email address for customer {}",
-                                     contactInfo.getUserId());
-                            result.addResult(channel,
-                                    new ChannelResult(false, "NO_EMAIL_ADDRESS"));
-                            continue;
-                        }
-
-                        GenericResponse emailResult = authClient.sendEmail(
-                                contactInfo.getUserId(),
-                                new EmailRequest(
-                                        contactInfo.getEmail(),
-                                        content.getEmailSubject(),
-                                        content.getEmailBody()
-                                )
-                        );
-                        result.addResult(channel,
-                                new ChannelResult("SUCCESS".equalsIgnoreCase(emailResult.getStatus()),
-                                        emailResult.getMessage()));
-                        break;
-
-                    case WEBPUSH:
-                        // Only send WebPush if targetRole is specified
-                        if (targetRole == null || targetRole.isEmpty()) {
-                            log.warn("Skipping WebPush for customer {}: No target role specified",
-                                     contactInfo.getUserId());
-                            result.addResult(channel,
-                                    new ChannelResult(false, "NO_TARGET_ROLE_SPECIFIED"));
-                            continue;
-                        }
-
-                        ResponseEntity<Map<String, Object>> pushResult =
-                                authClient.sendNotification(
-                                        new SendNotificationRequest(
-                                                contactInfo.getUserId().toString(),
-                                                targetRole,  // Pass the target role
-                                                content.getWebpushTitle(),
-                                                content.getWebpushBody(),
-                                                content.getWebpushUrl()
-                                        )
-                                );
-
-                        // Log role-based send
-                        log.info("Sent WebPush to user {} with role {}",
-                                 contactInfo.getUserId(), targetRole);
-
-                        result.addResult(channel,
-                                new ChannelResult(pushResult.getStatusCode().is2xxSuccessful(),
-                                        pushResult.getStatusCode().toString()));
-                        break;
-                }
-            } catch (Exception e) {
-                log.error("Failed to send {} notification: {}", channel, e.getMessage());
-                result.addResult(channel, new ChannelResult(false, e.getMessage()));
-            }
+            ChannelResult channelResult = sendToChannel(channel, content, contactInfo, targetRole);
+            result.addResult(channel, channelResult);
         }
 
         return result;
+    }
+
+    /**
+     * Send notification to a specific channel
+     */
+    private ChannelResult sendToChannel(Channel channel, NotificationContent content,
+                                       CustomerContactInfo contactInfo, String targetRole) {
+        try {
+            switch (channel) {
+                case SMS:
+                    return sendSms(content, contactInfo);
+                case EMAIL:
+                    return sendEmail(content, contactInfo);
+                case WEBPUSH:
+                    return sendWebPush(content, contactInfo, targetRole);
+                default:
+                    return new ChannelResult(false, "Unknown channel type");
+            }
+        } catch (Exception e) {
+            log.error("Failed to send {} notification: {}", channel, e.getMessage());
+            return new ChannelResult(false, e.getMessage());
+        }
+    }
+
+    /**
+     * Send SMS notification
+     */
+    private ChannelResult sendSms(NotificationContent content, CustomerContactInfo contactInfo) {
+        if (contactInfo.getPhoneNumber() == null || contactInfo.getPhoneNumber().isBlank()) {
+            log.warn("Skipping SMS channel: no phone number for customer {}", contactInfo.getUserId());
+            return new ChannelResult(false, "NO_PHONE_NUMBER");
+        }
+
+        GenericResponse smsResult = authClient.sendSms(
+                new SmsRequest(contactInfo.getPhoneNumber(), content.getSmsMessage())
+        );
+        return new ChannelResult("SUCCESS".equalsIgnoreCase(smsResult.getStatus()),
+                smsResult.getMessage());
+    }
+
+    /**
+     * Send Email notification
+     */
+    private ChannelResult sendEmail(NotificationContent content, CustomerContactInfo contactInfo) {
+        if (contactInfo.getEmail() == null || contactInfo.getEmail().isBlank()) {
+            log.warn("Skipping EMAIL channel: no email address for customer {}", contactInfo.getUserId());
+            return new ChannelResult(false, "NO_EMAIL_ADDRESS");
+        }
+
+        GenericResponse emailResult = authClient.sendEmail(
+                contactInfo.getUserId(),
+                new EmailRequest(
+                        contactInfo.getEmail(),
+                        content.getEmailSubject(),
+                        content.getEmailBody()
+                )
+        );
+        return new ChannelResult("SUCCESS".equalsIgnoreCase(emailResult.getStatus()),
+                emailResult.getMessage());
+    }
+
+    /**
+     * Send WebPush notification
+     */
+    private ChannelResult sendWebPush(NotificationContent content, CustomerContactInfo contactInfo,
+                                     String targetRole) {
+        if (targetRole == null || targetRole.isEmpty()) {
+            log.warn("Skipping WebPush for customer {}: No target role specified",
+                    contactInfo.getUserId());
+            return new ChannelResult(false, "NO_TARGET_ROLE_SPECIFIED");
+        }
+
+        ResponseEntity<Map<String, Object>> pushResult =
+                authClient.sendNotification(
+                        new SendNotificationRequest(
+                                contactInfo.getUserId().toString(),
+                                targetRole,
+                                content.getWebpushTitle(),
+                                content.getWebpushBody(),
+                                content.getWebpushUrl()
+                        )
+                );
+
+        log.info("Sent WebPush to user {} with role {}", contactInfo.getUserId(), targetRole);
+
+        return new ChannelResult(pushResult.getStatusCode().is2xxSuccessful(),
+                pushResult.getStatusCode().toString());
     }
 
     /**
@@ -372,7 +391,6 @@ public class NotificationDispatchService {
      */
     private NotificationResult handleNotificationFailure(
             Integer customerId,
-            NotificationType type,
             NotificationContent content,
             boolean isCritical,
             String targetRole,

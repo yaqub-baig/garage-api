@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.GarageRequest;
+import com.autoadda.apis.garage.request.GarageSearchCriteria;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.response.PagedResponse;
 import com.autoadda.apis.garage.response.UserResponse;
@@ -138,9 +139,18 @@ public class GarageController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
 
+        GarageSearchCriteria criteria = GarageSearchCriteria.builder()
+                .query(query)
+                .brand(brand)
+                .city(city)
+                .zip(zip)
+                .garageName(garageName)
+                .availableServiceIds(availableServiceIds)
+                .model(model)
+                .build();
+
         PagedResponse<GarageResponse> response = garageService.searchGaragesPaginated(
-                query, brand, city, zip, garageName, availableServiceIds, model,
-                page, size, sortBy, sortDirection);
+                criteria, page, size, sortBy, sortDirection);
 
         return ResponseEntity.ok(response);
     }

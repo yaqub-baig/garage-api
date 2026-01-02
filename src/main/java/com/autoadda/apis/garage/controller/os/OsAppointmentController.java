@@ -71,7 +71,6 @@ public class OsAppointmentController {
         return ResponseEntity.ok(OsGenericResponse.makeSuccessResponse(response));
     }
 
-    //TODO:33
     @GetMapping("/{otherServiceId}/available-slots")
     public ResponseEntity<Map<String, Object>> getAvailableSlots(@PathVariable Integer otherServiceId,
                                                                  @RequestParam @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate date) {

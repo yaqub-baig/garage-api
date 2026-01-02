@@ -42,82 +42,135 @@ public class GarageInventoryService {
     public GarageInventoryItemResponse addInventoryItem(AddInventoryItemRequest request) {
         log.info("Adding inventory item for garage: {}", request.getGarageId());
 
+        // 1. Find garage
         Garage garage = garageRepo.findById(request.getGarageId())
-                .orElseThrow(() -> new ResourceNotFoundException("Garage not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Garage not found with ID: " + request.getGarageId()));
 
-        // Declare partImage variable at method scope for later use in builder
-        MediaFile partImage = null;
+        // 2. Enrich with Part API data and fetch image
+        MediaFile partImage = enrichFromPartApi(request);
 
-        // NEW: If partNumber is provided, fetch from Part API
-        if (request.getPartNumber() != null && !request.getPartNumber().trim().isEmpty()) {
-            try {
-                ProductResponse productResponse = partClient.getProductByPartNumber(request.getPartNumber());
+        // 3. Validate request
+        validateInventoryItemRequest(request, request.getGarageId());
 
-                if (productResponse != null && "success".equals(productResponse.getStatus())
-                        && productResponse.getBody() != null) {
+        // 4. Create and save entity
+        GarageInventoryItem item = createInventoryItemEntity(garage, request, partImage);
+        item = inventoryItemRepo.save(item);
 
-                    ProductDetailResponse product = productResponse.getBody();
+        log.info("Inventory item created with ID: {}", item.getId());
+        return mapper.entityToResponse(item);
+    }
 
-                    // Auto-populate fields from Part API
-                    request.setInventoryPartId(product.getId());
-                    request.setPartName(product.getName());
-
-                    request.setDescription(product.getDescription());
-                    request.setCategory(product.getCategoryName());
-                    request.setManufacturer(product.getManufacturer());
-
-                    // Use Part API price if not provided by user
-                    if (request.getUnitPrice() == null) {
-                        request.setUnitPrice(product.getUnitPrice());
-                    }
-
-                    // Process first/primary image from Part API response
-                    if (product.getImages() != null && !product.getImages().isEmpty()) {
-                        try {
-                            ProductDetailResponse.ProductImageResponse firstImage = product.getImages().get(0);
-                            partImage = createMediaFileFromApiImage(firstImage);
-                            log.info("Created MediaFile reference for part image: {}",
-                                    firstImage.getFileName());
-                        } catch (Exception e) {
-                            log.warn("Failed to create MediaFile for part image. Continuing without image. Error: {}",
-                                    e.getMessage());
-                        }
-                    }
-
-                    log.info("Successfully fetched part details from Part API for part number: {}",
-                            request.getPartNumber());
-                } else {
-                    log.warn("Part API returned unsuccessful response for part number: {}",
-                            request.getPartNumber());
-                }
-            } catch (Exception e) {
-                log.error("Failed to fetch part from Part API for part number: {}. Error: {}",
-                        request.getPartNumber(), e.getMessage());
-                // Continue with manual entry - optional validation
-            }
+    /**
+     * Attempts to create a MediaFile from the first image in the product's image list.
+     * Returns null if images are not available or creation fails.
+     *
+     * @param product The product with potential images
+     * @return MediaFile for the first image, or null
+     */
+    private MediaFile tryFetchPartImageFromApi(ProductDetailResponse product) {
+        if (product == null || product.getImages() == null || product.getImages().isEmpty()) {
+            return null;
         }
 
-        // Validate required fields (after API fetch or manual entry)
+        try {
+            ProductDetailResponse.ProductImageResponse firstImage = product.getImages().get(0);
+            MediaFile partImage = createMediaFileFromApiImage(firstImage);
+            log.info("Created MediaFile reference for part image: {}",
+                    partImage.getFilePath().substring(0, Math.min(50, partImage.getFilePath().length())));
+            return partImage;
+        } catch (Exception e) {
+            log.warn("Failed to create MediaFile for part image. Error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Enriches the inventory request with data from the Part API.
+     * Returns the part image MediaFile if available.
+     *
+     * @param request The inventory item request to enrich
+     * @return MediaFile for part image, or null
+     */
+    private MediaFile enrichFromPartApi(AddInventoryItemRequest request) {
+        if (request.getPartNumber() == null || request.getPartNumber().trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            ProductResponse productResponse = partClient.getProductByPartNumber(request.getPartNumber());
+
+            if (productResponse == null || productResponse.getBody() == null) {
+                log.info("No product found in Part API for part number: {}", request.getPartNumber());
+                return null;
+            }
+
+            ProductDetailResponse product = productResponse.getBody();
+
+            // Enrich request with product details
+            request.setInventoryPartId(product.getId());
+            request.setPartName(product.getName());
+            request.setDescription(product.getDescription());
+            request.setCategory(product.getCategoryName());
+            request.setManufacturer(product.getManufacturer());
+
+            // Set unit price only if not already provided
+            if (request.getUnitPrice() == null) {
+                request.setUnitPrice(product.getUnitPrice());
+            }
+
+            // Fetch part image
+            return tryFetchPartImageFromApi(product);
+
+        } catch (Exception e) {
+            log.error("Failed to fetch part from Part API for part number: {}. Error: {}",
+                    request.getPartNumber(), e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Validates the inventory item request for business rules.
+     *
+     * @param request The request to validate
+     * @param garageId The garage ID
+     * @throws IllegalArgumentException if validation fails
+     */
+    private void validateInventoryItemRequest(AddInventoryItemRequest request, Integer garageId) {
+        // Part name is required
         if (request.getPartName() == null || request.getPartName().trim().isEmpty()) {
             throw new IllegalArgumentException("Part name is required");
         }
 
-        // Check for duplicates
+        // Check for duplicate inventory item
         if (request.getInventoryPartId() != null) {
-            inventoryItemRepo.findByGarageIdAndInventoryPartId(
-                            request.getGarageId(), request.getInventoryPartId())
-                    .ifPresent(item -> {
-                        throw new IllegalStateException("Inventory item already exists for this part");
+            inventoryItemRepo.findByGarageIdAndInventoryPartId(garageId, request.getInventoryPartId())
+                    .ifPresent(existingItem -> {
+                        throw new IllegalStateException(
+                                "Inventory item already exists for this part in the garage");
                     });
         }
 
-        // Validate threshold levels
-        if (request.getMinimumStockLevel() != null && request.getMaximumStockLevel() != null && request.getMinimumStockLevel() >= request.getMaximumStockLevel()) {
-            throw new IllegalArgumentException("Minimum stock level must be less than maximum stock level");
+        // Validate stock level thresholds
+        if (request.getMinimumStockLevel() != null &&
+            request.getMaximumStockLevel() != null &&
+            request.getMinimumStockLevel() >= request.getMaximumStockLevel()) {
+            throw new IllegalArgumentException(
+                    "Minimum stock level must be less than maximum stock level");
         }
+    }
 
-
-        GarageInventoryItem item = GarageInventoryItem.builder()
+    /**
+     * Creates a GarageInventoryItem entity from the request.
+     *
+     * @param garage The garage
+     * @param request The inventory item request
+     * @param partImage The part image (may be null)
+     * @return The created entity
+     */
+    private GarageInventoryItem createInventoryItemEntity(Garage garage,
+                                                         AddInventoryItemRequest request,
+                                                         MediaFile partImage) {
+        return GarageInventoryItem.builder()
                 .garage(garage)
                 .inventoryPartId(request.getInventoryPartId())
                 .partName(request.getPartName())
@@ -125,7 +178,7 @@ public class GarageInventoryService {
                 .sku(request.getSku())
                 .unitPrice(request.getUnitPrice())
                 .productCondition(request.getProductCondition())
-                .quantityInStock(request.getQuantityInStock()!=null?request.getQuantityInStock():0)
+                .quantityInStock(request.getQuantityInStock() != null ? request.getQuantityInStock() : 0)
                 .minimumStockLevel(request.getMinimumStockLevel())
                 .maximumStockLevel(request.getMaximumStockLevel())
                 .reorderQuantity(request.getReorderQuantity())
@@ -134,11 +187,6 @@ public class GarageInventoryService {
                 .notes(request.getNotes())
                 .partImage(partImage)
                 .build();
-
-        item = inventoryItemRepo.save(item);
-        log.info("Inventory item created with ID: {}", item.getId());
-
-        return mapper.entityToResponse(item);
     }
 
     /**

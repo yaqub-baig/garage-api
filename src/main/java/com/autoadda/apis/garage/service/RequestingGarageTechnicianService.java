@@ -39,6 +39,10 @@ public class RequestingGarageTechnicianService {
     private static final String DUPLICATE_REQUEST = "A pending request already exists between this garage and technician";
     private static final String INVALID_STATUS = "Request is not in HOLD status and cannot be processed";
     private static final String UNAUTHORIZED_ACTION = "You are not authorized to approve/reject this request";
+    public static final String GARAGE = "Garage";
+    public static final String GARAGE_OWNER = "GARAGE_OWNER";
+    public static final String TECHNICIAN = "Technician";
+    public static final String GARAGE_TECH = "GARAGE_TECH";
 
     private final RequestingGarageTechnicianRepository requestRepository;
     private final GarageRepository garageRepository;
@@ -197,7 +201,7 @@ public class RequestingGarageTechnicianService {
         return requestRepository.findPendingRequestsForGarage(garageId)
                 .stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -214,7 +218,7 @@ public class RequestingGarageTechnicianService {
         return requestRepository.findPendingRequestsForTechnician(technicianId)
                 .stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -231,7 +235,7 @@ public class RequestingGarageTechnicianService {
         return requestRepository.findAllRequestsByGarage(garageId)
                 .stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -248,7 +252,7 @@ public class RequestingGarageTechnicianService {
         return requestRepository.findAllRequestsByTechnician(technicianId)
                 .stream()
                 .map(mapper::entityToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -265,15 +269,15 @@ public class RequestingGarageTechnicianService {
             if (sendBy == SendBy.GARAGE) {
                 // Garage sent request → notify Technician
                 recipientUserId = technician.getAutoAddaId();
-                recipientRole = "GARAGE_TECH";
+                recipientRole = GARAGE_TECH;
                 senderName = garage.getName();
-                senderType = "Garage";
+                senderType = GARAGE;
             } else {
                 // Technician sent request → notify Garage Owner
                 recipientUserId = garage.getGarageOwner();
-                recipientRole = "GARAGE_OWNER";
+                recipientRole = GARAGE_OWNER;
                 senderName = technician.getFirstName();
-                senderType = "Technician";
+                senderType = TECHNICIAN;
             }
 
             // Build notification content
@@ -311,15 +315,15 @@ public class RequestingGarageTechnicianService {
             if (request.getSendBy() == SendBy.GARAGE) {
                 // Garage sent, Technician approved → notify Garage Owner
                 senderUserId = request.getGarage().getGarageOwner();
-                senderRole = "GARAGE_OWNER";
+                senderRole = GARAGE_OWNER;
                 approverName = request.getTechnician().getFirstName();
-                approverType = "Technician";
+                approverType = TECHNICIAN;
             } else {
                 // Technician sent, Garage approved → notify Technician
                 senderUserId = request.getTechnician().getAutoAddaId();
-                senderRole = "GARAGE_TECH";
+                senderRole = GARAGE_TECH;
                 approverName = request.getGarage().getName();
-                approverType = "Garage";
+                approverType = GARAGE;
             }
 
             // Build notification content
@@ -356,15 +360,15 @@ public class RequestingGarageTechnicianService {
             if (request.getSendBy() == SendBy.GARAGE) {
                 // Garage sent, Technician rejected → notify Garage Owner
                 senderUserId = request.getGarage().getGarageOwner();
-                senderRole = "GARAGE_OWNER";
+                senderRole = GARAGE_OWNER;
                 rejecterName = request.getTechnician().getFirstName();
-                rejecterType = "Technician";
+                rejecterType = TECHNICIAN;
             } else {
                 // Technician sent, Garage rejected → notify Technician
                 senderUserId = request.getTechnician().getAutoAddaId();
-                senderRole = "GARAGE_TECH";
+                senderRole = GARAGE_TECH;
                 rejecterName = request.getGarage().getName();
-                rejecterType = "Garage";
+                rejecterType = GARAGE;
             }
 
             // Build notification content

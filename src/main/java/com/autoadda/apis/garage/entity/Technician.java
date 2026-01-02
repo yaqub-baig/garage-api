@@ -49,7 +49,7 @@ public class Technician {
 
     @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<TechnicianExpertise> expertise = new ArrayList<>();
+    private Set<TechnicianExpertise> expertise = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private Status status;

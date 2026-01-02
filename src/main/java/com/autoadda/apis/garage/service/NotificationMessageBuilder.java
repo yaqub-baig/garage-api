@@ -6,6 +6,7 @@ import com.autoadda.apis.garage.entity.PartRequestItem;
 import com.autoadda.apis.garage.response.VehicleDetailResponse;
 import com.autoadda.apis.garage.request.NotificationContent;
 import com.autoadda.apis.garage.util.CustomerChoice;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -16,11 +17,13 @@ import java.util.List;
  * Builder service for creating multi-channel notification content.
  * Creates SMS, Email, and WebPush content for different notification scenarios.
  */
+@Slf4j
 @Component
 public class NotificationMessageBuilder {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mm a");
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+    public static final String COLLABORATION_REQUESTS = "/collaboration-requests";
 
     /**
      * Build notification content for job card started
@@ -216,7 +219,6 @@ public class NotificationMessageBuilder {
 
         String serviceName = partRequest.getJobCard().getService().getService()
                 .getAvailableService().getName();
-
         StringBuilder message = new StringBuilder();
         message.append("🔧 PARTS REQUIRED - AutoAdda\n\n");
         message.append("Service: ").append(serviceName).append("\n");
@@ -254,6 +256,8 @@ public class NotificationMessageBuilder {
         message.append("✅ RESPONSE CONFIRMED - AutoAdda\n\n");
         message.append("Service: ").append(serviceName).append("\n");
         message.append("Your choice: ");
+        message.append("Reg No: ").append(vehicle.getNumber()).append("\n\n");
+
 
         if (choice == CustomerChoice.SELF_PROVIDE) {
             message.append("You will provide the parts\n\n");
@@ -705,7 +709,7 @@ public class NotificationMessageBuilder {
                 .emailIsHtml(true)
                 .webpushTitle("New Collaboration Request")
                 .webpushBody(String.format("%s wants to collaborate", senderName))
-                .webpushUrl("/collaboration-requests")
+                .webpushUrl(COLLABORATION_REQUESTS)
                 .build();
     }
 
@@ -775,7 +779,7 @@ public class NotificationMessageBuilder {
                 .emailIsHtml(true)
                 .webpushTitle("Request Approved")
                 .webpushBody(String.format("%s accepted your request", approverName))
-                .webpushUrl("/collaboration-requests")
+                .webpushUrl(COLLABORATION_REQUESTS)
                 .build();
     }
 
@@ -835,7 +839,7 @@ public class NotificationMessageBuilder {
                 .emailIsHtml(true)
                 .webpushTitle("Request Declined")
                 .webpushBody(String.format("%s declined your request", rejecterName))
-                .webpushUrl("/collaboration-requests")
+                .webpushUrl(COLLABORATION_REQUESTS)
                 .build();
     }
 

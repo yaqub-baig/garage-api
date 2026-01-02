@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.TechnicianRequest;
+import com.autoadda.apis.garage.request.TechnicianSearchCriteria;
 import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.service.TechnicianService;
 import lombok.RequiredArgsConstructor;
@@ -137,9 +138,19 @@ public class TechnicianController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
 
+        TechnicianSearchCriteria criteria = TechnicianSearchCriteria.builder()
+                .query(query)
+                .name(name)
+                .skillIds(skillIds)
+                .expertiseCategories(expertiseCategories)
+                .expertiseLevels(expertiseLevels)
+                .city(city)
+                .brand(brand)
+                .model(model)
+                .build();
+
         PagedResponse<TechnicianResponse> response = technicianService.searchTechniciansPaginated(
-                query, name, skillIds, expertiseCategories, expertiseLevels,
-                city, brand, model, page, size, sortBy, sortDirection);
+                criteria, page, size, sortBy, sortDirection);
 
         return ResponseEntity.ok(response);
     }

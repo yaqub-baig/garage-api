@@ -38,7 +38,7 @@ import com.autoadda.apis.garage.request.VehicleReceivedRequest;
 import com.autoadda.apis.garage.response.VehicleRecievedResponse;
 
 @ExtendWith(MockitoExtension.class)
-public class VehicleReceivedServiceTest {
+class VehicleReceivedServiceTest {
 
 	@InjectMocks
 	private VehicleReceivedService vehicleReceivedService;

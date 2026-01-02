@@ -8,6 +8,7 @@ import com.autoadda.apis.garage.exception.UnauthorizedAccessException;
 import com.autoadda.apis.garage.mapper.GarageMapper;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.GarageRequest;
+import com.autoadda.apis.garage.request.GarageSearchCriteria;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
@@ -168,7 +169,8 @@ public class GarageManagementService {
         workingHoursRepository.flush();
         garageBreakTimeRepository.flush();
         slotGenerationService.generateSlotsForDays(saved, 60);
-        onboardTechnician(saved.getId(), new Technician(), saved.getGarageOwner());
+        Technician technician = onboardTechnician(saved.getId(), new Technician(), saved.getGarageOwner());
+        log.info("owner is added as a technician here "+technician.getFirstName());
         return garageMapper.entityToResponse(saved);
     }
 
@@ -560,7 +562,7 @@ public class GarageManagementService {
         return garageRepository.findByIdAndAccountStatusAndGarageBrandName(id, status, legalName);
     }
 
-    @Transactional
+
     public Technician onboardTechnician(Integer garageId, Technician technician, Integer ownerId) {
         Garage garage = garageRepository.findById(garageId)
                 .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND));
@@ -617,9 +619,17 @@ public class GarageManagementService {
      */
     @Transactional(readOnly = true)
     public PagedResponse<GarageResponse> searchGaragesPaginated(
-            String query, String brand, String city, String zip, String garageName,
-            List<Integer> availableServiceIds, String model,
+            GarageSearchCriteria criteria,
             int page, int size, String sortBy, String sortDirection) {
+
+        // Extract search parameters from criteria object
+        String query = criteria.getQuery();
+        String brand = criteria.getBrand();
+        String city = criteria.getCity();
+        String zip = criteria.getZip();
+        String garageName = criteria.getGarageName();
+        List<Integer> availableServiceIds = criteria.getAvailableServiceIds();
+        String model = criteria.getModel();
 
         log.info("Paginated search - query: '{}', page: {}, size: {}, sortBy: {}, sortDir: {}",
                 query, page, size, sortBy, sortDirection);

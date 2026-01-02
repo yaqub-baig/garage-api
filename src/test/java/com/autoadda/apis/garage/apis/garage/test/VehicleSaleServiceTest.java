@@ -35,7 +35,7 @@ import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-public class VehicleSaleServiceTest {
+class VehicleSaleServiceTest {
 
 	@InjectMocks
 	private VehicleSaleService vehicleSaleService;
@@ -111,11 +111,12 @@ public class VehicleSaleServiceTest {
 		VehicleListing listing = new VehicleListing();
 		listing.setId(listingId);
 		listing.setStatus(Status.SOLD);
+		Customer buyer = new Customer();
 
 		when(vehicleListingRepo.findById(listingId)).thenReturn(Optional.of(listing));
 
 		assertThrows(IllegalStateException.class,
-				() -> vehicleSaleService.purchaseVehicle(listingId, new Customer(), 10000, "CASH"));
+				() -> vehicleSaleService.purchaseVehicle(listingId, buyer, 10000, "CASH"));
 	}
 
 	@Test

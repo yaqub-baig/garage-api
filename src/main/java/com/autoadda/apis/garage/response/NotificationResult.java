@@ -4,8 +4,9 @@ import com.autoadda.apis.garage.util.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
  * Represents the aggregated result of sending a notification across multiple channels.
  */
 @Data
+@Slf4j
 @AllArgsConstructor
 public class NotificationResult {
     /**
@@ -26,7 +28,7 @@ public class NotificationResult {
      */
 
     public NotificationResult() {
-        this.results = new HashMap<>();
+        this.results = new EnumMap<>(Channel.class);
     }
 
     /**
@@ -81,7 +83,8 @@ public class NotificationResult {
      */
     public static NotificationResult failed(String errorMessage) {
         NotificationResult result = new NotificationResult();
-        result.setResults(new HashMap<>());
+        result.setResults(new EnumMap<>(Channel.class));
+        log.info(errorMessage);
         return result;
     }
 

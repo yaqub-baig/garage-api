@@ -24,6 +24,8 @@ import com.autoadda.apis.garage.util.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,10 @@ public class JobCardService {
     private final PartRequestService partRequestService;
     private final NotificationDispatchService notificationDispatchService;
     private final NotificationMessageBuilder notificationMessageBuilder;
+
+    @Lazy
+    @Autowired
+    private JobCardService self;
 
 
     @Transactional
@@ -323,7 +329,7 @@ public class JobCardService {
             }
 
             // Update the job card status first
-            JobCardResponse jobCardResponse = updateJobCardStatus(request.getJobcardId(), request.getStatus());
+            JobCardResponse jobCardResponse = self.updateJobCardStatus(request.getJobcardId(), request.getStatus());
 
             // Create or update part request
             CreatePartRequestRequest partRequest = CreatePartRequestRequest.builder()
@@ -343,7 +349,7 @@ public class JobCardService {
                 throw new IllegalArgumentException("Status must be provided");
             }
             // For other statuses, use the existing method
-            return updateJobCardStatus(request.getJobcardId(), request.getStatus());
+            return self.updateJobCardStatus(request.getJobcardId(), request.getStatus());
         }
     }
 
@@ -409,136 +415,6 @@ public class JobCardService {
         JobCard jobCard = jobCardRepo.findById ( jobCardId )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "JobCard not found with ID: " + jobCardId ) );
         return jobCardMapper.entityToResponse ( jobCard );
-    }
-
-    /**
-     * Retrieves job cards grouped by work order ID for a specific garage.
-     *
-     * @param garageId the ID of the garage
-     * @param status   the status of the job cards to filter by (optional)
-     * @return GroupedJobCardResponse with job cards organized by work order
-     */
-    @Transactional(readOnly = true)
-    public GroupedJobCardResponse getGroupedJobCardsByWorkOrder(Integer garageId, JobCardStatus status) {
-        List<JobCardResponse> jobCards = getGarageJobCards ( garageId, status );
-
-        Map<Integer, GroupedJobCardResponse.WorkOrderJobCardGroup> workOrderGroups = jobCards.stream ( )
-                .filter ( jobCard -> jobCard.getWorkOrderId ( ) != null )
-                .collect ( Collectors.groupingBy (
-                        JobCardResponse::getWorkOrderId,
-                        Collectors.collectingAndThen (
-                                Collectors.toList ( ),
-                                jobCardList -> {
-                                    Integer workOrderId = jobCardList.get ( 0 ).getWorkOrderId ( );
-                                    try {
-                                        WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
-                                                .orElse ( null );
-                                        return GroupedJobCardResponse.WorkOrderJobCardGroup.builder ( )
-                                                .workOrderId ( workOrderId )
-                                                .jobCards ( jobCardList )
-                                                .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus ( workOrder != null ? workOrder.getStatus ( ).toString ( ) : UNKNOWN)
-                                                .build ( );
-                                    }
-                                    catch ( Exception e ) {
-                                        log.warn ( "Failed to fetch work order details for ID: {}", workOrderId, e );
-                                        return GroupedJobCardResponse.WorkOrderJobCardGroup.builder ( )
-                                                .workOrderId ( workOrderId )
-                                                .jobCards ( jobCardList )
-                                                .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus (UNKNOWN)
-
-                                                .build ( );
-                                    }
-                                }
-                        )
-                ) );
-
-        // Handle job cards without work orders
-        List<JobCardResponse> orphanedJobCards = jobCards.stream ( )
-                .filter ( jobCard -> jobCard.getWorkOrderId ( ) == null )
-                .toList ( );
-
-        if ( ! orphanedJobCards.isEmpty ( ) ) {
-            workOrderGroups.put ( - 1, GroupedJobCardResponse.WorkOrderJobCardGroup.builder ( )
-                    .workOrderId ( - 1 )
-                    .jobCards ( orphanedJobCards )
-                    .jobCardCount ( orphanedJobCards.size ( ) )
-                    .workOrderStatus ( "NO_WORK_ORDER" )
-
-                    .build ( ) );
-        }
-
-        return GroupedJobCardResponse.builder ( )
-                .workOrderGroups ( workOrderGroups )
-                .totalJobCards ( jobCards.size ( ) )
-                .totalWorkOrders ( workOrderGroups.size ( ) )
-                .build ( );
-    }
-
-    /**
-     * Retrieves job cards grouped by work order ID for a specific technician.
-     *
-     * @param technicianId the ID of the technician
-     * @param status       the status of the job cards to filter by (optional)
-     * @return GroupedJobCardResponse with job cards organized by work order
-     */
-    @Transactional(readOnly = true)
-    public GroupedJobCardResponse getGroupedTechnicianJobCardsByWorkOrder(Integer technicianId, JobCardStatus status) throws MemberNotFoundException {
-        List<JobCardResponse> jobCards = getTechnicianJobCards ( technicianId, status );
-
-        Map<Integer, GroupedJobCardResponse.WorkOrderJobCardGroup> workOrderGroups = jobCards.stream ( )
-                .filter ( jobCard -> jobCard.getWorkOrderId ( ) != null )
-                .filter ( jobCard -> !Objects.equals ( jobCard.getStatus ( ), JobCardStatus.CREATED.name ( ) )  )
-                        .collect ( Collectors.groupingBy (
-                        JobCardResponse::getWorkOrderId,
-                        Collectors.collectingAndThen (
-                                Collectors.toList ( ),
-                                jobCardList -> {
-                                    Integer workOrderId = jobCardList.get ( 0 ).getWorkOrderId ( );
-                                    try {
-                                        WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
-                                                .orElse ( null );
-                                        return GroupedJobCardResponse.WorkOrderJobCardGroup.builder ( )
-                                                .workOrderId ( workOrderId )
-                                                .jobCards ( jobCardList )
-                                                .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus ( workOrder != null ? workOrder.getStatus ( ).toString ( ) : UNKNOWN)
-                                                .build ( );
-                                    }
-                                    catch ( Exception e ) {
-                                        log.warn ( "Failed to fetch work order details for ID: {}", workOrderId, e );
-                                        return GroupedJobCardResponse.WorkOrderJobCardGroup.builder ( )
-                                                .workOrderId ( workOrderId )
-                                                .jobCards ( jobCardList )
-                                                .jobCardCount ( jobCardList.size ( ) )
-                                                .workOrderStatus (UNKNOWN)
-
-                                                .build ( );
-                                    }
-                                }
-                        )
-                ) );
-
-        // Handle job cards without work orders
-        List<JobCardResponse> orphanedJobCards = jobCards.stream ( )
-                .filter ( jobCard -> jobCard.getWorkOrderId ( ) == null )
-                .toList ( );
-
-        if ( ! orphanedJobCards.isEmpty ( ) ) {
-            workOrderGroups.put ( - 1, GroupedJobCardResponse.WorkOrderJobCardGroup.builder ( )
-                    .workOrderId ( - 1 )
-                    .jobCards ( orphanedJobCards )
-                    .jobCardCount ( orphanedJobCards.size ( ) )
-                    .workOrderStatus ( "NO_WORK_ORDER" )
-                    .build ( ) );
-        }
-
-        return GroupedJobCardResponse.builder ( )
-                .workOrderGroups ( workOrderGroups )
-                .totalJobCards ( jobCards.size ( ) )
-                .totalWorkOrders ( workOrderGroups.size ( ) )
-                .build ( );
     }
 
 

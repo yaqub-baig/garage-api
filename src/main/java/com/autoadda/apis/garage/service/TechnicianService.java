@@ -13,8 +13,10 @@ import com.autoadda.apis.garage.mapper.TechnicianMapper;
 import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.JobCardRepository;
+import com.autoadda.apis.garage.repository.TechnicianExpertiseRepository;
 import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.request.TechnicianRequest;
+import com.autoadda.apis.garage.request.TechnicianSearchCriteria;
 import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
 import com.autoadda.apis.garage.util.ERole;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +53,7 @@ public class TechnicianService {
     private final JobCardRepository jobCardRepository;
     private final JobCardMapper jobCardMapper;
     private final com.autoadda.apis.garage.mapper.TechnicianExpertiseMapper technicianExpertiseMapper;
+    private final TechnicianExpertiseRepository technicianExpertiseRepository;
 
     /**
      * Retrieves a list of technicians associated with a specific garage.
@@ -106,10 +110,10 @@ public class TechnicianService {
 
         Technician garageTechnician = mapToEntity(technician);
         Optional<Technician> existingTechnician = technicianRepository.findByMobileNumber(technician.getMobileNumber());
-        if (existingTechnician.isPresent() && !existingTechnician.get().getIsDeleted()) {
+        if (existingTechnician.isPresent() && Boolean.FALSE.equals(existingTechnician.get().getIsDeleted())) {
             throw new AlreadyExistsException("Technician with this phone number already exists");
         }
-        if (existingTechnician.isPresent() && existingTechnician.get().getIsDeleted()) {
+        if (existingTechnician.isPresent() && Boolean.TRUE.equals(existingTechnician.get().getIsDeleted())) {
             existingTechnician.get().setIsDeleted(false);
             garageTechnician = existingTechnician.get();
         }
@@ -125,20 +129,23 @@ public class TechnicianService {
         garageTechnician.setDescription(technician.getDescription());
         garageTechnician.setYearOfExperience(technician.getYearOfExperience());
         garageTechnician.setCity(technician.getCity());
-        garageTechnician.setIsAvailableForService(
-                technician.getIsAvailableForService() != null
-                        ? technician.getIsAvailableForService()
-                        : true
-        );
+        if (technician.getIsAvailableForService() != null) {
+            garageTechnician.setIsAvailableForService(technician.getIsAvailableForService());
+        }else{
+            garageTechnician.setIsAvailableForService(false);
+        }
 
         // Handle expertise
         if (technician.getExpertise() != null && !technician.getExpertise().isEmpty()) {
             final Technician finalTechnician = garageTechnician;
-            List<TechnicianExpertise> expertiseList = technician.getExpertise().stream()
+            Set<TechnicianExpertise> expertiseSet = technician.getExpertise().stream()
                     .map(technicianExpertiseMapper::toEntity)
-                    .peek(expertise -> expertise.setTechnician(finalTechnician))
-                    .toList();
-            garageTechnician.setExpertise(expertiseList);
+                    .map(expertise -> {
+                        expertise.setTechnician(finalTechnician);
+                        return expertise;
+                    })
+                    .collect(Collectors.toSet());
+            garageTechnician.setExpertise(expertiseSet);
         }
 
         garageTechnician.setAutoAddaId(userDetails.getBody().getId());
@@ -246,21 +253,32 @@ public class TechnicianService {
             log.info("Updating 3 skill set for technician id {}: {}", id, garageTechnician.getSkillSet().stream().map(AvailableService::getId).toList());
         }
 
-        // Update expertise (replace all pattern like skillSet)
+        // Update expertise (replace all pattern)
         if (technicianRequest.getExpertise() != null) {
             log.info("Updating expertise for technician id {}", id);
+
+            // Delete old expertise records using explicit query to avoid 409 conflicts
+            // This ensures DELETE completes before INSERT within the transaction
+            technicianExpertiseRepository.deleteByTechnicianId(id);
+
+            // Clear the collection to remove references (already deleted in DB)
             garageTechnician.getExpertise().clear();
 
             if (!technicianRequest.getExpertise().isEmpty()) {
                 final Technician finalTechnician = garageTechnician;
-                List<TechnicianExpertise> expertiseList = technicianRequest.getExpertise().stream()
+                Set<TechnicianExpertise> expertiseSet = technicianRequest.getExpertise().stream()
                         .map(technicianExpertiseMapper::toEntity)
-                        .peek(expertise -> expertise.setTechnician(finalTechnician))
-                        .toList();
-                garageTechnician.getExpertise().addAll(expertiseList);
+                        .map(expertise -> {
+                            expertise.setTechnician(finalTechnician);
+                            return expertise;
+                        })
+                        .collect(java.util.stream.Collectors.toSet());
+                garageTechnician.getExpertise().addAll(expertiseSet);
+                log.info("Updated expertise for technician id {}: {} new categories added",
+                        id, expertiseSet.size());
+            } else {
+                log.info("Cleared all expertise for technician id {}", id);
             }
-            log.info("Updated expertise for technician id {}: {} categories",
-                    id, garageTechnician.getExpertise().size());
         }
 
         return technicianMapper.entityToResponse(technicianRepository.save(garageTechnician));
@@ -338,10 +356,18 @@ public class TechnicianService {
      */
     @Transactional(readOnly = true)
     public PagedResponse<TechnicianResponse> searchTechniciansPaginated(
-            String query, String name, List<Integer> skillIds,
-            List<String> expertiseCategories, List<String> expertiseLevels,
-            String city, String brand, String model,
+            TechnicianSearchCriteria criteria,
             int page, int size, String sortBy, String sortDirection) {
+
+        // Extract search parameters from criteria object
+        String query = criteria.getQuery();
+        String name = criteria.getName();
+        List<Integer> skillIds = criteria.getSkillIds();
+        List<String> expertiseCategories = criteria.getExpertiseCategories();
+        List<String> expertiseLevels = criteria.getExpertiseLevels();
+        String city = criteria.getCity();
+        String brand = criteria.getBrand();
+        String model = criteria.getModel();
 
         log.info("Paginated search - query: '{}', page: {}, size: {}, sortBy: {}, sortDir: {}",
                 query, page, size, sortBy, sortDirection);

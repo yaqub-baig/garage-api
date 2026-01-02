@@ -6,6 +6,7 @@ import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.GroupedJobCardResponse;
 import com.autoadda.apis.garage.response.JobCardResponse;
 import com.autoadda.apis.garage.response.JobCardStatusTimelineEntry;
+import com.autoadda.apis.garage.service.JobCardGroupingService;
 import com.autoadda.apis.garage.service.JobCardService;
 import com.autoadda.apis.garage.util.JobCardStatus;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class JobCardController {
 
     private final JobCardService jobCardService;
+    private final JobCardGroupingService jobCardGroupingService;
 
     @PostMapping("/assign")
     public ResponseEntity<GenericResponse> assignTechnician(@RequestBody AssignServiceRequest request) {
@@ -63,14 +65,14 @@ public class JobCardController {
     @GetMapping("/garage/{garageId}/grouped")
     public ResponseEntity<GenericResponse> getGroupedGarageJobCards(@PathVariable Integer garageId,
                                                                     @RequestParam(required = false) JobCardStatus status) {
-        GroupedJobCardResponse groupedJobCards = jobCardService.getGroupedJobCardsByWorkOrder(garageId, status);
+        GroupedJobCardResponse groupedJobCards = jobCardGroupingService.getGroupedJobCardsByWorkOrder(garageId, status);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Job cards grouped by work order", groupedJobCards));
     }
 
     @GetMapping("/technician/{technicianId}/grouped")
     public ResponseEntity<GenericResponse> getGroupedTechnicianJobCards(@PathVariable Integer technicianId,
                                                                         @RequestParam(required = false) JobCardStatus status) throws MemberNotFoundException {
-        GroupedJobCardResponse groupedJobCards = jobCardService.getGroupedTechnicianJobCardsByWorkOrder(technicianId, status);
+        GroupedJobCardResponse groupedJobCards = jobCardGroupingService.getGroupedTechnicianJobCardsByWorkOrder(technicianId, status);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Technician job cards grouped by work order", groupedJobCards));
     }
 }
