@@ -21,7 +21,7 @@ public class VehicleReceived {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    //TODO: make appoitment id Unique
+
     @OneToOne
     private AppointmentDetails appointment;
 

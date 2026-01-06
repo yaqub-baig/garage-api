@@ -1,10 +1,12 @@
 package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.entity.VehicleOwnerSubscription;
+import com.autoadda.apis.garage.mapper.VehicleOwnerSubscriptionMapper;
 import com.autoadda.apis.garage.request.SubscriptionRequest;
 import com.autoadda.apis.garage.response.GarageSubscriptionResponse;
 import com.autoadda.apis.garage.response.VehicleOwnerSubscriptionResponse;
 import com.autoadda.apis.garage.service.GarageSubscriptionService;
+import com.autoadda.apis.garage.service.SubscriptionValidationService;
 import com.autoadda.apis.garage.service.VehicleOwnerSubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +23,8 @@ public class VehicleSubscriptionController {
 
     private final VehicleOwnerSubscriptionService ownerSubscriptionService;
     private final GarageSubscriptionService garageSubscriptionService;
-    private final com.autoadda.apis.garage.service.SubscriptionValidationService subscriptionValidationService;
-    private final com.autoadda.apis.garage.mapper.VehicleOwnerSubscriptionMapper vehicleOwnerSubscriptionMapper;
+    private final SubscriptionValidationService subscriptionValidationService;
+    private final VehicleOwnerSubscriptionMapper vehicleOwnerSubscriptionMapper;
 
     @PostMapping("/subscribe")
     ResponseEntity<VehicleOwnerSubscription> subscribeToPlan(@RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId

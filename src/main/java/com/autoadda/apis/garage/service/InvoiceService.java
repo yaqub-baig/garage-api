@@ -296,7 +296,6 @@ public class InvoiceService {
         // Handle loyalty points if specified
         if ( request.getLoyaltyPointsToUse ( ) != null && request.getLoyaltyPointsToUse ( ) > 0 ) {
             invoice.setLoyaltyPointsUsed ( request.getLoyaltyPointsToUse ( ) );
-            // TODO: Integrate with loyalty service
         }
 
         // Update WorkOrder status to INVOICE_INITIATED when invoice is created

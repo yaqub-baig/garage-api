@@ -9,11 +9,10 @@ import com.autoadda.apis.garage.mapper.WorkOrderMapper;
 import com.autoadda.apis.garage.repository.*;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
 import com.autoadda.apis.garage.request.NotificationContent;
-import com.autoadda.apis.garage.request.SmsRequest;
 import com.autoadda.apis.garage.request.WorkOrderRequest;
 import com.autoadda.apis.garage.response.*;
-import com.autoadda.apis.garage.util.NotificationType;
 import com.autoadda.apis.garage.util.JobCardStatus;
+import com.autoadda.apis.garage.util.NotificationType;
 import com.autoadda.apis.garage.util.VehicleRecievedStatus;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,32 +53,32 @@ public class WorkOrderService {
      */
     @Transactional
     public WorkOrder createWorkOrder(List<JobCard> jobCards) {
-        WorkOrder workOrder = new WorkOrder ( );
-        workOrder.setJobCards ( jobCards );
-        workOrder.setStatus ( WorkOrderStatus.CREATED );
-        workOrder.setCreatedDate ( LocalDateTime.now ( ) );
-        return workOrderRepository.save ( workOrder );
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setJobCards(jobCards);
+        workOrder.setStatus(WorkOrderStatus.CREATED);
+        workOrder.setCreatedDate(LocalDateTime.now());
+        return workOrderRepository.save(workOrder);
     }
 
     public WorkOrderResponse createWorkOrder(WorkOrderRequest request) {
         checkAppointmentAlreadyExists(request.getAppointmentId());
-        WorkOrder workOrder = new WorkOrder ( );
-        workOrder.setStatus ( WorkOrderStatus.CREATED );
-        workOrder.setCreatedDate ( LocalDateTime.now ( ) );
-        workOrder.setAppointment ( appointmentDetailsRepository.findById ( request.getAppointmentId ( ) ).orElseThrow ( () -> new ResourceNotFoundException ( "appointment not found" ) ) );
-        workOrder.setGarage ( workOrder.getAppointment ( ).getGarage ( ) );
-        workOrder = workOrderRepository.save ( workOrder );
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setStatus(WorkOrderStatus.CREATED);
+        workOrder.setCreatedDate(LocalDateTime.now());
+        workOrder.setAppointment(appointmentDetailsRepository.findById(request.getAppointmentId()).orElseThrow(() -> new ResourceNotFoundException("appointment not found")));
+        workOrder.setGarage(workOrder.getAppointment().getGarage());
+        workOrder = workOrderRepository.save(workOrder);
 
-        VehicleReceived byAppointmentId = vehicleReceivedRepository.findByAppointmentId ( workOrder.getAppointment ( ).getId ( ) );
-        byAppointmentId.setStatus ( VehicleRecievedStatus.JOB_CARD_CREATED );
-        vehicleReceivedRepository.saveAndFlush ( byAppointmentId );
-        WorkOrderResponse workOrderResponse = workOrderMapper.entityToResponse ( workOrderRepository.save ( workOrder ) );
+        VehicleReceived byAppointmentId = vehicleReceivedRepository.findByAppointmentId(workOrder.getAppointment().getId());
+        byAppointmentId.setStatus(VehicleRecievedStatus.JOB_CARD_CREATED);
+        vehicleReceivedRepository.saveAndFlush(byAppointmentId);
+        WorkOrderResponse workOrderResponse = workOrderMapper.entityToResponse(workOrderRepository.save(workOrder));
 
-        List<JobCard> list = request.getAssignServiceRequestList ( ).stream ( ).map ( request1 -> jobCardService.assignTechnicianToServiceWithOutResponse ( request1, workOrderResponse.getId ( ) ) ).toList ( );
-        workOrder.setJobCards ( list );
+        List<JobCard> list = request.getAssignServiceRequestList().stream().map(request1 -> jobCardService.assignTechnicianToServiceWithOutResponse(request1, workOrderResponse.getId())).toList();
+        workOrder.setJobCards(list);
 
         WorkOrder finalWorkOrder = workOrder;
-        list.forEach ( jobCard -> jobCard.setWorkOrder ( finalWorkOrder ) );
+        list.forEach(jobCard -> jobCard.setWorkOrder(finalWorkOrder));
 
         // Send multi-channel notification with preference checking
         Integer customerId = workOrderResponse.getAppointmentDetail().getCustomerId();
@@ -87,17 +86,17 @@ public class WorkOrderService {
         int serviceCount = workOrder.getJobCards().size();
 
         NotificationContent content = notificationMessageBuilder.buildWorkOrderCreated(
-            workOrderResponse.getId(),
-            vehicleNumber,
-            serviceCount
+                workOrderResponse.getId(),
+                vehicleNumber,
+                serviceCount
         );
 
         NotificationResult result = notificationDispatchService.sendNotification(
-            customerId,
-            NotificationType.SERVICE_UPDATES,
-            content,
-            true,  // critical
-            "CUSTOMER"  // targetRole
+                customerId,
+                NotificationType.SERVICE_UPDATES,
+                content,
+                true,  // critical
+                "CUSTOMER"  // targetRole
         );
 
         log.info("Work order creation notification result: {}", result.getSummary());
@@ -107,19 +106,19 @@ public class WorkOrderService {
             Garage garage = workOrder.getGarage();
             if (garage != null && garage.getGarageOwner() != null) {
                 NotificationContent ownerContent = notificationMessageBuilder
-                    .buildGarageOwnerWorkOrder(
-                        workOrderResponse.getId(),
-                        vehicleNumber,
-                        serviceCount,
-                        garage.getName()
-                    );
+                        .buildGarageOwnerWorkOrder(
+                                workOrderResponse.getId(),
+                                vehicleNumber,
+                                serviceCount,
+                                garage.getName()
+                        );
 
                 NotificationResult ownerResult = notificationDispatchService.sendNotification(
-                    garage.getGarageOwner(),
-                    NotificationType.SERVICE_UPDATES,
-                    ownerContent,
-                    false,  // Not critical for owner
-                    "GARAGE_OWNER"  // targetRole
+                        garage.getGarageOwner(),
+                        NotificationType.SERVICE_UPDATES,
+                        ownerContent,
+                        false,  // Not critical for owner
+                        "GARAGE_OWNER"  // targetRole
                 );
 
                 log.info("Garage owner notification result: {}", ownerResult.getSummary());
@@ -135,14 +134,14 @@ public class WorkOrderService {
     }
 
     private void checkAppointmentAlreadyExists(Integer appointmentId) {
-        if (workOrderRepository.existsByAppointmentId ( appointmentId )) {
-            throw new AlreadyExistsException( "work order with this appointment Id :: " + appointmentId + " alreadyExist" );
+        if (workOrderRepository.existsByAppointmentId(appointmentId)) {
+            throw new AlreadyExistsException("work order with this appointment Id :: " + appointmentId + " alreadyExist");
         }
     }
 
     @Transactional
     public WorkOrder getWorkOrderById(Integer id) {
-        return workOrderRepository.findById ( id ).orElseThrow ( () -> new EntityNotFoundException ( "WorkOrder not found" ) );
+        return workOrderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("WorkOrder not found"));
     }
 
     /**
@@ -153,7 +152,7 @@ public class WorkOrderService {
      */
     @Transactional
     public List<WorkOrder> getWorkOrdersByStatus(WorkOrderStatus status) {
-        return workOrderRepository.findByStatus ( status );
+        return workOrderRepository.findByStatus(status);
     }
 
     /**
@@ -165,15 +164,15 @@ public class WorkOrderService {
      */
     @Transactional
     public WorkOrder updateWorkOrderStatus(Integer id, WorkOrderStatus status) {
-        WorkOrder workOrder = getWorkOrderById ( id );
-        workOrder.updateStatus ( status );
-        return workOrderRepository.save ( workOrder );
+        WorkOrder workOrder = getWorkOrderById(id);
+        workOrder.updateStatus(status);
+        return workOrderRepository.save(workOrder);
     }
 
     @Transactional
     public WorkOrder updateWorkOrderStatus(WorkOrder workOrder, WorkOrderStatus status) {
-        workOrder.updateStatus ( status );
-        return workOrderRepository.save ( workOrder );
+        workOrder.updateStatus(status);
+        return workOrderRepository.save(workOrder);
     }
 
     /**
@@ -184,79 +183,87 @@ public class WorkOrderService {
      */
 
     public List<WorkOrder> getWorkOrdersForGarage(Integer garageId) {
-        return workOrderRepository.findByGarageId ( garageId );
+        return workOrderRepository.findByGarageId(garageId);
     }
 
     public WorkOrderResponse getWorkOrderByAppointmentId(Integer appointmentId) {
-        return workOrderMapper.entityToResponse ( workOrderRepository.findByAppointmentId ( appointmentId ).orElseThrow ( () -> new ResourceNotFoundException ( "work order not found" ) ) );
+        return workOrderMapper.entityToResponse(workOrderRepository.findByAppointmentId(appointmentId).orElseThrow(() -> new ResourceNotFoundException("work order not found")));
     }
 
     public List<WorkOrderResponse> getWorkOrdersByGarageId(Integer garageId) {
-        return workOrderRepository.findByGarageId ( garageId )
-                .stream ( )
-                .sorted ( Comparator.comparing ( WorkOrder::getCreatedDate ).reversed () )
-                .map ( workOrderMapper::entityToResponse ).toList ( );
+        return workOrderRepository.findByGarageId(garageId)
+                .stream()
+                .sorted(Comparator.comparing(WorkOrder::getCreatedDate).reversed())
+                .map(workOrderMapper::entityToResponse).toList();
     }
 
     public WorkOrderResponse updateWorkOrder(Integer workOrderId, WorkOrderRequest request) {
-        WorkOrder workOrder = workOrderRepository.findById ( workOrderId ).orElseThrow ( () -> new ResourceNotFoundException ( "no work order found with this id" ) );
-        if ( request.getAssignServiceRequestList ( ) != null && ! request.getAssignServiceRequestList ( ).isEmpty ( ) ) {
-            List<JobCard> jobCards = request.getAssignServiceRequestList ( ).stream ( ).map ( (AssignServiceRequest request1) -> jobCardService.assignTechnicianToServiceWithOutResponse ( request1, workOrder.getId ( ) ) ).toList ( );
-            workOrder.getJobCards ( ).addAll ( jobCards );
-            jobCards.forEach ( jobCard -> jobCard.setWorkOrder ( workOrder ) );
+        WorkOrder workOrder = workOrderRepository.findById(workOrderId).orElseThrow(() -> new ResourceNotFoundException("no work order found with this id"));
+        if (request.getAssignServiceRequestList() != null && !request.getAssignServiceRequestList().isEmpty()) {
+            List<JobCard> jobCards = request.getAssignServiceRequestList().stream().map((AssignServiceRequest request1) -> jobCardService.assignTechnicianToServiceWithOutResponse(request1, workOrder.getId())).toList();
+            workOrder.getJobCards().addAll(jobCards);
+            jobCards.forEach(jobCard -> jobCard.setWorkOrder(workOrder));
         }
-        if ( request.getCustomerAcknowledged ( ) != null ) {
-            workOrder.setCustomerAcknowledged ( request.getCustomerAcknowledged ( ) );
+        if (request.getCustomerAcknowledged() != null) {
+            workOrder.setCustomerAcknowledged(request.getCustomerAcknowledged());
         }
-        if ( request.getCustomerNegotiatedAmount ( ) != null ) {
-            workOrder.setCustomerNegotiatedAmount ( request.getCustomerNegotiatedAmount ( )
-                    //TODO: send sms to Garage about the updated negotiated amount
-            );
+        if (request.getCustomerNegotiatedAmount() != null) {
+            workOrder.setCustomerNegotiatedAmount(request.getCustomerNegotiatedAmount());
         }
-        if ( request.getCustomerNegotiatedComment ( ) != null ) {
-            workOrder.setCustomerNegotiatedComment ( request.getCustomerNegotiatedComment ( ) );
+        if (request.getCustomerNegotiatedComment() != null) {
+            workOrder.setCustomerNegotiatedComment(request.getCustomerNegotiatedComment());
         }
-        if ( request.getGarageNegotiatedAmount ( ) != null ) {
-            workOrder.setGarageNegotiatedAmount ( request.getGarageNegotiatedAmount ( ) );
-            //TODO: send sms to Customer about the updated negotiated amount
+        if (request.getGarageNegotiatedAmount() != null) {
+            workOrder.setGarageNegotiatedAmount(request.getGarageNegotiatedAmount());
         }
-        if ( request.getGarageNegotiatedComment ( ) != null ) {
-            workOrder.setGarageNegotiatedComment ( request.getGarageNegotiatedComment ( ) );
+        if (request.getGarageNegotiatedComment() != null) {
+            workOrder.setGarageNegotiatedComment(request.getGarageNegotiatedComment());
         }
-        if ( request.getStatus ( ) != null ) {
-            if ( ! workOrderStatusFlowService.isValidTransition ( workOrder.getStatus ( ), request.getStatus ( ) ) ) {
-                throw new IllegalStateException ( "Invalid transition from " +
-                        workOrder.getStatus ( ) + " to " + request.getStatus ( ) );
+        if (request.getStatus() != null) {
+            if (!workOrderStatusFlowService.isValidTransition(workOrder.getStatus(), request.getStatus())) {
+                throw new IllegalStateException("Invalid transition from " +
+                        workOrder.getStatus() + " to " + request.getStatus());
             }
-            if ( request.getStatus ( ) == WorkOrderStatus.CONFIRMED ) {
-                workOrder.getJobCards ( ).stream ( ).map ( JobCard::getId ).forEach ( id -> {
-                    JobCard jobCard = jobCardRepository.findById ( id ).orElseThrow ( () -> new ResourceNotFoundException ( "no job card found with this id" ) );
-                    if ( jobCard.getStatus ( ) == JobCardStatus.CREATED ) {
-                        jobCardService.updateJobCardStatus ( jobCard.getId ( ), JobCardStatus.ASSIGNED );
-                    }
-                } );
+            if (request.getStatus() == WorkOrderStatus.CONFIRMED) {
+                handleWorkOrderConfirmation(workOrder);
             }
-            workOrder.updateStatus ( request.getStatus ( ) );
+            workOrder.updateStatus(request.getStatus());
         }
 
-        return workOrderMapper.entityToResponse ( workOrderRepository.save ( workOrder ) );
+        return workOrderMapper.entityToResponse(workOrderRepository.save(workOrder));
+    }
+
+    /**
+     * Handles the confirmation of a work order by updating associated job card statuses
+     */
+    private void handleWorkOrderConfirmation(WorkOrder workOrder) {
+        workOrder.getJobCards().stream()
+                .map(JobCard::getId)
+                .forEach(id -> {
+                    JobCard jobCard = jobCardRepository.findById(id)
+                            .orElseThrow(() -> new ResourceNotFoundException("no job card found with this id"));
+                    if (jobCard.getStatus() == JobCardStatus.CREATED) {
+                        jobCardService.updateJobCardStatus(jobCard.getId(), JobCardStatus.ASSIGNED);
+                    }
+                });
     }
 
     public List<WorkOrderResponse> getWorkOrdersByCustomerId(Integer customerId) {
-        return workOrderRepository.findByAppointmentCustomerId ( customerId )
-                .stream ( )
-                .sorted ( Comparator.comparing ( WorkOrder::getCreatedDate ).reversed () )
-                .map ( workOrderMapper::entityToResponse )
-                .toList ( );
+        return workOrderRepository.findByAppointmentCustomerId(customerId)
+                .stream()
+                .sorted(Comparator.comparing(WorkOrder::getCreatedDate).reversed())
+                .map(workOrderMapper::entityToResponse)
+                .toList();
     }
+
     public List<VehicleServiceHistoryResponse> getWorkOrdersByVehicleId(Integer vehicleId) {
-        return workOrderRepository.findByAppointmentVehicleId ( vehicleId )
-                .stream ( )
-                .filter ( workOrder -> workOrder.getStatus ( ) == WorkOrderStatus.DELIVERED_TO_CUSTOMER
-                        || workOrder.getStatus ( ) == WorkOrderStatus.COMPLETED )
-                .sorted ( Comparator.comparing ( WorkOrder::getCreatedDate ).reversed () )
-                .map ( this::convertToServiceHistoryResponse )
-                .toList ( );
+        return workOrderRepository.findByAppointmentVehicleId(vehicleId)
+                .stream()
+                .filter(workOrder -> workOrder.getStatus() == WorkOrderStatus.DELIVERED_TO_CUSTOMER
+                        || workOrder.getStatus() == WorkOrderStatus.COMPLETED)
+                .sorted(Comparator.comparing(WorkOrder::getCreatedDate).reversed())
+                .map(this::convertToServiceHistoryResponse)
+                .toList();
     }
 
     /**
@@ -264,113 +271,117 @@ public class WorkOrderService {
      */
     private VehicleServiceHistoryResponse convertToServiceHistoryResponse(WorkOrder workOrder) {
         // Extract service names from job cards
-        List<String> servicesPerformed = workOrder.getJobCards ( ).stream ( )
-                .map (JobCard::getService)
-                .filter ( appointmentService -> appointmentService != null
-                        && appointmentService.getService ( ) != null
-                        && appointmentService.getService ( ).getAvailableService ( ) != null )
-                .map ( appointmentService -> appointmentService.getService ( ).getAvailableService ( ).getName ( ) )
-                .toList ( );
+        List<String> servicesPerformed = workOrder.getJobCards().stream()
+                .map(JobCard::getService)
+                .filter(appointmentService -> appointmentService != null
+                        && appointmentService.getService() != null
+                        && appointmentService.getService().getAvailableService() != null)
+                .map(appointmentService -> appointmentService.getService().getAvailableService().getName())
+                .toList();
 
         // Build garage basic info
         GarageBasicInfo garageInfo = null;
-        if ( workOrder.getGarage ( ) != null ) {
-            garageInfo = GarageBasicInfo.builder ( )
-                    .id ( workOrder.getGarage ( ).getId ( ) )
-                    .garageBrandName ( workOrder.getGarage ( ).getGarageBrandName ( ) )
-                    .name ( workOrder.getGarage ( ).getName ( ) )
-                    .phoneNumber ( workOrder.getGarage ( ).getPhoneNumber ( ) )
-                    .mobileNumber ( workOrder.getGarage ( ).getMobileNumber ( ) )
-                    .location ( workOrder.getGarage ( ).getGarageLocation ( ) )
-                    .build ( );
+        if (workOrder.getGarage() != null) {
+            garageInfo = GarageBasicInfo.builder()
+                    .id(workOrder.getGarage().getId())
+                    .garageBrandName(workOrder.getGarage().getGarageBrandName())
+                    .name(workOrder.getGarage().getName())
+                    .phoneNumber(workOrder.getGarage().getPhoneNumber())
+                    .mobileNumber(workOrder.getGarage().getMobileNumber())
+                    .location(workOrder.getGarage().getGarageLocation())
+                    .build();
         }
 
         // Get invoice if exists
         InvoiceResponse invoiceResponse = null;
-        Invoice invoice = invoiceRepository.findByWorkOrderId ( workOrder.getId ( ) ).orElse ( null );
-        if ( invoice != null ) {
-            invoiceResponse = InvoiceResponse.builder ( )
-                    .id ( invoice.getId ( ) )
-                    .workOrderId ( invoice.getWorkOrder ( ).getId ( ) )
-                    .totalAmount ( invoice.getTotalAmount ( ) )
-                    .taxRate ( invoice.getTaxRate ( ) )
-                    .taxAmount ( invoice.getTaxAmount ( ) )
-                    .amountPaid ( invoice.getAmountPaid ( ) )
-                    .loyaltyPointsUsed ( invoice.getLoyaltyPointsUsed ( ) )
-                    .loyaltyPointsEarned ( invoice.getLoyaltyPointsEarned ( ) )
-                    .paymentStatus ( invoice.getPaymentStatus ( ) )
-                    .paymentMethod ( invoice.getPaymentMethod ( ) )
-                    .isPaid ( invoice.getIsPaid ( ) )
-                    .notes ( invoice.getNotes ( ) )
-                    .createdAt ( invoice.getCreatedAt ( ) )
-                    .build ( );
+        Invoice invoice = invoiceRepository.findByWorkOrderId(workOrder.getId()).orElse(null);
+        if (invoice != null) {
+            invoiceResponse = InvoiceResponse.builder()
+                    .id(invoice.getId())
+                    .workOrderId(invoice.getWorkOrder().getId())
+                    .totalAmount(invoice.getTotalAmount())
+                    .taxRate(invoice.getTaxRate())
+                    .taxAmount(invoice.getTaxAmount())
+                    .amountPaid(invoice.getAmountPaid())
+                    .loyaltyPointsUsed(invoice.getLoyaltyPointsUsed())
+                    .loyaltyPointsEarned(invoice.getLoyaltyPointsEarned())
+                    .paymentStatus(invoice.getPaymentStatus())
+                    .paymentMethod(invoice.getPaymentMethod())
+                    .isPaid(invoice.getIsPaid())
+                    .notes(invoice.getNotes())
+                    .createdAt(invoice.getCreatedAt())
+                    .build();
         }
 
         // Get latest delivery if exists
         LatestDeliveryInfo latestDelivery = null;
-        VehicleDelivery delivery = vehicleDeliveryRepository.findTopByWorkOrderIdOrderByCreatedAtDesc ( workOrder.getId ( ) )
-                .orElse ( null );
-        if ( delivery != null ) {
-            List<String> photoUrls = delivery.getDeliveryPhotos ( ).stream ( )
-                    .map (MediaFile::getFilePath )
-                    .toList ( );
+        VehicleDelivery delivery = vehicleDeliveryRepository.findTopByWorkOrderIdOrderByCreatedAtDesc(workOrder.getId())
+                .orElse(null);
+        if (delivery != null) {
+            List<String> photoUrls = delivery.getDeliveryPhotos().stream()
+                    .map(MediaFile::getFilePath)
+                    .toList();
 
-            latestDelivery = LatestDeliveryInfo.builder ( )
-                    .id ( delivery.getId ( ) )
-                    .status ( delivery.getStatus ( ) )
-                    .deliveryDate ( delivery.getDeliveryDate ( ) )
-                    .customerApproved ( delivery.getCustomerApproved ( ) )
-                    .customerComments ( delivery.getCustomerComments ( ) )
-                    .rejectionReason ( delivery.getRejectionReason ( ) )
-                    .attemptNumber ( delivery.getAttemptNumber ( ) )
-                    .deliveryPhotos ( photoUrls )
-                    .build ( );
+            latestDelivery = LatestDeliveryInfo.builder()
+                    .id(delivery.getId())
+                    .status(delivery.getStatus())
+                    .deliveryDate(delivery.getDeliveryDate())
+                    .customerApproved(delivery.getCustomerApproved())
+                    .customerComments(delivery.getCustomerComments())
+                    .rejectionReason(delivery.getRejectionReason())
+                    .attemptNumber(delivery.getAttemptNumber())
+                    .deliveryPhotos(photoUrls)
+                    .build();
         }
 
         // Build and return the service history response
-        return VehicleServiceHistoryResponse.builder ( )
-                .workOrderId ( workOrder.getId ( ) )
-                .serviceDate ( workOrder.getCreatedDate ( ) )
-                .status ( workOrder.getStatus ( ) )
-                .garage ( garageInfo )
-                .servicesPerformed ( servicesPerformed )
-                .invoice ( invoiceResponse )
-                .latestDelivery ( latestDelivery )
-                .build ( );
+        return VehicleServiceHistoryResponse.builder()
+                .workOrderId(workOrder.getId())
+                .serviceDate(workOrder.getCreatedDate())
+                .status(workOrder.getStatus())
+                .garage(garageInfo)
+                .servicesPerformed(servicesPerformed)
+                .invoice(invoiceResponse)
+                .latestDelivery(latestDelivery)
+                .build();
     }
+
     public WorkOrderResponse getWorkOrderResponseById(Integer workOrderId) {
-        WorkOrder workOrder = getWorkOrderById ( workOrderId );
-        return workOrderMapper.entityToResponse ( workOrder );
+        WorkOrder workOrder = getWorkOrderById(workOrderId);
+        return workOrderMapper.entityToResponse(workOrder);
     }
 
     public void updateJobCardStatus(JobCard jobCard, JobCardStatus newStatus) {
-        if ( ! statusFlowService.isValidTransition ( jobCard.getStatus ( ), newStatus ) ) {
-            throw new IllegalStateException ( "Invalid transition from " +
-                    jobCard.getStatus ( ) + " to " + newStatus );
+        if (!statusFlowService.isValidTransition(jobCard.getStatus(), newStatus)) {
+            throw new IllegalStateException("Invalid transition from " +
+                    jobCard.getStatus() + " to " + newStatus);
         }
-        JobCardStatus oldStatus = jobCard.getStatus ( );
-        jobCard.setStatus ( newStatus );
+        JobCardStatus oldStatus = jobCard.getStatus();
+        jobCard.setStatus(newStatus);
 
         // Update timestamps based on status
         switch (newStatus) {
             case ASSIGNED:
-                jobCard.setAssignedAt ( LocalDateTime.now ( ) );
+                jobCard.setAssignedAt(LocalDateTime.now());
                 break;
             case IN_PROGRESS:
-                if ( oldStatus == JobCardStatus.ASSIGNED ) {
-                    jobCard.setStartedAt ( LocalDateTime.now ( ) );
+                if (oldStatus == JobCardStatus.ASSIGNED) {
+                    jobCard.setStartedAt(LocalDateTime.now());
                 }
                 break;
             case WORK_COMPLETED:
-                jobCard.setCompletedAt ( LocalDateTime.now ( ) );
+                jobCard.setCompletedAt(LocalDateTime.now());
                 break;
             case QUALITY_CHECK_PASSED, QUALITY_CHECK_FAILED:
-                jobCard.setQualityCheckedAt ( LocalDateTime.now ( ) );
+                jobCard.setQualityCheckedAt(LocalDateTime.now());
+                break;
+            default:
+                // No timestamp update needed for other statuses
                 break;
         }
 
         // Update WorkOrder status based on JobCard statuses
-        workOrderStatusFlowService.updateWorkOrderStatusBasedOnJobCards ( jobCard.getWorkOrder ( ) );
+        workOrderStatusFlowService.updateWorkOrderStatusBasedOnJobCards(jobCard.getWorkOrder());
     }
 
 
@@ -381,21 +392,21 @@ public class WorkOrderService {
 
     public void assignJobCard(JobCard jobCard) {
         // Set technician and update status
-        updateJobCardStatus ( jobCard, JobCardStatus.ASSIGNED );
+        updateJobCardStatus(jobCard, JobCardStatus.ASSIGNED);
     }
 
     public void startJobCard(JobCard jobCard) {
-        updateJobCardStatus ( jobCard, JobCardStatus.IN_PROGRESS );
+        updateJobCardStatus(jobCard, JobCardStatus.IN_PROGRESS);
     }
 
     public void completeJobCard(JobCard jobCard) {
-        updateJobCardStatus ( jobCard, JobCardStatus.WORK_COMPLETED );
+        updateJobCardStatus(jobCard, JobCardStatus.WORK_COMPLETED);
     }
 
     public void performQualityCheck(JobCard jobCard, boolean passed, String comments) {
-        jobCard.setQualityComments ( comments );
-        updateJobCardStatus ( jobCard, passed ?
-                JobCardStatus.QUALITY_CHECK_PASSED : JobCardStatus.QUALITY_CHECK_FAILED );
+        jobCard.setQualityComments(comments);
+        updateJobCardStatus(jobCard, passed ?
+                JobCardStatus.QUALITY_CHECK_PASSED : JobCardStatus.QUALITY_CHECK_FAILED);
     }
 
 

@@ -3,9 +3,12 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.entity.AvailableService;
 import com.autoadda.apis.garage.repository.AvailableServiceRepository;
 import com.autoadda.apis.garage.request.AvailableServiceRequest;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +40,7 @@ public class AvailableServiceManagementService {
      * @return the created AvailableService entity
      */
     @Transactional
+    @CacheEvict(value = "service", key = "'allServices'")
     public AvailableService createService(AvailableServiceRequest service) {
 
         AvailableService save = availableServiceRepository.save ( mapToEntity ( service ) );
@@ -52,6 +56,7 @@ public class AvailableServiceManagementService {
      * @return a list of all AvailableService entities
      */
     @Transactional
+    @Cacheable(value = "service", key = "'allServices'")
     public List<AvailableService> getAllServices() {
         return availableServiceRepository.findAll ( );
     }
@@ -76,6 +81,7 @@ public class AvailableServiceManagementService {
      * @return the updated AvailableService entity
      */
     @Transactional
+    @CacheEvict(value = "service", key = "'allServices'")
     public AvailableService updateService(Integer id, AvailableService updatedService) {
         return availableServiceRepository.findById ( id ).map ( existing -> {
             existing.setName ( updatedService.getName ( ) );
@@ -92,6 +98,7 @@ public class AvailableServiceManagementService {
      * @param id the ID of the service to delete
      */
     @Transactional
+    @CacheEvict(value = "service", key = "'allServices'")
     public void deleteService(Integer id) {
         availableServiceRepository.deleteById ( id );
     }
