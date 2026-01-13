@@ -52,4 +52,6 @@ public class GarageResponse {
     private List<MediaFile> garageImages;
     private List<MediaFile> vatCertificate;
     private List<MediaFile> tradeLicenseAttachment;
+    private Double averageRating;
+    private Long totalRatings;
 }

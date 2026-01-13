@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.mapper;
 
 import com.autoadda.apis.garage.entity.Garage;
+import com.autoadda.apis.garage.repository.GarageRatingRepository;
 import com.autoadda.apis.garage.response.GarageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class GarageMapper {
     private final GarageServiceMapper garageServiceMapper;
+    private final GarageRatingRepository garageRatingRepository;
 
     public GarageResponse entityToResponse(Garage garage) {
         GarageResponse garageResponse = new GarageResponse();
@@ -61,6 +63,15 @@ public class GarageMapper {
         mapField(garage.getServices(),
             services -> garageResponse.setServices(
                 services.stream().map(garageServiceMapper::entityToResponse).toList()));
+
+        // Populate rating fields
+        if (garage.getId() != null) {
+            Double avgRating = garageRatingRepository.calculateAverageRatingByGarageId(garage.getId());
+            if (avgRating != null) {
+                garageResponse.setAverageRating(Math.round(avgRating * 10.0) / 10.0);
+            }
+            garageResponse.setTotalRatings(garageRatingRepository.countByGarageIdAndIsVisibleTrue(garage.getId()));
+        }
 
         return garageResponse;
     }
