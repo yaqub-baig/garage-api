@@ -31,6 +31,7 @@ public class WorkOrderResponse {
     private List<StatusTimelineEntry> statusTimeline;
     private Map<WorkOrderStatus, LocalDateTime> statusTimestamps;
 
+    private boolean haveRating = false;
     // Delivery status fields for frontend
     private DeliveryStatus currentDeliveryStatus;
     private Boolean canInitiateDelivery;

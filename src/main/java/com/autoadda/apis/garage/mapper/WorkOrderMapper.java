@@ -4,6 +4,7 @@ import com.autoadda.apis.garage.entity.AppointmentServices;
 import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.WorkOrder;
+import com.autoadda.apis.garage.repository.GarageRatingRepository;
 import com.autoadda.apis.garage.response.StatusTimelineEntry;
 import com.autoadda.apis.garage.response.WorkOrderResponse;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
@@ -25,6 +26,7 @@ public class WorkOrderMapper {
     private final AppointmentDetailMapper appointmentDetailMapper;
     private final JobCardMapper jobCardMapper;
     private final GarageMapper garageMapper;
+    private final GarageRatingRepository  garageRatingRepository;
 
     public WorkOrderResponse entityToResponse(WorkOrder save) {
         WorkOrderResponse workOrderResponse = new WorkOrderResponse ( );
@@ -65,7 +67,7 @@ public class WorkOrderMapper {
 
         // Generate status timeline
         workOrderResponse.setStatusTimeline ( generateStatusTimeline ( save.getStatusTimestamps ( ) ) );
-
+        workOrderResponse.setHaveRating(garageRatingRepository.existsByWorkOrderId(save.getId()));
         // Set delivery status fields for frontend
         workOrderResponse.setCurrentDeliveryStatus ( save.getCurrentDeliveryStatus ( ) );
         workOrderResponse.setCanInitiateDelivery ( save.canInitiateDelivery ( ) );
