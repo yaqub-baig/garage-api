@@ -26,6 +26,7 @@ public class Invoice {
     private WorkOrder workOrder;
 
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<InvoiceLineItem> lineItems = new ArrayList<> ( );
 
     private Double totalAmount;

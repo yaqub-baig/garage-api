@@ -34,6 +34,7 @@ public class AvailableService {
 
     @OneToMany(mappedBy = "availableService", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
+    @Builder.Default
     private List<GarageService> garageLinks = new ArrayList<> ( );
 
 }

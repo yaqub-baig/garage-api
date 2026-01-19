@@ -128,7 +128,7 @@ public class NotificationMessageBuilder {
                 .emailBody(emailBody)
                 .emailIsHtml(true)
                 .webpushTitle("Invoice Ready")
-                .webpushBody(String.format("Invoice #%d - ₹%.2f",
+                .webpushBody(String.format("Invoice #%d - AED%.2f",
                         invoice.getId(), invoice.getTotalAmount()))
                 .webpushUrl("/invoices/" + invoice.getId())
                 .build();
@@ -199,7 +199,7 @@ public class NotificationMessageBuilder {
         message.append("Invoice ID: ").append(invoice.getId()).append("\n");
 
         if (invoice.getTotalAmount() != null) {
-            message.append("Total Amount: ₹").append(String.format("%.2f", invoice.getTotalAmount())).append("\n");
+            message.append("Total Amount: AED").append(String.format("%.2f", invoice.getTotalAmount())).append("\n");
         }
 
         if (invoice.getIsPaid() != null && invoice.getIsPaid()) {
@@ -416,7 +416,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Vehicle:</strong> %s %s</p>
                         <p style="margin: 5px 0;"><strong>Reg. No:</strong> %s</p>
                         <p style="margin: 5px 0;"><strong>Invoice ID:</strong> #%d</p>
-                        <p style="margin: 15px 0 5px 0;"><strong>Total Amount:</strong> <span style="font-size: 24px; color: #e74c3c;">₹%.2f</span></p>
+                        <p style="margin: 15px 0 5px 0;"><strong>Total Amount:</strong> <span style="font-size: 24px; color: #e74c3c;">AED%.2f</span></p>
                         <p style="margin: 5px 0;"><strong>Status:</strong> %s</p>
                     </div>
                     %s

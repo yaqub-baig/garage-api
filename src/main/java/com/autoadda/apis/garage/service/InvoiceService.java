@@ -421,11 +421,11 @@ public class InvoiceService {
 
         // Amount details
         if ( invoice.getTotalAmount ( ) != null ) {
-            message.append ( "Total Amount: ₹" ).append ( String.format ( "%.2f", invoice.getTotalAmount ( ) ) ).append ( "\n" );
+            message.append ( "Total Amount: AED" ).append ( String.format ( "%.2f", invoice.getTotalAmount ( ) ) ).append ( "\n" );
         }
 
         if ( invoice.getTaxAmount ( ) != null && invoice.getTaxAmount ( ) > 0 ) {
-            message.append ( "Tax: ₹" ).append ( String.format ( "%.2f", invoice.getTaxAmount ( ) ) ).append ( "\n" );
+            message.append ( "Tax: AED" ).append ( String.format ( "%.2f", invoice.getTaxAmount ( ) ) ).append ( "\n" );
         }
 
         // Payment status

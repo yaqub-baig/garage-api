@@ -124,22 +124,27 @@ public class Garage {
 
     @OneToMany
     @JoinColumn(name = "garage_trade_license")
+    @Builder.Default
     private List<MediaFile> tradeLicenseAttachment = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "garage_vat_certificate")
+    @Builder.Default
     private List<MediaFile> vatCertificate = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "garage", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<GarageService> services = new ArrayList<>();
 
     @ManyToMany(mappedBy = "garages")
     @JsonIgnore
+    @Builder.Default
     private List<Technician> technicians = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "garage_images")
+    @Builder.Default
     private List<MediaFile> garageImages = new ArrayList<>();
 
     @PrePersist

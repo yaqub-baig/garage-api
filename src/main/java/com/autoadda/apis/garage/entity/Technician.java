@@ -45,6 +45,7 @@ public class Technician {
             joinColumns = @JoinColumn(name = "technician_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_set_id")
     )
+    @Builder.Default
     private List<AvailableService> skillSet = new ArrayList<> ( );
 
     @OneToMany(mappedBy = "technician", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -60,6 +61,7 @@ public class Technician {
             joinColumns = @JoinColumn(name = "technician_id"),
             inverseJoinColumns = @JoinColumn(name = "garage_id")
     )
+    @Builder.Default
     private Set<Garage> garages = new HashSet<>();
 
     @Column(name = "brand")
