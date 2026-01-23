@@ -30,7 +30,7 @@ public class WorkOrderResponse {
     private String garageNegotiatedComment;
     private List<StatusTimelineEntry> statusTimeline;
     private Map<WorkOrderStatus, LocalDateTime> statusTimestamps;
-
+    private LocalDateTime receivedAt;
     private boolean haveRating = false;
     // Delivery status fields for frontend
     private DeliveryStatus currentDeliveryStatus;

@@ -3,8 +3,8 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.entity.Invoice;
 import com.autoadda.apis.garage.entity.PartRequest;
 import com.autoadda.apis.garage.entity.PartRequestItem;
-import com.autoadda.apis.garage.response.VehicleDetailResponse;
 import com.autoadda.apis.garage.request.NotificationContent;
+import com.autoadda.apis.garage.response.VehicleDetailResponse;
 import com.autoadda.apis.garage.util.CustomerChoice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -292,7 +292,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Started At:</strong> %s</p>
                     </div>
                     <p style="font-size: 16px; color: #555;">Track your service progress in the AutoAdda app.</p>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #3498db; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Details
@@ -329,7 +329,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Completed At:</strong> %s</p>
                     </div>
                     <p style="font-size: 16px; color: #555;">View the full details in your AutoAdda app.</p>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #27ae60; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Details
@@ -366,7 +366,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Services:</strong> %d service(s)</p>
                     </div>
                     <p style="font-size: 16px; color: #555;">Please visit your AutoAdda dashboard to proceed with the services.</p>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #3498db; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Work Order
@@ -420,7 +420,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Status:</strong> %s</p>
                     </div>
                     %s
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #e74c3c; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Invoice
@@ -488,7 +488,7 @@ public class NotificationMessageBuilder {
                             <li>Garage should buy (genuine/used options available)</li>
                         </ol>
                     </div>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #e67e22; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         Make Your Choice
@@ -547,7 +547,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">Your Choice:</p>
                         %s
                     </div>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #27ae60; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Details
@@ -613,7 +613,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Vehicle:</strong> %s</p>
                         <p style="margin: 5px 0;"><strong>Appointment ID:</strong> #%d</p>
                     </div>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #3498db; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Job Details
@@ -673,7 +673,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Vehicle:</strong> %s</p>
                         <p style="margin: 5px 0;"><strong>Services:</strong> %d service(s)</p>
                     </div>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #27ae60; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Work Order
@@ -738,7 +738,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 0; font-weight: bold; color: #856404;">Action Required:</p>
                         <p style="margin: 10px 0;">Please review this request and accept or reject it through your AutoAdda dashboard.</p>
                     </div>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #3498db; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Request
@@ -799,7 +799,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Type:</strong> %s</p>
                     </div>
                     <p style="font-size: 16px; color: #555;">You can now collaborate and work together on the AutoAdda platform.</p>
-                    <a href="https://autoadda.mylstech.com"
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #27ae60; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         View Details
@@ -859,7 +859,7 @@ public class NotificationMessageBuilder {
                         <p style="margin: 5px 0;"><strong>Type:</strong> %s</p>
                     </div>
                     <p style="font-size: 16px; color: #555;">You can search for other garages or technicians to collaborate with on the AutoAdda platform.</p>
-                    <a href="https://autoadda.mylstech.com
+                    <a href="https://autoadda.ae"
                        style="display: inline-block; margin-top: 20px; background-color: #3498db; color: white;
                               padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
                         Find Partners

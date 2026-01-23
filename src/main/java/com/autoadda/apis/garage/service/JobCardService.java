@@ -3,9 +3,6 @@ package com.autoadda.apis.garage.service;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.*;
-import com.autoadda.apis.garage.entity.AppointmentDetails;
-import com.autoadda.apis.garage.entity.AppointmentServices;
-import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.exception.MemberNotFoundException;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.mapper.JobCardMapper;
@@ -14,13 +11,11 @@ import com.autoadda.apis.garage.request.AssignServiceRequest;
 import com.autoadda.apis.garage.request.CreatePartRequestRequest;
 import com.autoadda.apis.garage.request.JobCardStatusRequest;
 import com.autoadda.apis.garage.request.NotificationContent;
-import com.autoadda.apis.garage.request.SmsRequest;
-import com.autoadda.apis.garage.response.*;
-import com.autoadda.apis.garage.util.NotificationType;
-import com.autoadda.apis.garage.util.BusinessValidator;
-import com.autoadda.apis.garage.util.DateHelper;
-import com.autoadda.apis.garage.util.JobCardStatus;
-import com.autoadda.apis.garage.util.Status;
+import com.autoadda.apis.garage.response.JobCardResponse;
+import com.autoadda.apis.garage.response.NotificationResult;
+import com.autoadda.apis.garage.response.PartRequestResponse;
+import com.autoadda.apis.garage.response.VehicleDetailResponse;
+import com.autoadda.apis.garage.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -32,9 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

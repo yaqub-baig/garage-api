@@ -1,7 +1,9 @@
 package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.*;
-import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.repository.AppointmentServiceRepository;
+import com.autoadda.apis.garage.repository.SubscriptionUsageLogRepository;
+import com.autoadda.apis.garage.repository.VehicleOwnerSubscriptionRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -1,10 +1,9 @@
 package com.autoadda.apis.garage.mapper;
 
-import com.autoadda.apis.garage.entity.AppointmentServices;
-import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.WorkOrder;
 import com.autoadda.apis.garage.repository.GarageRatingRepository;
+import com.autoadda.apis.garage.repository.VehicleReceivedRepository;
 import com.autoadda.apis.garage.response.StatusTimelineEntry;
 import com.autoadda.apis.garage.response.WorkOrderResponse;
 import com.autoadda.apis.garage.util.WorkOrderStatus;
@@ -27,6 +26,7 @@ public class WorkOrderMapper {
     private final JobCardMapper jobCardMapper;
     private final GarageMapper garageMapper;
     private final GarageRatingRepository  garageRatingRepository;
+    private final VehicleReceivedRepository   vehicleReceivedRepository;
 
     public WorkOrderResponse entityToResponse(WorkOrder save) {
         WorkOrderResponse workOrderResponse = new WorkOrderResponse ( );
@@ -61,7 +61,8 @@ public class WorkOrderMapper {
         workOrderResponse.setGarageNegotiatedComment ( save.getGarageNegotiatedComment ( ) );
         workOrderResponse.setCustomerNegotiatedAmount1 ( save.getCustomerNegotiatedAmount ( ) );
         workOrderResponse.setCustomerNegotiatedComment ( save.getCustomerNegotiatedComment ( ) );
-
+        var vehicleReceived = vehicleReceivedRepository.findByAppointmentId(save.getAppointment().getId());
+        workOrderResponse.setReceivedAt(vehicleReceived != null ? vehicleReceived.getCreatedAt() : null);
         // Set status timestamps
         workOrderResponse.setStatusTimestamps ( save.getStatusTimestamps ( ) );
 

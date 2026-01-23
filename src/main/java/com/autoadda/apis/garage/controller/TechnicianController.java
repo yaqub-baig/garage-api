@@ -2,7 +2,10 @@ package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.TechnicianRequest;
 import com.autoadda.apis.garage.request.TechnicianSearchCriteria;
-import com.autoadda.apis.garage.response.*;
+import com.autoadda.apis.garage.response.GarageResponse;
+import com.autoadda.apis.garage.response.PagedResponse;
+import com.autoadda.apis.garage.response.TechnicianResponse;
+import com.autoadda.apis.garage.response.TechnicianWorkHistoryResponse;
 import com.autoadda.apis.garage.service.TechnicianService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

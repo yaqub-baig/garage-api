@@ -3,13 +3,11 @@ package com.autoadda.apis.garage.response;
 import com.autoadda.apis.garage.util.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Represents the aggregated result of sending a notification across multiple channels.
