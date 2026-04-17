@@ -2,7 +2,6 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.MediaFileRepository;
-import com.autoadda.apis.garage.repository.os.OtherServiceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -24,7 +23,6 @@ public class MediaFileCleanupServiceImpl implements MediaFileCleanupService {
 
     private final MediaFileRepository mediaFileRepository;
     private final GarageRepository garageRepository;
-    private final OtherServiceRepository otherServiceRepository;
 
     /**
      * Schedules asynchronous cleanup of media files.
@@ -97,15 +95,8 @@ public class MediaFileCleanupServiceImpl implements MediaFileCleanupService {
         long garageTradeLicenseCount = garageRepository.countByTradeLicenseId(mediaFileId);
         long garageVatCertCount = garageRepository.countByVatCertificateId(mediaFileId);
 
-        // Check OtherService references
-        long otherServiceLogoCount = otherServiceRepository.countByCompanyLogoId(mediaFileId);
-        long otherServiceVatCertCount = otherServiceRepository.countByVatCertificateId(mediaFileId);
-        long otherServiceTradeLicenseCount = otherServiceRepository.countByTradeLicenseAttachmentId(mediaFileId);
-        long otherServiceImagesCount = otherServiceRepository.countByCompanyImagesId(mediaFileId);
-
         // Calculate total references across all entities
-        long totalReferences = garageLogoCount + garageImageCount + garageTradeLicenseCount + garageVatCertCount
-                + otherServiceLogoCount + otherServiceVatCertCount + otherServiceTradeLicenseCount + otherServiceImagesCount;
+        long totalReferences = garageLogoCount + garageImageCount + garageTradeLicenseCount + garageVatCertCount;
 
         return totalReferences > 0;
     }

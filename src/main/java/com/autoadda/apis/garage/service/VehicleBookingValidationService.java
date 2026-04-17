@@ -62,7 +62,7 @@ public class VehicleBookingValidationService {
                             serviceStartTime, scheduleDate, garageName)
             );
         }
-
+        //todo: add rest client api for validate if car has otherservice booking
         // Check in OtherService appointments
         boolean hasOsBooking = osAppointmentDetailsRepository
                 .existsByVehicleIdAndScheduleDateAndServiceStartTimeAndStatus(
@@ -145,6 +145,7 @@ public class VehicleBookingValidationService {
             );
         }
 
+        //todo: add rest client api for validate if car has otherservice booking
         // Check in OtherService appointments
         boolean hasOsConflict;
         if (!isGarageAppointment) {
@@ -158,7 +159,6 @@ public class VehicleBookingValidationService {
                     .existsByVehicleIdAndScheduleDateAndServiceStartTimeAndStatus(
                             vehicleId, scheduleDate, serviceStartTime, Status.CONFIRMED);
         }
-
         if (hasOsConflict) {
             Optional<OsAppointmentDetails> conflictingBooking = osAppointmentDetailsRepository
                     .findByVehicleIdAndScheduleDateAndServiceStartTimeAndStatus(
