@@ -20,8 +20,8 @@ public class MediaFileController {
 
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public List<MediaFile> upload(@RequestPart("files") List<MultipartFile> files) throws IOException {
-        if (files.stream().anyMatch(f -> f.getSize() > 10 * 1024 * 1024)) {
-            throw new IllegalArgumentException("File size must be less than 10MB");
+        if (files.stream().anyMatch(f -> f.getSize() > 30 * 1024 * 1024)) {
+            throw new IllegalArgumentException("File size must be less than 30MB");
         }
         return mediaFileService.upload(files);
     }
