@@ -37,7 +37,7 @@ public class Location {
 
     @Column(name = "country")
     private String country;
-    @Column(name = "gmap")
+    @Column(name = "gmap", length = 2048)
     private String gmap;
 
     @Column(name = "type")
