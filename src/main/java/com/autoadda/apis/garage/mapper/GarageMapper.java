@@ -51,6 +51,9 @@ public class GarageMapper {
         mapField(garage.getGarageLocation(), garageResponse::setLocation);
         mapField(garage.getBreakStartTime(), garageResponse::setBreakStartTime);
         mapField(garage.getBreakEndTime(), garageResponse::setBreakEndTime);
+        mapField(garage.getGmapRating(), garageResponse::setGmapRating);
+        mapField(garage.getGmapReviewsCount(), garageResponse::setGmapReviewsCount);
+        mapField(garage.getGmapCategory(), garageResponse::setGmapCategory);
 
         // Primitive boolean - no null check needed
         garageResponse.setIsActive(garage.isActive());

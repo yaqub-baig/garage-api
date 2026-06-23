@@ -1,7 +1,9 @@
 package com.autoadda.apis.garage.controller;
 
 import com.autoadda.apis.garage.request.ApproveGarageRequest;
+import com.autoadda.apis.garage.request.GarageImportRequest;
 import com.autoadda.apis.garage.request.RejectGarageRequest;
+import com.autoadda.apis.garage.response.GarageImportResult;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.service.GarageManagementService;
@@ -27,6 +29,19 @@ import java.util.Map;
 public class GarageAdministratorController {
 
     private final GarageManagementService garageManagementService;
+
+    /**
+     * Bulk import garages scraped from Google Maps (Apify)
+     * POST /admin/garages/import
+     */
+    @PostMapping("/import")
+    public ResponseEntity<GenericResponse> importScrapedGarages(
+            @RequestBody List<GarageImportRequest> records) {
+        log.info("Importing {} scraped garage records", records.size());
+        GarageImportResult result = garageManagementService.importScrapedGarages(records);
+        return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
+                "Import complete", result));
+    }
 
     /**
      * Approve a pending garage

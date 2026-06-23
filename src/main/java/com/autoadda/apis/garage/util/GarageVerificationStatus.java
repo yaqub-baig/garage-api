@@ -8,5 +8,6 @@ public enum GarageVerificationStatus {
     ACTIVE,               // Approved and operational
     SUSPENDED,            // Temporarily suspended
     INACTIVE,             // Deactivated
-    BLOCKED               // Permanently blocked
+    BLOCKED,              // Permanently blocked
+    IMPORTED              // Scraped from external source, pending manual review
 }

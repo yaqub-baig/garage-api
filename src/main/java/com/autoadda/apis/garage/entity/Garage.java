@@ -122,6 +122,15 @@ public class Garage {
 
     private Integer concurrentAppointmentCapacity;
 
+    @Column(name = "gmap_rating")
+    private Double gmapRating;
+
+    @Column(name = "gmap_reviews_count")
+    private Integer gmapReviewsCount;
+
+    @Column(name = "gmap_category")
+    private String gmapCategory;
+
     @OneToMany
     @JoinColumn(name = "garage_trade_license")
     @Builder.Default

@@ -54,4 +54,7 @@ public class GarageResponse {
     private List<MediaFile> tradeLicenseAttachment;
     private Double averageRating;
     private Long totalRatings;
+    private Double gmapRating;
+    private Integer gmapReviewsCount;
+    private String gmapCategory;
 }

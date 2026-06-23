@@ -7,9 +7,11 @@ import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.exception.UnauthorizedAccessException;
 import com.autoadda.apis.garage.mapper.GarageMapper;
 import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.request.GarageImportRequest;
 import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.request.GarageSearchCriteria;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
+import com.autoadda.apis.garage.response.GarageImportResult;
 import com.autoadda.apis.garage.response.GarageResponse;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.PagedResponse;
@@ -60,6 +62,7 @@ public class GarageManagementService {
     private final MediaFileCleanupService mediaFileCleanupService;
     private final AppointmentDetailsRepository appointmentDetailsRepository;
     private final GarageSearchHelper garageSearchHelper;
+    private final LocationRepository locationRepository;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage();
@@ -1222,6 +1225,141 @@ public class GarageManagementService {
         return garages.stream()
                 .map(garageMapper::entityToResponse)
                 .toList();
+    }
+
+    // ====================================================================================
+    // SCRAPER IMPORT: Bulk import garages from Google Maps scraping
+    // ====================================================================================
+
+    private static final Set<String> AUTOMOTIVE_CATEGORIES = Set.of(
+        "auto repair shop",
+        "car repair and maintenance service",
+        "auto body shop",
+        "auto parts store",
+        "used auto parts store",
+        "auto machine shop",
+        "auto electrical service",
+        "auto bodywork mechanic",
+        "auto painting",
+        "oil change service",
+        "tire shop",
+        "tyre shop",
+        "brake shop",
+        "wheel alignment service",
+        "mechanic",
+        "auto air conditioning service",
+        "vehicle inspection service",
+        "auto tune up service",
+        "engine rebuilding service",
+        "auto detailing service",
+        "transmission shop",
+        "auto glass shop",
+        "car inspection station",
+        "auto workshop",
+        "car repair workshop",
+        "automobile repair shop",
+        "auto service center",
+        "auto service centre",
+        "car service",
+        "car maintenance",
+        "vehicle service",
+        "auto spare parts",
+        "auto accessories store",
+        "garage",
+        "car garage",
+        "auto garage",
+        "car workshop",
+        "automotive",
+        "car repair",
+        "auto repair",
+        "motor vehicle dealer",
+        "car wash"
+    );
+
+    @Transactional
+    public GarageImportResult importScrapedGarages(List<GarageImportRequest> records) {
+        int imported = 0;
+        int skippedNonAutomotive = 0;
+        int skippedDuplicatePhone = 0;
+        int skippedInvalidTitle = 0;
+
+        for (GarageImportRequest record : records) {
+            // Skip blank or garbage titles
+            String title = record.getTitle();
+            if (title == null || title.isBlank() || title.chars().allMatch(c -> c == ',' || c == ' ')) {
+                skippedInvalidTitle++;
+                continue;
+            }
+
+            // Filter non-automotive records
+            if (!isAutomotiveCategory(record.getCategoryName(), record.getCategories())) {
+                log.debug("Skipping non-automotive record: {} ({})", title, record.getCategoryName());
+                skippedNonAutomotive++;
+                continue;
+            }
+
+            // Normalise phone: empty string → null
+            String phone = (record.getPhone() != null && !record.getPhone().isBlank())
+                    ? record.getPhone().trim()
+                    : null;
+
+            // Skip if a garage with this phone already exists
+            if (phone != null && garageRepository.findByPhoneNumber(phone).isPresent()) {
+                log.debug("Skipping duplicate phone {}: {}", phone, title);
+                skippedDuplicatePhone++;
+                continue;
+            }
+
+            // Build Location
+            Location location = new Location();
+            location.setStreetAddress1(record.getAddress());
+            location.setArea(record.getNeighborhood());
+            location.setCity(record.getCity());
+            location.setState(record.getState());
+            location.setCountry(record.getCountryCode());
+            location.setGmap(record.getGmapUrl());
+            locationRepository.save(location);
+
+            // Build Garage
+            Garage garage = Garage.builder()
+                    .name(title.trim())
+                    .phoneNumber(phone)
+                    .website(record.getWebsite())
+                    .garageLocation(location)
+                    .accountStatus(GarageVerificationStatus.IMPORTED)
+                    .gmapRating(record.getTotalScore())
+                    .gmapReviewsCount(record.getReviewsCount())
+                    .gmapCategory(record.getCategoryName())
+                    .build();
+
+            garageRepository.save(garage);
+            imported++;
+        }
+
+        log.info("Import complete — imported: {}, skippedNonAutomotive: {}, skippedDuplicatePhone: {}, skippedInvalidTitle: {}",
+                imported, skippedNonAutomotive, skippedDuplicatePhone, skippedInvalidTitle);
+
+        return GarageImportResult.builder()
+                .total(records.size())
+                .imported(imported)
+                .skippedNonAutomotive(skippedNonAutomotive)
+                .skippedDuplicatePhone(skippedDuplicatePhone)
+                .skippedInvalidTitle(skippedInvalidTitle)
+                .build();
+    }
+
+    private boolean isAutomotiveCategory(String categoryName, List<String> categories) {
+        if (categoryName != null && AUTOMOTIVE_CATEGORIES.contains(categoryName.toLowerCase().trim())) {
+            return true;
+        }
+        if (categories != null) {
+            for (String cat : categories) {
+                if (cat != null && AUTOMOTIVE_CATEGORIES.contains(cat.toLowerCase().trim())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
