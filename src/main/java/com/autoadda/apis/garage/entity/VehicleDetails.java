@@ -70,14 +70,6 @@ public class VehicleDetails {
     @Column(name = "status")
     private Status status;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "insurance_id", referencedColumnName = "id")
-    private InsuranceDetails insurance;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "registration_id", referencedColumnName = "id")
-    private VehicleRegistration registration;
-
     @ManyToOne
     @JoinColumn(name = "vehicle_owner_id", referencedColumnName = "id")
     private VehicleOwner vehicleOwner;

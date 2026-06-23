@@ -1,10 +1,9 @@
 package com.autoadda.apis.garage.util;
 
-import com.autoadda.apis.garage.entity.AuthenticationDetails;
+
 import com.autoadda.apis.garage.entity.Customer;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.exception.*;
-import com.autoadda.apis.garage.repository.AuthenticationDetailsRepository;
 import com.autoadda.apis.garage.repository.CustomerRepository;
 import com.autoadda.apis.garage.repository.GarageRepository;
 import com.autoadda.apis.garage.repository.TechnicianRepository;
@@ -19,7 +18,7 @@ public class BusinessValidator {
     private final GarageRepository garageRepository;
     private final CustomerRepository customerRepository;
     private final TechnicianRepository garageTechnicianRepository;
-    private final AuthenticationDetailsRepository authenticationDetailsRepository;
+
 
     /**
      * Validates if the given garage ID exists.
@@ -28,12 +27,7 @@ public class BusinessValidator {
      * @throws GarageNotFoundException if the garage does not exist
      */
 
-    public void validateUsername(String username) throws MemberAlreadyExistException {
-        AuthenticationDetails authData = authenticationDetailsRepository.findByUserName ( username );
-        if ( null != authData ) {
-            throw new MemberAlreadyExistException ( "Username already exist" );
-        }
-    }
+
 
     public void validateTechnician(Integer technicianId) throws MemberNotFoundException {
 
