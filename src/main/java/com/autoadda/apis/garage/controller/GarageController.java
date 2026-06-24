@@ -40,8 +40,12 @@ public class GarageController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<List<GarageResponse>> getAllGarages() {
-        return ResponseEntity.ok(garageService.getAllGarages());
+    public ResponseEntity<PagedResponse<GarageResponse>> getAllGarages(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        return ResponseEntity.ok(garageService.getAllGaragesPaged(page, size, sortBy, sortDir));
     }
 
     @GetMapping

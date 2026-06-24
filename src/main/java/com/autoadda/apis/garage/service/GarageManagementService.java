@@ -267,6 +267,35 @@ public class GarageManagementService {
         return garageRepository.findAll().stream().filter(Garage::isActive).map(garageMapper::entityToResponse).toList();
     }
 
+    @Transactional(readOnly = true)
+    public PagedResponse<GarageResponse> getAllGaragesPaged(int page, int size, String sortBy, String sortDirection) {
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Page<Integer> idPage = garageRepository.findActiveGarageIdsPaged(pageable);
+        List<Garage> garages = idPage.getContent().isEmpty()
+                ? Collections.emptyList()
+                : garageRepository.findByIdInWithCollections(idPage.getContent());
+        Map<Integer, Garage> garageById = garages.stream().collect(Collectors.toMap(Garage::getId, g -> g));
+        List<GarageResponse> content = idPage.getContent().stream()
+                .map(garageById::get)
+                .filter(Objects::nonNull)
+                .map(garageMapper::entityToResponse)
+                .toList();
+
+        return PagedResponse.<GarageResponse>builder()
+                .content(content)
+                .pageNumber(idPage.getNumber())
+                .pageSize(idPage.getSize())
+                .totalElements(idPage.getTotalElements())
+                .totalPages(idPage.getTotalPages())
+                .first(idPage.isFirst())
+                .last(idPage.isLast())
+                .empty(content.isEmpty())
+                .numberOfElements(content.size())
+                .build();
+    }
+
     public List<GarageResponse> getAllGaragesByOwnerId(String autoAddaId) {
         return garageRepository.findByGarageOwner(Integer.parseInt(autoAddaId)).stream()
                 .filter(Garage::isActive)

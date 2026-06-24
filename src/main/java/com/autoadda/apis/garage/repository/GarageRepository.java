@@ -99,6 +99,11 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
             "WHERE g.accountStatus = 'APPROVED'")
     Set<Garage> findAllWithLocationAndServices();
 
+    // Paginate all active garages by ID only (for /garages/all endpoint)
+    @Query(value = "SELECT g.id FROM Garage g WHERE g.isActive = true",
+           countQuery = "SELECT COUNT(g) FROM Garage g WHERE g.isActive = true")
+    Page<Integer> findActiveGarageIdsPaged(Pageable pageable);
+
     // Step 1 of 2-query pagination: fetch only IDs with SQL-level LIMIT (no collection joins)
     @Query(value = "SELECT g.id FROM Garage g LEFT JOIN g.garageLocation WHERE g.accountStatus = 'APPROVED'",
            countQuery = "SELECT COUNT(DISTINCT g) FROM Garage g WHERE g.accountStatus = 'APPROVED'")
