@@ -99,17 +99,18 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
             "WHERE g.accountStatus = 'APPROVED'")
     Set<Garage> findAllWithLocationAndServices();
 
-    // Paginated version - finds all approved garages with pagination
+    // Step 1 of 2-query pagination: fetch only IDs with SQL-level LIMIT (no collection joins)
+    @Query(value = "SELECT g.id FROM Garage g LEFT JOIN g.garageLocation WHERE g.accountStatus = 'APPROVED'",
+           countQuery = "SELECT COUNT(DISTINCT g) FROM Garage g WHERE g.accountStatus = 'APPROVED'")
+    Page<Integer> findApprovedGarageIdsPaged(Pageable pageable);
+
+    // Step 2 of 2-query pagination: hydrate full entities with collections for a known ID set
     @Query("SELECT DISTINCT g FROM Garage g " +
            "LEFT JOIN FETCH g.garageLocation " +
            "LEFT JOIN FETCH g.services s " +
            "LEFT JOIN FETCH s.availableService " +
-           "WHERE g.accountStatus = 'APPROVED'")
-    Page<Garage> findAllApprovedWithPagination(Pageable pageable);
-
-    // Count query for pagination (required for Page)
-    @Query("SELECT COUNT(DISTINCT g) FROM Garage g WHERE g.accountStatus = 'APPROVED'")
-    long countAllApproved();
+           "WHERE g.id IN :ids")
+    List<Garage> findByIdInWithCollections(@Param("ids") List<Integer> ids);
 
     // ====================================================================================
     // GARAGE VERIFICATION QUERY METHODS (for future admin features)

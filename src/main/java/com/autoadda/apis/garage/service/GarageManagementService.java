@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Boolean.TRUE;
 
@@ -650,10 +651,30 @@ public class GarageManagementService {
         // Create Pageable
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // APPROACH 1: If no filters, use database pagination directly
+        // APPROACH 1: If no filters, use two-query DB pagination (avoids Hibernate in-memory pagination)
         if (hasNoFilters(brand, city, zip, garageName, availableServiceIds, model)) {
-            Page<Garage> garagePage = garageRepository.findAllApprovedWithPagination(pageable);
-            return convertToPagedResponse(garagePage);
+            Page<Integer> idPage = garageRepository.findApprovedGarageIdsPaged(pageable);
+            List<Garage> garages = idPage.getContent().isEmpty()
+                    ? Collections.emptyList()
+                    : garageRepository.findByIdInWithCollections(idPage.getContent());
+            Map<Integer, Garage> garageById = garages.stream()
+                    .collect(Collectors.toMap(Garage::getId, g -> g));
+            List<GarageResponse> content = idPage.getContent().stream()
+                    .map(garageById::get)
+                    .filter(Objects::nonNull)
+                    .map(garageMapper::entityToResponse)
+                    .toList();
+            return PagedResponse.<GarageResponse>builder()
+                    .content(content)
+                    .pageNumber(idPage.getNumber())
+                    .pageSize(idPage.getSize())
+                    .totalElements(idPage.getTotalElements())
+                    .totalPages(idPage.getTotalPages())
+                    .first(idPage.isFirst())
+                    .last(idPage.isLast())
+                    .empty(content.isEmpty())
+                    .numberOfElements(content.size())
+                    .build();
         }
 
         // APPROACH 2: With filters, load all and filter in-memory (not ideal but matches current behavior)
