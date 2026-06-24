@@ -58,7 +58,7 @@ public class Garage {
     @Column(name = "trn_number")
     private String trnNumber;
 
-    @Column(name = "website")
+    @Column(name = "website", length = 2048)
     private String website;
 
     @Column(name = "email_id")
