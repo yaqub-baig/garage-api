@@ -13,7 +13,7 @@ CREATE TABLE working_tools (
     brand VARCHAR(100),
     model VARCHAR(100),
     quantity INT NOT NULL DEFAULT 1,
-    condition VARCHAR(50),
+    tool_condition VARCHAR(50),
     tool_image_id BIGINT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE working_tools (
 /*
 INSERT INTO working_tools (
     garage_id, tool_name, category, brand, model,
-    quantity, condition, created_at, updated_at
+    quantity, tool_condition, created_at, updated_at
 )
 VALUES (
     1, 'Impact Wrench', 'Power Tool', 'DeWalt', 'DCF899',

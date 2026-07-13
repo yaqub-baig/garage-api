@@ -39,6 +39,7 @@ public class WorkingTools {
     @Builder.Default
     private Integer quantity = 1;
 
+    @Column(name = "tool_condition")
     @Enumerated(EnumType.STRING)
     private ToolCondition condition;
 
