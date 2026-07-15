@@ -109,10 +109,10 @@ public class Garage {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "brands")
+    @Column(name = "brands", columnDefinition = "LONGTEXT")
     private String brands;
 
-    @Column(name = "models", length = 2000)
+    @Column(name = "models", columnDefinition = "LONGTEXT")
     private String models;
 
     @Column(name = "garage_owner_id")
