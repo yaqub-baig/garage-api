@@ -1,15 +1,23 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.entity.ExpertiseCategory;
 import com.autoadda.apis.garage.entity.TechnicianExpertise;
+import com.autoadda.apis.garage.exception.ResourceNotFoundException;
+import com.autoadda.apis.garage.repository.ExpertiseCategoryRepository;
 import com.autoadda.apis.garage.request.TechnicianExpertiseRequest;
 import com.autoadda.apis.garage.response.TechnicianExpertiseResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Mapper for converting between TechnicianExpertise entity and DTOs.
  */
 @Component
+@RequiredArgsConstructor
 public class TechnicianExpertiseMapper {
+
+    private final ExpertiseCategoryRepository expertiseCategoryRepository;
+    private final ExpertiseCategoryMapper expertiseCategoryMapper;
 
     /**
      * Convert TechnicianExpertise entity to response DTO.
@@ -24,7 +32,7 @@ public class TechnicianExpertiseMapper {
 
         return TechnicianExpertiseResponse.builder()
                 .id(entity.getId())
-                .expertiseCategory(entity.getExpertiseCategory())
+                .expertiseCategory(expertiseCategoryMapper.toResponse(entity.getExpertiseCategory()))
                 .expertiseLevel(entity.getExpertiseLevel())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
@@ -43,8 +51,12 @@ public class TechnicianExpertiseMapper {
             return null;
         }
 
+        ExpertiseCategory expertiseCategory = expertiseCategoryRepository.findById(request.getExpertiseCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Expertise category not found with id: " + request.getExpertiseCategoryId()));
+
         return TechnicianExpertise.builder()
-                .expertiseCategory(request.getExpertiseCategory())
+                .expertiseCategory(expertiseCategory)
                 .expertiseLevel(request.getExpertiseLevel())
                 .build();
     }

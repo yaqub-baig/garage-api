@@ -1,6 +1,5 @@
 package com.autoadda.apis.garage.entity;
 
-import com.autoadda.apis.garage.util.ExpertiseCategory;
 import com.autoadda.apis.garage.util.ExpertiseLevel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
     name = "technician_expertise",
     uniqueConstraints = @UniqueConstraint(
         name = "uk_technician_category",
-        columnNames = {"technician_id", "expertise_category"}
+        columnNames = {"technician_id", "expertise_category_id"}
     )
 )
 @Data
@@ -36,8 +35,8 @@ public class TechnicianExpertise {
     @JoinColumn(name = "technician_id", nullable = false)
     private Technician technician;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "expertise_category", nullable = false, length = 50)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expertise_category_id", nullable = false)
     private ExpertiseCategory expertiseCategory;
 
     @Enumerated(EnumType.STRING)

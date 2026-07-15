@@ -1,11 +1,12 @@
 package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.entity.AvailableService;
+import com.autoadda.apis.garage.entity.ExpertiseCategory;
 import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.mapper.TechnicianMapper;
+import com.autoadda.apis.garage.repository.ExpertiseCategoryRepository;
 import com.autoadda.apis.garage.repository.TechnicianRepository;
 import com.autoadda.apis.garage.response.TechnicianResponse;
-import com.autoadda.apis.garage.util.ExpertiseCategory;
 import com.autoadda.apis.garage.util.ExpertiseLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class TechnicianSearchHelper {
 
     private final TechnicianRepository technicianRepository;
     private final TechnicianMapper technicianMapper;
+    private final ExpertiseCategoryRepository expertiseCategoryRepository;
 
     /**
      * Universal search method that searches across multiple fields in priority order.
@@ -145,7 +147,8 @@ public class TechnicianSearchHelper {
         return technician.getExpertise().stream()
                 .filter(Objects::nonNull)
                 .anyMatch(exp -> exp.getExpertiseCategory() != null &&
-                        exp.getExpertiseCategory().name().toLowerCase()
+                        exp.getExpertiseCategory().getName() != null &&
+                        exp.getExpertiseCategory().getName().toLowerCase()
                            .contains(query.toLowerCase()));
     }
 
@@ -249,8 +252,14 @@ public class TechnicianSearchHelper {
         List<ExpertisePair> pairs = new ArrayList<>();
         for (int i = 0; i < categories.size(); i++) {
             try {
-                ExpertiseCategory category = ExpertiseCategory.valueOf(
-                    categories.get(i).toUpperCase());
+                ExpertiseCategory category = expertiseCategoryRepository
+                        .findByNameIgnoreCase(categories.get(i))
+                        .orElse(null);
+                if (category == null) {
+                    log.warn("Invalid expertise filter: category={}, level={}",
+                             categories.get(i), levels.get(i));
+                    continue;
+                }
                 ExpertiseLevel level = ExpertiseLevel.valueOf(
                     levels.get(i).toUpperCase());
                 pairs.add(new ExpertisePair(category, level));
@@ -286,7 +295,8 @@ public class TechnicianSearchHelper {
             technician.getExpertise().stream()
                 .filter(Objects::nonNull)
                 .anyMatch(exp ->
-                    exp.getExpertiseCategory() == pair.category() &&
+                    exp.getExpertiseCategory() != null &&
+                    Objects.equals(exp.getExpertiseCategory().getId(), pair.category().getId()) &&
                     exp.getExpertiseLevel() == pair.level()
                 )
         );

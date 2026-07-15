@@ -1,6 +1,5 @@
 package com.autoadda.apis.garage.response;
 
-import com.autoadda.apis.garage.util.ExpertiseCategory;
 import com.autoadda.apis.garage.util.ExpertiseLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +20,7 @@ public class TechnicianExpertiseResponse {
 
     private Integer id;
 
-    private ExpertiseCategory expertiseCategory;
+    private ExpertiseCategoryResponse expertiseCategory;
 
     private ExpertiseLevel expertiseLevel;
 

@@ -2,6 +2,7 @@ package com.autoadda.apis.garage.service;
 
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.AvailableService;
+import com.autoadda.apis.garage.entity.ExpertiseCategory;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.entity.TechnicianExpertise;
@@ -46,6 +47,7 @@ public class TechnicianService {
     private final JobCardMapper jobCardMapper;
     private final com.autoadda.apis.garage.mapper.TechnicianExpertiseMapper technicianExpertiseMapper;
     private final TechnicianExpertiseRepository technicianExpertiseRepository;
+    private final ExpertiseCategoryRepository expertiseCategoryRepository;
 
     /**
      * Retrieves a list of technicians associated with a specific garage.
@@ -503,8 +505,14 @@ public class TechnicianService {
         List<ExpertisePair> pairs = new ArrayList<>();
         for (int i = 0; i < categories.size(); i++) {
             try {
-                ExpertiseCategory category = ExpertiseCategory.valueOf(
-                    categories.get(i).toUpperCase());
+                ExpertiseCategory category = expertiseCategoryRepository
+                        .findByNameIgnoreCase(categories.get(i))
+                        .orElse(null);
+                if (category == null) {
+                    log.warn("Invalid expertise filter: category={}, level={}",
+                             categories.get(i), levels.get(i));
+                    continue;
+                }
                 ExpertiseLevel level = ExpertiseLevel.valueOf(
                     levels.get(i).toUpperCase());
                 pairs.add(new ExpertisePair(category, level));
@@ -540,7 +548,8 @@ public class TechnicianService {
             technician.getExpertise().stream()
                 .filter(Objects::nonNull)
                 .anyMatch(exp ->
-                    exp.getExpertiseCategory() == pair.category() &&
+                    exp.getExpertiseCategory() != null &&
+                    Objects.equals(exp.getExpertiseCategory().getId(), pair.category().getId()) &&
                     exp.getExpertiseLevel() == pair.level()
                 )
         );

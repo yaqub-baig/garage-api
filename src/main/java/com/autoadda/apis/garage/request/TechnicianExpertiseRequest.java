@@ -1,6 +1,5 @@
 package com.autoadda.apis.garage.request;
 
-import com.autoadda.apis.garage.util.ExpertiseCategory;
 import com.autoadda.apis.garage.util.ExpertiseLevel;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class TechnicianExpertiseRequest {
 
     @NotNull(message = "Expertise category is required")
-    private ExpertiseCategory expertiseCategory;
+    private Integer expertiseCategoryId;
 
     @NotNull(message = "Expertise level is required")
     private ExpertiseLevel expertiseLevel;
