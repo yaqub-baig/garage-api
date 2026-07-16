@@ -116,7 +116,9 @@ public class TechnicianService {
         garageTechnician.setFirstName(technician.getFirstName());
         garageTechnician.setEmailId(technician.getEmailId());
         garageTechnician.setGarages(garages);  // Use garages list for many-to-many
-        garageTechnician.setSkillSet(availableServiceRepository.findAllById(technician.getSkillSetIds()));
+        if (technician.getSkillSetIds() != null && !technician.getSkillSetIds().isEmpty()) {
+            garageTechnician.setSkillSet(availableServiceRepository.findAllById(technician.getSkillSetIds()));
+        }
 
         // Set new fields
         garageTechnician.setBrand(technician.getBrand());
