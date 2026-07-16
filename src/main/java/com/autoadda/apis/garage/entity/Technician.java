@@ -64,10 +64,10 @@ public class Technician {
     @Builder.Default
     private Set<Garage> garages = new HashSet<>();
 
-    @Column(name = "brand")
+    @Column(name = "brand", columnDefinition = "LONGTEXT")
     private String brand;
 
-    @Column(name = "model")
+    @Column(name = "model", columnDefinition = "LONGTEXT")
     private String model;
 
     @Column(name = "description", length = 1000)
