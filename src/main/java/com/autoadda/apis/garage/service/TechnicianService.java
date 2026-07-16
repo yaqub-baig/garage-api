@@ -19,6 +19,7 @@ import com.autoadda.apis.garage.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -145,7 +146,14 @@ public class TechnicianService {
         garageTechnician.setAutoAddaId(userDetails.getBody().getId());
         authClient.updateRole(garageTechnician.getAutoAddaId(), ERole.GARAGE_TECH);
 
-        return technicianMapper.entityToResponse(technicianRepository.saveAndFlush(garageTechnician));
+        try {
+            return technicianMapper.entityToResponse(technicianRepository.saveAndFlush(garageTechnician));
+        } catch (DataIntegrityViolationException e) {
+            // Guards the race window between the findByMobileNumber() check above and this
+            // save (e.g. concurrent duplicate submissions); the DB unique constraint on
+            // mobile_number is the actual source of truth.
+            throw new AlreadyExistsException("Technician with this phone number already exists");
+        }
     }
 
     /**

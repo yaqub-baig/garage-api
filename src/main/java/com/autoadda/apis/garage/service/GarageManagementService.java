@@ -599,14 +599,25 @@ public class GarageManagementService {
         Garage garage = garageRepository.findById(garageId)
                 .orElseThrow(() -> new EntityNotFoundException(GARAGE_NOT_FOUND));
         UserResponse user = authClient.getUser(ownerId);
-        technician.setAutoAddaId(user.getId());
-        // You may check for duplicate email, phone etc.
-        technician.setFirstName(user.getName());
-        technician.setEmailId(user.getEmail());
-        technician.setStatus(Status.ACTIVE);
-        technician.setGarages(Set.of(garage));  // Changed to use garages set for many-to-many
-        technician.setEmployeeRole(EMPLOYEE_ROLE.OWNER);
-        return technicianRepository.save(technician);
+
+        // An owner can own multiple garages; reuse their existing technician
+        // record (if any) instead of inserting a new OWNER row per garage.
+        Technician ownerTechnician = technicianRepository.findByAutoAddaId(ownerId)
+                .filter(existing -> Boolean.FALSE.equals(existing.getIsDeleted()))
+                .orElse(technician);
+
+        ownerTechnician.setAutoAddaId(user.getId());
+        ownerTechnician.setFirstName(user.getName());
+        ownerTechnician.setEmailId(user.getEmail());
+        ownerTechnician.setStatus(Status.ACTIVE);
+        ownerTechnician.setEmployeeRole(EMPLOYEE_ROLE.OWNER);
+
+        Set<Garage> garages = new HashSet<>(ownerTechnician.getGarages() != null
+                ? ownerTechnician.getGarages() : Set.of());
+        garages.add(garage);
+        ownerTechnician.setGarages(garages);
+
+        return technicianRepository.save(ownerTechnician);
     }
 
     @Transactional
