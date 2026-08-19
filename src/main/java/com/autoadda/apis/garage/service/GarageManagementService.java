@@ -129,6 +129,8 @@ public class GarageManagementService {
         Optional.ofNullable(request.getTrnNumber()).ifPresent(garage::setTrnNumber);
         Optional.ofNullable(request.getConcurrentAppointmentCapacity())
                 .ifPresent(garage::setConcurrentAppointmentCapacity);
+        Optional.ofNullable(request.getTamaraPaymentAvailable())
+                .ifPresent(garage::setTamaraPaymentAvailable);
     }
 
     private void mapVehicleInfo(GarageRequest request, Garage garage) {
@@ -404,6 +406,8 @@ public class GarageManagementService {
                     existing.setConcurrentAppointmentCapacity(capacity);
                     slotGenerationService.updateUpcomingSlotsForGarage(existing);
                 });
+        Optional.ofNullable(request.getTamaraPaymentAvailable())
+                .ifPresent(existing::setTamaraPaymentAvailable);
     }
 
     private void updateVehicleInfo(GarageRequest request, Garage existing) {

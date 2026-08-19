@@ -54,6 +54,7 @@ public class GarageMapper {
         mapField(garage.getGmapRating(), garageResponse::setGmapRating);
         mapField(garage.getGmapReviewsCount(), garageResponse::setGmapReviewsCount);
         mapField(garage.getGmapCategory(), garageResponse::setGmapCategory);
+        mapField(garage.getTamaraPaymentAvailable(), garageResponse::setTamaraPaymentAvailable);
 
         // Primitive boolean - no null check needed
         garageResponse.setIsActive(garage.isActive());

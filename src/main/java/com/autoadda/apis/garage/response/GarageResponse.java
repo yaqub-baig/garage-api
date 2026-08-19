@@ -57,4 +57,5 @@ public class GarageResponse {
     private Double gmapRating;
     private Integer gmapReviewsCount;
     private String gmapCategory;
+    private Boolean tamaraPaymentAvailable;
 }

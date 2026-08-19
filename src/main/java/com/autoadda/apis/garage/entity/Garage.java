@@ -100,6 +100,10 @@ public class Garage {
     @Builder.Default
     private Integer resubmissionCount = 0;
 
+    @Column(name = "tamara_payment_available")
+    @Builder.Default
+    private Boolean tamaraPaymentAvailable = false;
+
     @Column(name = "last_reviewed_by")
     private Integer lastReviewedBy;
 

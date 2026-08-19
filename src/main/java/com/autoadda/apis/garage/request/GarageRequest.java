@@ -46,5 +46,6 @@ public class GarageRequest {
     private List<Long> vatCertificateIds;
     private List<Long> tradeLicenseAttachmentIds;
     private List<Long> garageImagesIds;
+    private Boolean tamaraPaymentAvailable;
 
 }
