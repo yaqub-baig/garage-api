@@ -235,7 +235,7 @@ public class AppointmentSlotService {
             // Validate vehicle availability for reschedule
             Integer targetVehicleId = vehicleId != null ? vehicleId : appointmentDetails.getVehicleId ( );
             vehicleBookingValidationService.validateVehicleAvailabilityForEdit (
-                    targetVehicleId, date, time1, appointmentId, true );
+                    targetVehicleId, date, time1, appointmentId );
 
             appointmentDetails.setGarage ( garageRepo.findById ( garageId ).orElseThrow ( () -> new ResourceNotFoundException ( "Garage not found" ) ) );
         }

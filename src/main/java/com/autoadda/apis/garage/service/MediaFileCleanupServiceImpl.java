@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Implementation of media file cleanup service.
  * Handles asynchronous cleanup of media files that are no longer referenced
- * by any entity (Garage or OtherService) in the system.
+ * by any Garage entity in the system.
  */
 @Slf4j
 @Service
@@ -82,8 +82,8 @@ public class MediaFileCleanupServiceImpl implements MediaFileCleanupService {
 
     /**
      * Checks if a media file is still referenced by any entity in the system.
-     * This method checks references in both Garage and OtherService entities
-     * across all their media file relationships (logo, images, certificates, etc.).
+     * This method checks references in Garage entities across all their media
+     * file relationships (logo, images, certificates, etc.).
      *
      * @param mediaFileId The ID of the media file to check
      * @return true if the file is still referenced, false otherwise
