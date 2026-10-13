@@ -18,6 +18,8 @@ public class TechnicianRequest {
 
     private String firstName;
 
+    private String lastName;
+
     private String emailId;
 
     private String mobileNumber;

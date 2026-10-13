@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.request;
 
+import com.autoadda.apis.garage.util.ProfileCompletionStatus;
 import lombok.*;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public class TechnicianSearchCriteria {
     private String city;                        // Location city filter
     private String brand;                       // Vehicle brand specialization
     private String model;                       // Vehicle model specialization
+    private Integer minProfileCompletion;       // Minimum CV profile completion percent (0-100)
+    private ProfileCompletionStatus profileCompletionStatus; // CV profile completion status
 }

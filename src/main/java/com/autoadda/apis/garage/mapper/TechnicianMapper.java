@@ -21,6 +21,7 @@ public class TechnicianMapper {
         TechnicianResponse technicianResponse = new TechnicianResponse ( );
         technicianResponse.setId ( technician.getId ( ) );
         technicianResponse.setFirstName ( technician.getFirstName ( ) );
+        technicianResponse.setLastName ( technician.getLastName ( ) );
         technicianResponse.setEmiratesId ( technician.getEmiratesId ( ) );
 
         technicianResponse.setEmailId ( technician.getEmailId ( ) );
@@ -55,6 +56,9 @@ public class TechnicianMapper {
                 : Collections.emptyList()
         );
 
+        technicianResponse.setProfileCompletionPercent ( technician.getProfileCompletionPercent ( ) );
+        technicianResponse.setProfileCompletionStatus ( technician.getProfileCompletionStatus ( ) );
+
         technicianResponse.setAutoAddaUser ( authClient.getUser ( technician.getAutoAddaId ( ) ) );
         return technicianResponse;
     }
@@ -64,6 +68,8 @@ public class TechnicianMapper {
             technician.setEmailId ( technicianRequest.getEmailId ( ) );
         if ( technicianRequest.getFirstName ( ) != null )
             technician.setFirstName ( technicianRequest.getFirstName ( ) );
+        if ( technicianRequest.getLastName ( ) != null )
+            technician.setLastName ( technicianRequest.getLastName ( ) );
         if ( technicianRequest.getEmiratesId ( ) != null )
             technician.setEmiratesId ( technicianRequest.getEmiratesId ( ) );
         if ( technicianRequest.getMobileNumber ( ) != null )

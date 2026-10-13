@@ -12,6 +12,7 @@ import com.autoadda.apis.garage.mapper.GarageMapper;
 import com.autoadda.apis.garage.mapper.JobCardMapper;
 import com.autoadda.apis.garage.mapper.TechnicianMapper;
 import com.autoadda.apis.garage.repository.*;
+import com.autoadda.apis.garage.request.TechnicianExpertiseRequest;
 import com.autoadda.apis.garage.request.TechnicianRequest;
 import com.autoadda.apis.garage.request.TechnicianSearchCriteria;
 import com.autoadda.apis.garage.response.*;
@@ -49,6 +50,7 @@ public class TechnicianService {
     private final com.autoadda.apis.garage.mapper.TechnicianExpertiseMapper technicianExpertiseMapper;
     private final TechnicianExpertiseRepository technicianExpertiseRepository;
     private final ExpertiseCategoryRepository expertiseCategoryRepository;
+    private final TechnicianProfileCompletionCalculator profileCompletionCalculator;
 
     /**
      * Retrieves a list of technicians associated with a specific garage.
@@ -114,6 +116,7 @@ public class TechnicianService {
         }
 
         garageTechnician.setFirstName(technician.getFirstName());
+        garageTechnician.setLastName(technician.getLastName());
         garageTechnician.setEmailId(technician.getEmailId());
         garageTechnician.setGarages(garages);  // Use garages list for many-to-many
         if (technician.getSkillSetIds() != null && !technician.getSkillSetIds().isEmpty()) {
@@ -147,6 +150,7 @@ public class TechnicianService {
 
         garageTechnician.setAutoAddaId(userDetails.getBody().getId());
         authClient.updateRole(garageTechnician.getAutoAddaId(), ERole.GARAGE_TECH);
+        profileCompletionCalculator.recalculate(garageTechnician);
 
         try {
             return technicianMapper.entityToResponse(technicianRepository.saveAndFlush(garageTechnician));
@@ -259,33 +263,43 @@ public class TechnicianService {
 
         // Update expertise (replace all pattern)
         if (technicianRequest.getExpertise() != null) {
-            log.info("Updating expertise for technician id {}", id);
-
-            // Delete old expertise records using explicit query to avoid 409 conflicts
-            // This ensures DELETE completes before INSERT within the transaction
-            technicianExpertiseRepository.deleteByTechnicianId(id);
-
-            // Clear the collection to remove references (already deleted in DB)
-            garageTechnician.getExpertise().clear();
-
-            if (!technicianRequest.getExpertise().isEmpty()) {
-                final Technician finalTechnician = garageTechnician;
-                Set<TechnicianExpertise> expertiseSet = technicianRequest.getExpertise().stream()
-                        .map(technicianExpertiseMapper::toEntity)
-                        .map(expertise -> {
-                            expertise.setTechnician(finalTechnician);
-                            return expertise;
-                        })
-                        .collect(java.util.stream.Collectors.toSet());
-                garageTechnician.getExpertise().addAll(expertiseSet);
-                log.info("Updated expertise for technician id {}: {} new categories added",
-                        id, expertiseSet.size());
-            } else {
-                log.info("Cleared all expertise for technician id {}", id);
-            }
+            replaceExpertise(garageTechnician, technicianRequest.getExpertise());
         }
 
+        profileCompletionCalculator.recalculate(garageTechnician);
         return technicianMapper.entityToResponse(technicianRepository.save(garageTechnician));
+    }
+
+    /**
+     * Replaces all expertise of a technician with the given list (an empty list clears it).
+     * Must be called inside a transaction.
+     */
+    @Transactional
+    public void replaceExpertise(Technician technician, List<TechnicianExpertiseRequest> expertiseRequests) {
+        Integer id = technician.getId();
+        log.info("Updating expertise for technician id {}", id);
+
+        // Delete old expertise records using explicit query to avoid 409 conflicts
+        // This ensures DELETE completes before INSERT within the transaction
+        technicianExpertiseRepository.deleteByTechnicianId(id);
+
+        // Clear the collection to remove references (already deleted in DB)
+        technician.getExpertise().clear();
+
+        if (!expertiseRequests.isEmpty()) {
+            Set<TechnicianExpertise> expertiseSet = expertiseRequests.stream()
+                    .map(technicianExpertiseMapper::toEntity)
+                    .map(expertise -> {
+                        expertise.setTechnician(technician);
+                        return expertise;
+                    })
+                    .collect(java.util.stream.Collectors.toSet());
+            technician.getExpertise().addAll(expertiseSet);
+            log.info("Updated expertise for technician id {}: {} new categories added",
+                    id, expertiseSet.size());
+        } else {
+            log.info("Cleared all expertise for technician id {}", id);
+        }
     }
 
     /**
@@ -378,7 +392,9 @@ public class TechnicianService {
 
         if (StringUtils.isNotEmpty(query)) {
             List<TechnicianResponse> universalResults = technicianSearchHelper.universalSearch(
-                query, skillIds, expertiseCategories, expertiseLevels);
+                query, skillIds, expertiseCategories, expertiseLevels).stream()
+                    .filter(r -> matchesCompletionFilter(r.getProfileCompletionPercent(), r.getProfileCompletionStatus(), criteria))
+                    .toList();
             return paginateTechnicianResponses(universalResults, page, size, sortBy, sortDirection);
         }
 
@@ -387,7 +403,9 @@ public class TechnicianService {
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        if (hasNoFilters(name, skillIds, expertiseCategories, expertiseLevels,
+        boolean hasCompletionFilter = criteria.getMinProfileCompletion() != null
+                || criteria.getProfileCompletionStatus() != null;
+        if (!hasCompletionFilter && hasNoFilters(name, skillIds, expertiseCategories, expertiseLevels,
                          city, brand, model)) {
             Page<Technician> technicianPage = technicianRepository.findAllActiveWithPagination(pageable);
             return convertToPagedResponse(technicianPage);
@@ -401,11 +419,20 @@ public class TechnicianService {
         List<Technician> filtered = allTechnicians.stream()
                 .filter(t -> matchesSearchCriteria(t, name, skillIds, expertisePairs,
                                                    city, brand, model))
+                .filter(t -> matchesCompletionFilter(t.getProfileCompletionPercent(), t.getProfileCompletionStatus(), criteria))
                 .sorted(getTechnicianComparator(sortBy, direction))
                 .toList();
 
         log.info("Filtered {} technicians from {} total", filtered.size(), allTechnicians.size());
         return paginateList(filtered, page, size);
+    }
+
+    private boolean matchesCompletionFilter(Integer percent, ProfileCompletionStatus status,
+                                            TechnicianSearchCriteria criteria) {
+        int actualPercent = percent != null ? percent : 0;
+        ProfileCompletionStatus actualStatus = status != null ? status : ProfileCompletionStatus.NOT_STARTED;
+        return (criteria.getMinProfileCompletion() == null || actualPercent >= criteria.getMinProfileCompletion())
+                && (criteria.getProfileCompletionStatus() == null || actualStatus == criteria.getProfileCompletionStatus());
     }
 
     @Transactional(readOnly = true)
