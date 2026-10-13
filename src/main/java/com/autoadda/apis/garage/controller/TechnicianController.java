@@ -7,6 +7,7 @@ import com.autoadda.apis.garage.response.PagedResponse;
 import com.autoadda.apis.garage.response.TechnicianResponse;
 import com.autoadda.apis.garage.response.TechnicianWorkHistoryResponse;
 import com.autoadda.apis.garage.service.TechnicianService;
+import com.autoadda.apis.garage.util.ProfileCompletionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -125,6 +126,7 @@ public class TechnicianController {
      * - Specific: /technicians/search/paginated?city=Dubai&skillIds=1,2&sortBy=yearOfExperience&sortDirection=desc
      * - Expertise: /technicians/search/paginated?expertiseCategories=ENGINE_SYSTEMS,TRANSMISSION&expertiseLevels=L4,L3&page=0&size=10
      * - Combined: /technicians/search/paginated?city=Dubai&expertiseCategories=ENGINE_SYSTEMS&expertiseLevels=L4&sortBy=yearOfExperience&sortDirection=desc
+     * - Profile completion: /technicians/search/paginated?profileCompletionStatus=IN_PROGRESS&minProfileCompletion=50
      */
     @GetMapping("/search/paginated")
     public ResponseEntity<PagedResponse<TechnicianResponse>> searchTechniciansPaginated(
@@ -136,6 +138,8 @@ public class TechnicianController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String model,
+            @RequestParam(required = false) Integer minProfileCompletion,
+            @RequestParam(required = false) ProfileCompletionStatus profileCompletionStatus,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -150,6 +154,8 @@ public class TechnicianController {
                 .city(city)
                 .brand(brand)
                 .model(model)
+                .minProfileCompletion(minProfileCompletion)
+                .profileCompletionStatus(profileCompletionStatus)
                 .build();
 
         PagedResponse<TechnicianResponse> response = technicianService.searchTechniciansPaginated(

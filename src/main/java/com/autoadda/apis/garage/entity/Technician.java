@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.entity;
 
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
+import com.autoadda.apis.garage.util.ProfileCompletionStatus;
 import com.autoadda.apis.garage.util.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,6 +33,9 @@ public class Technician {
 
     @Column(name = "first_name")
     private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
 
     @Column(name = "email_id")
     private String emailId;
@@ -92,6 +96,19 @@ public class Technician {
     private Boolean isDeleted;
 
     private LocalDateTime createdAt;
+
+    // CV profile completion, recalculated by TechnicianProfileCompletionCalculator after each profile change
+    @Column(name = "profile_completion_percent")
+    @Builder.Default
+    private Integer profileCompletionPercent = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "profile_completion_status", length = 20)
+    @Builder.Default
+    private ProfileCompletionStatus profileCompletionStatus = ProfileCompletionStatus.NOT_STARTED;
+
+    @Column(name = "profile_updated_at")
+    private LocalDateTime profileUpdatedAt;
 
     @PrePersist
     private void prePersist() {

@@ -1,6 +1,7 @@
 package com.autoadda.apis.garage.response;
 
 import com.autoadda.apis.garage.util.EMPLOYEE_ROLE;
+import com.autoadda.apis.garage.util.ProfileCompletionStatus;
 import com.autoadda.apis.garage.util.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,4 +34,6 @@ public class TechnicianResponse {
     private String city;
     private Boolean isAvailableForService;
     private List<TechnicianExpertiseResponse> expertise;
+    private Integer profileCompletionPercent;
+    private ProfileCompletionStatus profileCompletionStatus;
 }

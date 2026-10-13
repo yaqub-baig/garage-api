@@ -47,6 +47,9 @@ class TechnicianServiceTest {
     @Mock
     private AuthClient authClient;
 
+    @Mock
+    private TechnicianProfileCompletionCalculator profileCompletionCalculator;
+
     @InjectMocks
     private TechnicianService technicianService;
 
