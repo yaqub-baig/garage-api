@@ -7,12 +7,9 @@ import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.entity.AppointmentServices;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
-import com.autoadda.apis.garage.mapper.AppointmentInvoiceMapper;
 import com.autoadda.apis.garage.mapper.InvoiceLineItemMapper;
-import com.autoadda.apis.garage.mapper.InvoiceMapper;
 import com.autoadda.apis.garage.mapper.InvoiceResponseMapper;
 import com.autoadda.apis.garage.repository.*;
-import com.autoadda.apis.garage.request.AppointmentInvoiceRequest;
 import com.autoadda.apis.garage.request.InvoicePayRequest;
 import com.autoadda.apis.garage.request.InvoiceRequest;
 import com.autoadda.apis.garage.request.NotificationContent;
@@ -32,14 +29,9 @@ import java.util.List;
 public class InvoiceService {
 
     public static final String WORK_ORDER_NOT_FOUND = "Work order not found";
-    private final AppointmentInvoiceRepository invoiceRepo;
-    private final AppointmentInvoiceBreakDownRepository breakdownRepo;
     private final AppointmentDetailsRepository appointmentRepo;
-    private final GarageRepository garageRepo;
     private final WorkOrderRepository workOrderRepository;
     private final InvoiceRepository invoiceRepository;
-    private final AppointmentInvoiceMapper appointmentInvoiceMapper;
-    private final InvoiceMapper invoiceMapper;
     private final InvoiceLineItemMapper lineItemMapper;
     private final InvoiceResponseMapper invoiceResponseMapper;
     private final InvoiceLineItemGeneratorService lineItemGenerator;
@@ -51,39 +43,11 @@ public class InvoiceService {
     private final AppointmentServiceRepository appointmentServiceRepository;
 
     /**
-     * Prepares an invoice for a given appointment and garage.
-     *
-     * @param request the request containing appointment and garage details
-     * @return the created AppointmentInvoice
-     */
-    @Transactional
-    public AppointmentInvoiceResponse prepareInvoice(AppointmentInvoiceRequest request) {
-        AppointmentDetails appointment = appointmentRepo.findById ( request.getAppointmentId ( ) )
-                .orElseThrow ( () -> new RuntimeException ( "Appointment not found" ) );
-
-        Garage garage = garageRepo.findById ( request.getGarageId ( ) )
-                .orElseThrow ( () -> new RuntimeException ( "Garage not found" ) );
-
-        AppointmentInvoice invoice = invoiceMapper.toEntity ( request, garage, appointment );
-        invoiceRepo.save ( invoice );
-
-        List<AppointmentInvoiceBreakDown> breakdowns = request.getService ( ).stream ( )
-                .map ( service -> invoiceMapper.toBreakdown ( service, invoice, garage, appointment ) )
-                .toList ( );
-        breakdownRepo.saveAll ( breakdowns );
-
-        appointment.setStatus ( Status.INVOICE_INITIATED );
-        appointmentRepo.save ( appointment );
-
-        return appointmentInvoiceMapper.fromEntity ( invoice );
-    }
-
-    /**
      * Updates the payment status of an invoice based on the appointment payment
      * request.
      *
      * @param request the request containing appointment ID and payment status
-     * @return the updated AppointmentInvoice
+     * @return the updated invoice
      */
     @Transactional
     public InvoiceResponse updateInvoicePayment(InvoicePayRequest request) {
