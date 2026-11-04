@@ -23,4 +23,5 @@ public class GarageProcurementResponse {
     private LocalDateTime procurementDate;
     private String procuredByUserName;
     private String notes;
+    private MediaFileResponse voiceNote;
 }

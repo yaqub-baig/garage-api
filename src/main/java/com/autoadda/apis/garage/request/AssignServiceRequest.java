@@ -16,4 +16,5 @@ public class AssignServiceRequest {
     private Integer garageId;
     private String status;
     private String comments;
+    private Long voiceNoteId;
 }

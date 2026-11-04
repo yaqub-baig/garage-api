@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.VehicleReceived;
@@ -26,6 +27,7 @@ import java.util.List;
 @Slf4j
 public class VehicleReceivedService {
     private final VehicleReceivedRepository vehicleReceivedRepository;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final AppointmentDetailsRepository appointmentRepository;
     private final TechnicianRepository technicianRepository;
     private final MediaFileRepository mediaFileRepository;
@@ -46,6 +48,9 @@ public class VehicleReceivedService {
 
         if ( request.getComment ( ) != null ) {
             vehicleReceived.setComment ( request.getComment ( ) );
+        }
+        if ( request.getVoiceNoteId ( ) != null ) {
+            vehicleReceived.setVoiceNote ( voiceNoteHelper.resolve ( request.getVoiceNoteId ( ) ) );
         }
         log.info ( "  requested images ------->" + request.getVehicleImages ( ).stream ( ).toList ( ) );
         if ( request.getVehicleImages ( ) != null && ! request.getVehicleImages ( ).isEmpty ( ) ) {
@@ -103,6 +108,9 @@ public class VehicleReceivedService {
 
         if ( request.getComment ( ) != null ) {
             vehicleReceived.setComment ( request.getComment ( ) );
+        }
+        if ( request.getVoiceNoteId ( ) != null ) {
+            vehicleReceived.setVoiceNote ( voiceNoteHelper.resolve ( request.getVoiceNoteId ( ) ) );
         }
 
         if ( request.getVehicleImages ( ) != null ) {

@@ -20,4 +20,5 @@ public class GarageProcurementRequest {
     private String receiptNumber;
     private Integer procuredByUserId;
     private String notes;
+    private Long voiceNoteId;
 }

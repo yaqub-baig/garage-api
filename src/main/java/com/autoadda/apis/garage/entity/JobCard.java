@@ -61,6 +61,10 @@ public class JobCard {
     @Column(name = "comments")
     private String comments;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     private LocalDateTime assignedAt;
     private LocalDateTime startedAt;
     private LocalDateTime qualityCheckedAt;

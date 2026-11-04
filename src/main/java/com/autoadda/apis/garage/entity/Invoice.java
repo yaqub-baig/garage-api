@@ -54,5 +54,9 @@ public class Invoice {
 
     private String notes;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     private LocalDateTime createdAt;
 }

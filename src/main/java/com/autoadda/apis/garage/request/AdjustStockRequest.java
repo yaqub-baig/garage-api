@@ -15,4 +15,5 @@ public class AdjustStockRequest {
     private Integer technicianId;
     private String adjustmentReason;  // "DAMAGE", "COUNT_CORRECTION", "RETURN"
     private String notes;
+    private Long voiceNoteId;
 }

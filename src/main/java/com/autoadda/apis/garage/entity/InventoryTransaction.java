@@ -64,6 +64,10 @@ public class InventoryTransaction {
     @Column(name = "notes", length = 1000)
     private String notes;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate;
 

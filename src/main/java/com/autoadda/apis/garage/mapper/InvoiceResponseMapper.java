@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.entity.Invoice;
@@ -14,6 +15,7 @@ public class InvoiceResponseMapper {
 
     private final InvoiceLineItemMapper lineItemMapper;
     private final GarageSubscriptionRepository garageSubscriptionRepository;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     public InvoiceResponse toResponse(Invoice invoice) {
         if ( invoice == null ) return null;
@@ -58,6 +60,7 @@ public class InvoiceResponseMapper {
                 .paymentMethod ( invoice.getPaymentMethod ( ) )
                 .isPaid ( invoice.getIsPaid ( ) )
                 .notes ( invoice.getNotes ( ) )
+                .voiceNote ( voiceNoteHelper.toResponse ( invoice.getVoiceNote ( ) ) )
                 .createdAt ( invoice.getCreatedAt ( ) )
                 .build ( );
     }

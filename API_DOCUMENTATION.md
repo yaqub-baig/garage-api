@@ -137,6 +137,29 @@
 | `/upload` | POST | Upload media files |
 | `/delete-image/{id}` | DELETE | Delete a media file |
 
+### Voice notes
+Every note / comment / remark field can carry one optional voice recording. Frontend guide with per-screen changes and sample code: [VOICE_NOTES_FRONTEND_INTEGRATION.md](VOICE_NOTES_FRONTEND_INTEGRATION.md).
+
+1. Upload the recording to `POST /mediafiles/upload` (field `files`). Audio (`audio/*`, or `.mp3 .m4a .aac .wav .ogg .opus .amr .flac`) is stored under `uploads/audios/`.
+2. Send the returned media file `id` next to the text field. Only audio files are accepted (non-audio id → 400).
+3. Responses return the recording as a media file object (`id`, `mediaType`, `fileUrl`, …).
+
+On update endpoints, omitting the id keeps the existing recording.
+
+| Text field | Request field | Response field | Where |
+|------------|---------------|----------------|-------|
+| `notes` | `voiceNoteId` | `voiceNote` | part request create/update, garage procurement, working tools add/update, inventory item add/update, stock add/remove/adjust, invoice generate, garage sale finalize, pickup/drop create |
+| `notes` (query) | `voiceNoteId` (query) | `voiceNote` | `POST /invoices/work-order/{id}/auto-generate` |
+| `comments` | `voiceNoteId` | `voiceNote` (on invoice) | invoice pay |
+| `notes` | `voiceNoteId` | `resolutionVoiceNote` | inventory alert resolve/dismiss |
+| `partRequestNotes` | `partRequestVoiceNoteId` | part request `voiceNote` | job card status → `WAITING_FOR_PARTS` |
+| `comments` | `voiceNoteId` | `voiceNote` | appointment status update, job card assign (also via work order update), job card additional request |
+| `comment` | `voiceNoteId` | `voiceNote` | vehicle received create/update |
+| `comments` / `customerComments` | `voiceNoteId` / `customerVoiceNoteId` | `customerVoiceNote` | delivery checklist / customer delivery approval |
+| `customerComments` | `customerVoiceNoteId` | `customerVoiceNote` | customer part response |
+| `customerNegotiatedComment` / `garageNegotiatedComment` | `customerNegotiatedVoiceNoteId` / `garageNegotiatedVoiceNoteId` | `customerNegotiatedVoiceNote` / `garageNegotiatedVoiceNote` | work order update |
+| `remarks` (query) | `voiceNoteId` (query) | `voiceNote` | roadside assistance status, insurance claim status (`approvalVoiceNote`) |
+
 ## Communication Preferences
 **Controller:** `CommunicationPreferenceController`  
 **Base Path:** `/preferences`

@@ -38,6 +38,7 @@ public class InvoiceResponse {
     private PaymentMethod paymentMethod;
     private Boolean isPaid;
     private String notes;
+    private MediaFileResponse voiceNote;
 
     private LocalDateTime createdAt;
 }

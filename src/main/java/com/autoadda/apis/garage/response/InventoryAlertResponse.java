@@ -28,4 +28,5 @@ public class InventoryAlertResponse {
     private Integer resolvedByTechnicianId;
     private String resolvedByTechnicianName;
     private String resolutionNotes;
+    private MediaFileResponse resolutionVoiceNote;
 }

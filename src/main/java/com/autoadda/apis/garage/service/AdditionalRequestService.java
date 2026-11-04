@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.JobCardAdditionalRequest;
 import com.autoadda.apis.garage.repository.JobCardAdditionalRequestRepository;
 import com.autoadda.apis.garage.request.JobCardAdditionalAPIRequest;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class AdditionalRequestService {
 
     private final JobCardAdditionalRequestRepository additionalRequestRepo;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     /**
      * Creates a new additional request for a job card.
@@ -25,7 +27,8 @@ public class AdditionalRequestService {
     public JobCardAdditionalRequest createAdditionalRequest(JobCardAdditionalAPIRequest request) {
         JobCardAdditionalRequest additionalRequest = JobCardAdditionalRequest.builder ( ).garageId ( request.getGarageId ( ) )
                 .customerId ( request.getCustomerId ( ) ).technicianId ( request.getTechnicianId ( ) ).status ( Status.REQUESTED )
-                .requestType ( request.getRequestType ( ) ).comments ( request.getComments ( ) ).insertTms( DateHelper.dbDate ( ) )
+                .requestType ( request.getRequestType ( ) ).comments ( request.getComments ( ) )
+                .voiceNote ( voiceNoteHelper.resolve ( request.getVoiceNoteId ( ) ) ).insertTms( DateHelper.dbDate ( ) )
                 .build ( );
 
         return additionalRequestRepo.save ( additionalRequest );

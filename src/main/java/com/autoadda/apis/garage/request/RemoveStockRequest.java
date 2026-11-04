@@ -16,4 +16,5 @@ public class RemoveStockRequest {
     private String referenceType;  // "JOB_CARD", "WORK_ORDER", "SALE"
     private Integer referenceId;
     private String notes;
+    private Long voiceNoteId;
 }

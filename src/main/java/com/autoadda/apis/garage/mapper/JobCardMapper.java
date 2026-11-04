@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.response.JobCardResponse;
 import com.autoadda.apis.garage.response.JobCardStatusTimelineEntry;
@@ -20,6 +21,7 @@ import java.util.Map;
 @Slf4j
 public class JobCardMapper {
     private final AppointmentServicesMapper appointmentServicesMapper;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     public JobCardResponse entityToResponse(JobCard jobCard) {
         log.info ( "9" );
@@ -36,6 +38,7 @@ public class JobCardMapper {
                 .appointmentId ( jobCard.getAppointment ( ) != null ? jobCard.getAppointment ( ).getId ( ) : null )
                 .appointmentService ( jobCard.getService ( ) != null ? appointmentServicesMapper.entityToResponse ( jobCard.getService ( ) ) : null )
                 .comments ( jobCard.getComments ( ) )
+                .voiceNote ( voiceNoteHelper.toResponse ( jobCard.getVoiceNote ( ) ) )
                 .build ( );
 
         // Set status timestamps

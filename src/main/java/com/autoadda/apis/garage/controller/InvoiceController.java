@@ -40,8 +40,9 @@ public class InvoiceController {
     public ResponseEntity<GenericResponse> autoGenerateInvoice(
             @PathVariable Integer workOrderId,
             @RequestParam(required = false, defaultValue = "10.0") Double taxRate,
-            @RequestParam(required = false) String notes) {
-        InvoiceResponse invoice = invoiceService.generateInvoiceFromWorkOrder(workOrderId, taxRate, notes);
+            @RequestParam(required = false) String notes,
+            @RequestParam(required = false) Long voiceNoteId) {
+        InvoiceResponse invoice = invoiceService.generateInvoiceFromWorkOrder(workOrderId, taxRate, notes, voiceNoteId);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Invoice auto-generated successfully", invoice));
     }
 

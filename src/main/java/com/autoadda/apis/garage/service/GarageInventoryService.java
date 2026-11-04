@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.PartClient;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.entity.Garage;
@@ -34,6 +35,7 @@ public class GarageInventoryService {
     private final GarageInventoryMapper mapper;
     private final PartClient partClient;
     private final MediaFileRepository mediaFileRepository;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     /**
      * Add a new part to garage inventory
@@ -185,6 +187,7 @@ public class GarageInventoryService {
                 .shelfLocation(request.getShelfLocation())
                 .binLocation(request.getBinLocation())
                 .notes(request.getNotes())
+                .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                 .partImage(partImage)
                 .build();
     }
@@ -235,6 +238,9 @@ public class GarageInventoryService {
         }
         if (request.getNotes() != null) {
             item.setNotes(request.getNotes());
+        }
+        if (request.getVoiceNoteId() != null) {
+            item.setVoiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()));
         }
         if (request.getProductCondition() != null) {
             item.setProductCondition(request.getProductCondition());
@@ -293,6 +299,7 @@ public class GarageInventoryService {
                 .supplierName(request.getSupplierName())
                 .receiptNumber(request.getReceiptNumber())
                 .notes(request.getNotes())
+                .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                 .build();
 
         transactionRepo.save(transaction);
@@ -349,6 +356,7 @@ public class GarageInventoryService {
                 .referenceType(request.getReferenceType())
                 .referenceId(request.getReferenceId())
                 .notes(request.getNotes())
+                .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                 .build();
 
         transactionRepo.save(transaction);
@@ -410,6 +418,7 @@ public class GarageInventoryService {
                 .performedBy(technician)
                 .reason(request.getAdjustmentReason())
                 .notes(request.getNotes())
+                .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                 .build();
 
         transactionRepo.save(transaction);
@@ -580,7 +589,7 @@ public class GarageInventoryService {
                     .toList();
 
             for (InventoryAlert alert : activeAlerts) {
-                alert.resolve(technician, "Stock replenished automatically");
+                alert.resolve(technician, "Stock replenished automatically", null);
                 alertRepo.save(alert);
                 log.info("Auto-resolved alert: {}", alert.getId());
             }

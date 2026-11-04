@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
 import com.autoadda.apis.garage.repository.*;
@@ -27,6 +28,7 @@ public class VehicleDeliveryService {
 
     public static final String VEHICLE_DELIVERY_NOT_FOUND = "Vehicle delivery not found";
     private final VehicleDeliveryRepository vehicleDeliveryRepo;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final WorkOrderRepository workOrderRepo;
     private final TechnicianRepository technicianRepo;
     private final MediaFileRepository mediaFileRepo;
@@ -124,6 +126,9 @@ public class VehicleDeliveryService {
         // Update comments if provided
         if (request.getComments() != null && !request.getComments().trim().isEmpty()) {
             delivery.setCustomerComments(request.getComments());
+        }
+        if (request.getVoiceNoteId() != null) {
+            delivery.setCustomerVoiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()));
         }
 
         // Change status to pending customer approval
@@ -243,6 +248,7 @@ public class VehicleDeliveryService {
             delivery.setCustomerApproved(true);
             delivery.setStatus(DeliveryStatus.APPROVED);
             delivery.setCustomerComments(request.getCustomerComments());
+            delivery.setCustomerVoiceNote(voiceNoteHelper.resolve(request.getCustomerVoiceNoteId()));
 
             // Update work order status
             workOrder.updateStatus(WorkOrderStatus.DELIVERED_TO_CUSTOMER);
@@ -259,6 +265,7 @@ public class VehicleDeliveryService {
             delivery.setStatus(DeliveryStatus.REJECTED);
             delivery.setRejectionReason(request.getRejectionReason());
             delivery.setCustomerComments(request.getCustomerComments());
+            delivery.setCustomerVoiceNote(voiceNoteHelper.resolve(request.getCustomerVoiceNoteId()));
 
             // Revert work order status back to READY_FOR_DELIVERY
             workOrder.updateStatus(WorkOrderStatus.READY_FOR_DELIVERY);
@@ -440,6 +447,7 @@ public class VehicleDeliveryService {
                 .deliveryDate(delivery.getDeliveryDate())
                 .customerApproved(delivery.getCustomerApproved())
                 .customerComments(delivery.getCustomerComments())
+                .customerVoiceNote(voiceNoteHelper.toResponse(delivery.getCustomerVoiceNote()))
                 .rejectionReason(delivery.getRejectionReason())
                 .deliveryPhotos(photoUrls)
                 .isMainKeyReturned(delivery.getIsMainKeyReturned())
@@ -495,6 +503,7 @@ public class VehicleDeliveryService {
                 .deliveryDate(delivery.getDeliveryDate())
                 .customerApproved(delivery.getCustomerApproved())
                 .customerComments(delivery.getCustomerComments())
+                .customerVoiceNote(voiceNoteHelper.toResponse(delivery.getCustomerVoiceNote()))
                 .rejectionReason(delivery.getRejectionReason())
                 .deliveryPhotos(photoUrls)
                 .isMainKeyReturned(delivery.getIsMainKeyReturned())

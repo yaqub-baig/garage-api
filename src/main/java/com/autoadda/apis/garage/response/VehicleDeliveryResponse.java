@@ -24,6 +24,7 @@ public class VehicleDeliveryResponse {
     private LocalDateTime deliveryDate;
     private Boolean customerApproved;
     private String customerComments;
+    private MediaFileResponse customerVoiceNote;
     private String rejectionReason;
     private List<String> deliveryPhotos; // URLs
 

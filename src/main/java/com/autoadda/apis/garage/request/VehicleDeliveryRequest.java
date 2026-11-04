@@ -15,6 +15,7 @@ public class VehicleDeliveryRequest {
     private Integer deliveredByTechnicianId;
     private List<Long> deliveryPhotos = new ArrayList<>();
     private String comments;
+    private Long voiceNoteId;
 
     // Re-verification of 12 items from vehicle receiving
     private Boolean isMainKeyReturned;

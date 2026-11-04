@@ -29,8 +29,9 @@ public class RoadsideAssistanceController {
 
     @PutMapping("/{id}/status")
     public ResponseEntity<RoadsideAssistance> updateStatus(@PathVariable Integer id, @RequestParam Status status,
-                                                           @RequestParam(required = false) String remarks) {
-        return ResponseEntity.ok(assistanceService.updateStatus(id, status, remarks));
+                                                           @RequestParam(required = false) String remarks,
+                                                           @RequestParam(required = false) Long voiceNoteId) {
+        return ResponseEntity.ok(assistanceService.updateStatus(id, status, remarks, voiceNoteId));
     }
 
     @GetMapping("/{id}")

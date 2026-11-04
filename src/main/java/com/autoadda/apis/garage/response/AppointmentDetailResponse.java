@@ -24,6 +24,7 @@ public class AppointmentDetailResponse {
     private LocalTime deliveryTime;
     private Status status;
     private String comments;
+    private MediaFileResponse voiceNote;
     private GarageResponse garage;
     private String selectedGarageServiceIds;
     private List<GarageServiceResponse> garageServicesResponse;

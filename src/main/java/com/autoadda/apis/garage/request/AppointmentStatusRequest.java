@@ -14,4 +14,5 @@ public class AppointmentStatusRequest {
     private String memberType;
     private Status status;
     private String comments;
+    private Long voiceNoteId;
 }

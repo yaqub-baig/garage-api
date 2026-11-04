@@ -22,4 +22,5 @@ public class CustomerPartResponseResponse {
     private LocalDateTime responseDate;
     private LocalDate expectedDeliveryDate;
     private String customerComments;
+    private MediaFileResponse customerVoiceNote;
 }

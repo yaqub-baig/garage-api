@@ -55,6 +55,10 @@ public class InventoryAlert {
     @Column(name = "resolution_notes", length = 500)
     private String resolutionNotes;
 
+    @ManyToOne
+    @JoinColumn(name = "resolution_voice_note_id")
+    private MediaFile resolutionVoiceNote;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {
@@ -65,17 +69,19 @@ public class InventoryAlert {
         }
     }
 
-    public void resolve(Technician technician, String notes) {
+    public void resolve(Technician technician, String notes, MediaFile voiceNote) {
         this.alertStatus = AlertStatus.RESOLVED;
         this.resolvedAt = LocalDateTime.now();
         this.resolvedBy = technician;
         this.resolutionNotes = notes;
+        this.resolutionVoiceNote = voiceNote;
     }
 
-    public void dismiss(Technician technician, String notes) {
+    public void dismiss(Technician technician, String notes, MediaFile voiceNote) {
         this.alertStatus = AlertStatus.DISMISSED;
         this.resolvedAt = LocalDateTime.now();
         this.resolvedBy = technician;
         this.resolutionNotes = notes;
+        this.resolutionVoiceNote = voiceNote;
     }
 }

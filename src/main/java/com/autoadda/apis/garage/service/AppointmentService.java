@@ -1,5 +1,7 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.entity.MediaFile;
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.CustomerNotFoundException;
 import com.autoadda.apis.garage.exception.GarageNotFoundException;
@@ -29,6 +31,7 @@ import java.util.Objects;
 public class AppointmentService {
 
     private final AppointmentDetailsRepository appointmentRepo;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final AppointmentStatusActivityRepository appointmentActivityRepo;
     private final AppointmentServiceRepository serviceRepo;
     private final GarageRepository garageRepo;
@@ -157,11 +160,13 @@ public class AppointmentService {
         }
 
         appointment.setComments(request.getComments());
+        MediaFile voiceNote = voiceNoteHelper.resolve(request.getVoiceNoteId());
+        appointment.setVoiceNote(voiceNote);
         appointmentRepo.save(appointment);
 
         appointmentActivityRepo.save(AppointmentStatusActivity.builder().appointmentId(appointment.getId())
                 .status(appointment.getStatus()).memberId(request.getMemberId()).memberType(request.getMemberType())
-                .comments(request.getComments()).insertTms(DateHelper.dbDate()).build());
+                .comments(request.getComments()).voiceNote(voiceNote).insertTms(DateHelper.dbDate()).build());
 
         return appointment;
     }

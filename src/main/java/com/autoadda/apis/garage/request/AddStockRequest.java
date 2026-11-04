@@ -17,4 +17,5 @@ public class AddStockRequest {
     private String supplierName;
     private String receiptNumber;
     private String notes;
+    private Long voiceNoteId;
 }

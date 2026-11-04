@@ -18,5 +18,6 @@ public class UpdateWorkingToolRequest {
     private Integer quantity;
     private ToolCondition condition;
     private String notes;
+    private Long voiceNoteId;
     private Long toolImageId;
 }

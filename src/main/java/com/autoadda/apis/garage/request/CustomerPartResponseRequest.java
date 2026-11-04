@@ -19,4 +19,5 @@ public class CustomerPartResponseRequest {
     private PartCondition partCondition; // Required if choice is GARAGE_PROCURE
     private LocalDate expectedDeliveryDate; // Optional, for SELF_PROVIDE
     private String customerComments;
+    private Long customerVoiceNoteId;
 }

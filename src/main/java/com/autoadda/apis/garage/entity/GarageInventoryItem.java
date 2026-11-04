@@ -79,6 +79,10 @@ public class GarageInventoryItem {
     @Column(name = "notes", length = 1000)
     private String notes;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     @OneToOne
     @JoinColumn(name = "part_image_id")
     private MediaFile partImage;

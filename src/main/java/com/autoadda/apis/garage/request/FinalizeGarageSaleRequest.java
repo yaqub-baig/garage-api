@@ -14,4 +14,5 @@ public class FinalizeGarageSaleRequest {
     private Double salePrice;
     private String paymentMode;
     private String notes;
+    private Long voiceNoteId;
 }

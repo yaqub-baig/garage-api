@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.*;
@@ -41,6 +42,7 @@ public class InvoiceService {
     private final NotificationMessageBuilder notificationMessageBuilder;
     private final GarageSubscriptionRepository garageSubscriptionRepository;
     private final AppointmentServiceRepository appointmentServiceRepository;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     /**
      * Updates the payment status of an invoice based on the appointment payment
@@ -70,6 +72,9 @@ public class InvoiceService {
         // Update notes/comments if provided
         if ( request.getComments ( ) != null ) {
             invoice.setNotes ( request.getComments ( ) );
+        }
+        if ( request.getVoiceNoteId ( ) != null ) {
+            invoice.setVoiceNote ( voiceNoteHelper.resolve ( request.getVoiceNoteId ( ) ) );
         }
 
         // Set isPaid flag based on payment status
@@ -231,6 +236,7 @@ public class InvoiceService {
         invoice.setTaxRate ( request.getTaxRate ( ) );
         invoice.setPaymentMethod ( request.getPaymentMethod ( ) );
         invoice.setNotes ( request.getNotes ( ) );
+        invoice.setVoiceNote ( voiceNoteHelper.resolve ( request.getVoiceNoteId ( ) ) );
 
         // Calculate totals
         double subtotal = lineItems.stream ( )
@@ -279,7 +285,7 @@ public class InvoiceService {
      * Auto-generates line items from WorkOrder and creates invoice
      */
     @Transactional
-    public InvoiceResponse generateInvoiceFromWorkOrder(Integer workOrderId, Double taxRate, String notes) {
+    public InvoiceResponse generateInvoiceFromWorkOrder(Integer workOrderId, Double taxRate, String notes, Long voiceNoteId) {
         WorkOrder workOrder = workOrderRepository.findById ( workOrderId )
                 .orElseThrow ( () -> new EntityNotFoundException (WORK_ORDER_NOT_FOUND) );
 
@@ -291,6 +297,7 @@ public class InvoiceService {
                 .lineItems ( generatedLineItems )
                 .taxRate ( taxRate )
                 .notes ( notes )
+                .voiceNoteId ( voiceNoteId )
                 .build ( );
 
         return generateInvoiceFromRequest ( request );

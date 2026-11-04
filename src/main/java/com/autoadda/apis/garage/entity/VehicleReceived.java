@@ -36,6 +36,10 @@ public class VehicleReceived {
     private VehicleRecievedStatus status;
     private String comment;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     private Boolean isMainKeyReceived;
     private Boolean isSpareKeyReceived;
     private Boolean isToolKitReceived;

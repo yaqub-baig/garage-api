@@ -1,5 +1,7 @@
 package com.autoadda.apis.garage.mapper;
 
+import lombok.RequiredArgsConstructor;
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.GarageInventoryItem;
 import com.autoadda.apis.garage.entity.InventoryAlert;
 import com.autoadda.apis.garage.entity.InventoryTransaction;
@@ -10,7 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class GarageInventoryMapper {
+
+    private final VoiceNoteHelper voiceNoteHelper;
 
     @Value("${file.base-url}")
     private String baseUrl;
@@ -48,6 +53,7 @@ public class GarageInventoryMapper {
                 .updatedAt(item.getUpdatedAt())
                 .lastRestockedAt(item.getLastRestockedAt())
                 .notes(item.getNotes())
+                .voiceNote(voiceNoteHelper.toResponse(item.getVoiceNote()))
                 // Add part image information
                 .partImageId(item.getPartImage() != null ? item.getPartImage().getId() : null)
                 .partImageUrl(item.getPartImage() != null ?
@@ -84,6 +90,7 @@ public class GarageInventoryMapper {
                 .receiptNumber(transaction.getReceiptNumber())
                 .reason(transaction.getReason())
                 .notes(transaction.getNotes())
+                .voiceNote(voiceNoteHelper.toResponse(transaction.getVoiceNote()))
                 .transactionDate(transaction.getTransactionDate())
                 .build();
     }
@@ -113,6 +120,7 @@ public class GarageInventoryMapper {
                 .resolvedByTechnicianName(alert.getResolvedBy() != null ?
                         alert.getResolvedBy().getFirstName() : null)
                 .resolutionNotes(alert.getResolutionNotes())
+                .resolutionVoiceNote(voiceNoteHelper.toResponse(alert.getResolutionVoiceNote()))
                 .build();
     }
 
