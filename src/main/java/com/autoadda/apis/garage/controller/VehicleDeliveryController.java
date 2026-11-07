@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.CustomerDeliveryApprovalRequest;
 import com.autoadda.apis.garage.request.VehicleDeliveryRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 public class VehicleDeliveryController {
 
     private final VehicleDeliveryService vehicleDeliveryService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     /**
      * Initiate delivery process for a work order
@@ -27,7 +32,9 @@ public class VehicleDeliveryController {
     @PostMapping("/workorder/{workOrderId}/initiate")
     public ResponseEntity<GenericResponse> initiateDelivery(
             @PathVariable Integer workOrderId,
-            @RequestParam Integer technicianId) {
+            @RequestParam Integer technicianId,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofWorkOrder(workOrderId), GaragePermission.VEHICLE_CHECKIN_DELIVERY);
         log.info("API: Initiate delivery for work order: {}, technician: {}", workOrderId, technicianId);
         VehicleDeliveryResponse response = vehicleDeliveryService.initiateDelivery(workOrderId, technicianId);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Delivery initiated successfully", response));
@@ -39,7 +46,9 @@ public class VehicleDeliveryController {
     @PutMapping("/{deliveryId}/checklist")
     public ResponseEntity<GenericResponse> submitDeliveryChecklist(
             @PathVariable Integer deliveryId,
-            @RequestBody VehicleDeliveryRequest request) {
+            @RequestBody VehicleDeliveryRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofDelivery(deliveryId), GaragePermission.VEHICLE_CHECKIN_DELIVERY);
         log.info("API: Submit delivery checklist for delivery ID: {}", deliveryId);
         VehicleDeliveryResponse response = vehicleDeliveryService.submitDeliveryChecklist(deliveryId, request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Delivery checklist submitted successfully", response));

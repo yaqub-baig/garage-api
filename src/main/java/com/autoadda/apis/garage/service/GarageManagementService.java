@@ -66,6 +66,7 @@ public class GarageManagementService {
     private final GarageSearchHelper garageSearchHelper;
     private final LocationRepository locationRepository;
     private final VoiceNoteHelper voiceNoteHelper;
+    private final GarageTeamService garageTeamService;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage();
@@ -178,6 +179,8 @@ public class GarageManagementService {
         slotGenerationService.generateSlotsForDays(saved, 60);
         Technician technician = onboardTechnician(saved.getId(), new Technician(), saved.getGarageOwner());
         log.info("owner is added as a technician here "+technician.getFirstName());
+        // Default team roles (Owner, Admin, Manager, HR, Technician) + the owner's membership
+        garageTeamService.addOwner(saved, technician);
         return garageMapper.entityToResponse(saved);
     }
 

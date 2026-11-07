@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.exception.MemberNotFoundException;
 import com.autoadda.apis.garage.request.AssignServiceRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
@@ -22,16 +25,22 @@ import java.util.List;
 public class JobCardController {
 
     private final JobCardService jobCardService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
     private final JobCardGroupingService jobCardGroupingService;
 
     @PostMapping("/assign")
-    public ResponseEntity<GenericResponse> assignTechnician(@RequestBody AssignServiceRequest request) {
+    public ResponseEntity<GenericResponse> assignTechnician(@RequestBody AssignServiceRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofAppointment(request.getAppointmentId()), GaragePermission.JOB_CARD_ASSIGN);
         JobCardResponse jobCard = jobCardService.assignTechnicianToService(request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Technician assigned", jobCard));
     }
 
     @PutMapping("/status/{jobCardId}")
-    public ResponseEntity<GenericResponse> updateJobCardStatus(@PathVariable Integer jobCardId, @RequestParam JobCardStatus status) {
+    public ResponseEntity<GenericResponse> updateJobCardStatus(@PathVariable Integer jobCardId, @RequestParam JobCardStatus status,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofJobCard(jobCardId), GaragePermission.JOB_CARD_UPDATE);
         JobCardResponse updated = jobCardService.updateJobCardStatus(jobCardId, status);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Jobcard status updated", updated));
     }

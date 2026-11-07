@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.WorkOrderRequest;
 import com.autoadda.apis.garage.response.StatusTimelineEntry;
 import com.autoadda.apis.garage.response.VehicleServiceHistoryResponse;
@@ -26,10 +29,16 @@ import java.util.List;
 @Tag(name = "Work Order Management", description = "APIs for managing work orders and service history")
 public class WorkOrderController {
     private final WorkOrderService workOrderService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
 
     @PostMapping
-    public ResponseEntity<WorkOrderResponse> createWorkOrder(@RequestBody WorkOrderRequest request) {
+    public ResponseEntity<WorkOrderResponse> createWorkOrder(@RequestBody WorkOrderRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        Integer garageId = garageResolver.ofAppointment(request.getAppointmentId());
+        guard.require(caller, garageId, GaragePermission.WORK_ORDER_MANAGE);
+        if (request.getAssignServiceRequestList() != null && !request.getAssignServiceRequestList().isEmpty()) guard.require(caller, garageId, GaragePermission.JOB_CARD_ASSIGN);
         WorkOrderResponse workOrder = workOrderService.createWorkOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(workOrder);
     }
@@ -41,7 +50,12 @@ public class WorkOrderController {
     }
 
     @PutMapping("/update/{workOrderId}")
-    public ResponseEntity<WorkOrderResponse> updateWorkOrder(@PathVariable Integer workOrderId, @RequestBody WorkOrderRequest request) {
+    public ResponseEntity<WorkOrderResponse> updateWorkOrder(@PathVariable Integer workOrderId, @RequestBody WorkOrderRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        Integer garageId = garageResolver.ofWorkOrder(workOrderId);
+        guard.requireUnlessCustomer(caller, garageId, garageResolver.customerOfWorkOrder(workOrderId), GaragePermission.WORK_ORDER_MANAGE);
+        if (request.getAssignServiceRequestList() != null && !request.getAssignServiceRequestList().isEmpty()) guard.require(caller, garageId, GaragePermission.JOB_CARD_ASSIGN);
+        if (request.getGarageNegotiatedAmount() != null || request.getGarageNegotiatedComment() != null || request.getGarageNegotiatedVoiceNoteId() != null) guard.require(caller, garageId, GaragePermission.WORK_ORDER_MANAGE);
         WorkOrderResponse response = workOrderService.updateWorkOrder(workOrderId, request);
         return ResponseEntity.ok(response);
     }

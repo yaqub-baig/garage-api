@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.AddWorkingToolRequest;
 import com.autoadda.apis.garage.request.UpdateWorkingToolRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
@@ -19,6 +22,8 @@ import java.util.List;
 public class WorkingToolsController {
 
     private final WorkingToolsService workingToolsService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     /**
      * Add a new tool/equipment entry to a garage
@@ -26,7 +31,9 @@ public class WorkingToolsController {
      */
     @PostMapping
     public ResponseEntity<GenericResponse> addTool(
-            @RequestBody AddWorkingToolRequest request) {
+            @RequestBody AddWorkingToolRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, request.getGarageId(), GaragePermission.TOOLS_MANAGE);
         log.info("Adding working tool for garage: {}", request.getGarageId());
         WorkingToolResponse response = workingToolsService.addTool(request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
@@ -66,7 +73,9 @@ public class WorkingToolsController {
     @PutMapping("/{toolId}")
     public ResponseEntity<GenericResponse> updateTool(
             @PathVariable Integer toolId,
-            @RequestBody UpdateWorkingToolRequest request) {
+            @RequestBody UpdateWorkingToolRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofWorkingTool(toolId), GaragePermission.TOOLS_MANAGE);
         log.info("Updating working tool: {}", toolId);
         WorkingToolResponse response = workingToolsService.updateTool(toolId, request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
@@ -93,7 +102,9 @@ public class WorkingToolsController {
      */
     @DeleteMapping("/{toolId}")
     public ResponseEntity<GenericResponse> deactivateTool(
-            @PathVariable Integer toolId) {
+            @PathVariable Integer toolId,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofWorkingTool(toolId), GaragePermission.TOOLS_MANAGE);
         log.info("Deactivating working tool: {}", toolId);
         workingToolsService.deactivateTool(toolId);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(

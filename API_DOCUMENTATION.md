@@ -6,6 +6,7 @@
 - [Garage Services](#garage-services)
 - [Garage Subscriptions](#garage-subscriptions)
 - [Technician Management](#technician-management)
+- [Garage Team Management](#garage-team-management)
 - [Roadside Assistance](#roadside-assistance)
 - [Pickup & Drop](#pickup--drop)
 - [Invoicing](#invoicing)
@@ -74,6 +75,31 @@
 | `/` | POST | Onboard a new technician |
 | `/{id}` | GET | Get technician by ID |
 | `/{id}/delete` | DELETE | Delete a technician |
+
+## Garage Team Management
+**Controller:** `GarageTeamController`  
+**Base Path:** `/garages/{garageId}/team`
+
+Each garage has team members with custom roles (a set of `GaragePermission`s). Every call acts as the user in the `X-Auto-Adda-Id` header. Garage-side write endpoints across the API now check these permissions and return **403** when the caller lacks them; the garage owner always passes. Frontend guide: [GARAGE_TEAM_FRONTEND_INTEGRATION.md](GARAGE_TEAM_FRONTEND_INTEGRATION.md).
+
+| Endpoint | Method | Permission | Description |
+|----------|--------|------------|-------------|
+| `/me` | GET | — | Caller's role and effective permissions |
+| `/members` | GET | TEAM_VIEW | List team members |
+| `/members/{memberId}/role` | PUT | TEAM_MANAGE | Change a member's role |
+| `/members/{memberId}/status` | PUT | TEAM_MANAGE | Suspend / reactivate a member |
+| `/members/{memberId}` | DELETE | TEAM_MANAGE | Remove a member |
+| `/roles` | GET | TEAM_VIEW | List roles |
+| `/roles` | POST | ROLE_MANAGE | Create a role |
+| `/roles/{roleId}` | PUT | ROLE_MANAGE | Edit a role |
+| `/roles/{roleId}` | DELETE | ROLE_MANAGE | Delete an unused role |
+| `/invites` | POST | TEAM_MANAGE | Invite by phone with a role |
+| `/invites` | GET | TEAM_VIEW | Pending invites |
+| `/invites/{inviteId}` | DELETE | TEAM_MANAGE | Cancel an invite |
+| `/team/invites/mine` (no garage prefix) | GET | — | Invites waiting for the caller |
+| `/team/permissions` (no garage prefix) | GET | — | Permission catalogue |
+
+Config: `garage.permissions.enforcement=ENFORCE` (default) or `LOG_ONLY` to log denials without blocking.
 
 ## Roadside Assistance
 **Controller:** `RoadsideAssistanceController`  

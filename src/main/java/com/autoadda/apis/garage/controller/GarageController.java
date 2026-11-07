@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.GarageRequest;
 import com.autoadda.apis.garage.request.GarageSearchCriteria;
 import com.autoadda.apis.garage.response.GarageResponse;
@@ -24,6 +27,8 @@ import java.util.List;
 public class GarageController {
 
     private final GarageManagementService garageService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
 
     @PostMapping
@@ -62,6 +67,7 @@ public class GarageController {
     public ResponseEntity<GarageResponse> updateGarage(@PathVariable Integer id,
                                                        @RequestHeader(value = "X-Auto-Adda-Id") String autoAddaId,
                                                        @RequestBody GarageRequest garage) {
+        guard.require(autoAddaId, id, GaragePermission.GARAGE_PROFILE_EDIT);
 
         return ResponseEntity.ok(garageService.updateGarage(id, garage));
     }

@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.entity.GarageSubscription;
 import com.autoadda.apis.garage.request.GarageSubscriptionRequest;
 import com.autoadda.apis.garage.response.GarageSubscriptionResponse;
@@ -17,9 +20,13 @@ import java.util.List;
 public class GarageSubscriptionController {
 
     private final GarageSubscriptionService garageSubscriptionService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     @PostMapping
-    public ResponseEntity<List<GarageSubscriptionResponse>> createPlan(@RequestBody GarageSubscriptionRequest plan) {
+    public ResponseEntity<List<GarageSubscriptionResponse>> createPlan(@RequestBody GarageSubscriptionRequest plan,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        if (plan.getGarageIds() != null) plan.getGarageIds().forEach(gid -> guard.require(caller, gid, GaragePermission.SUBSCRIPTION_MANAGE));
         if (plan.getGarageIds() == null || plan.getGarageIds().isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
@@ -39,17 +46,23 @@ public class GarageSubscriptionController {
 
     @PostMapping("/{id}/update")
     public ResponseEntity<GarageSubscriptionResponse> updatePlan(@PathVariable Integer id,
-                                                                 @RequestBody GarageSubscription updatedPlan) {
+                                                                 @RequestBody GarageSubscription updatedPlan,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofSubscriptionPlan(id), GaragePermission.SUBSCRIPTION_MANAGE);
         return ResponseEntity.ok(garageSubscriptionService.updatePlan(id, updatedPlan));
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<GarageSubscriptionResponse> activatePlan(@PathVariable Integer id) {
+    public ResponseEntity<GarageSubscriptionResponse> activatePlan(@PathVariable Integer id,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofSubscriptionPlan(id), GaragePermission.SUBSCRIPTION_MANAGE);
         return ResponseEntity.ok(garageSubscriptionService.changeStatus(id));
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Object> deletePlan(@PathVariable Integer id) {
+    ResponseEntity<Object> deletePlan(@PathVariable Integer id,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofSubscriptionPlan(id), GaragePermission.SUBSCRIPTION_MANAGE);
         garageSubscriptionService.deletePlan(id);
         return ResponseEntity.noContent().build();
     }

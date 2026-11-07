@@ -50,6 +50,9 @@ class TechnicianServiceTest {
     @Mock
     private TechnicianProfileCompletionCalculator profileCompletionCalculator;
 
+    @Mock
+    private com.autoadda.apis.garage.service.GarageTeamService garageTeamService;
+
     @InjectMocks
     private TechnicianService technicianService;
 

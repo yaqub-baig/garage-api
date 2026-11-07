@@ -51,6 +51,7 @@ public class TechnicianService {
     private final TechnicianExpertiseRepository technicianExpertiseRepository;
     private final ExpertiseCategoryRepository expertiseCategoryRepository;
     private final TechnicianProfileCompletionCalculator profileCompletionCalculator;
+    private final GarageTeamService garageTeamService;
 
     /**
      * Retrieves a list of technicians associated with a specific garage.
@@ -153,7 +154,10 @@ public class TechnicianService {
         profileCompletionCalculator.recalculate(garageTechnician);
 
         try {
-            return technicianMapper.entityToResponse(technicianRepository.saveAndFlush(garageTechnician));
+            Technician savedTechnician = technicianRepository.saveAndFlush(garageTechnician);
+            // Garages linked directly (garageIds) get a team membership with the default member role
+            garageTeamService.syncLinkedGarages(savedTechnician, null);
+            return technicianMapper.entityToResponse(savedTechnician);
         } catch (DataIntegrityViolationException e) {
             // Guards the race window between the findByMobileNumber() check above and this
             // save (e.g. concurrent duplicate submissions); the DB unique constraint on
@@ -267,7 +271,11 @@ public class TechnicianService {
         }
 
         profileCompletionCalculator.recalculate(garageTechnician);
-        return technicianMapper.entityToResponse(technicianRepository.save(garageTechnician));
+        Technician savedTechnician = technicianRepository.save(garageTechnician);
+        if (technicianRequest.getGarageIds() != null) {
+            garageTeamService.syncLinkedGarages(savedTechnician, null);
+        }
+        return technicianMapper.entityToResponse(savedTechnician);
     }
 
     /**

@@ -17,6 +17,8 @@ public class RequestingGarageTechnicianRequest {
     private Integer technicianId;
 
     private String description;  // Optional description/message for the request
+    /** Optional team role offered with a garage-sent request. */
+    private Integer roleId;
 
     // Note: sendBy will be automatically determined by the service layer
     // based on the authenticated user's role (not provided by client)

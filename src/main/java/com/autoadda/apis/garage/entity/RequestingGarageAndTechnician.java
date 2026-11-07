@@ -28,6 +28,18 @@ public class RequestingGarageAndTechnician {
     private ApprovalStatus approvalStatus;
     private LocalDateTime requestedAt;
     private String description;
+
+    /** Role the person gets when the request is accepted (team invites). */
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private GarageRole role;
+
+    /** Phone number the invite was sent to; set when the invitee had no AutoAdda account yet. */
+    @Column(length = 30)
+    private String invitedPhone;
+
+    /** AutoAdda user id of the team member who sent the invite. */
+    private Integer invitedBy;
     @PrePersist
     public void prePersist() {
         requestedAt = LocalDateTime.now();
