@@ -35,6 +35,7 @@ public class AppointmentService {
     private final AppointmentStatusActivityRepository appointmentActivityRepo;
     private final AppointmentServiceRepository serviceRepo;
     private final GarageRepository garageRepo;
+    private final VehicleBookingAccessService vehicleBookingAccessService;
     private final GarageServiceRepository garageServiceRepo;
     private final AppointmentDetailMapper appointmentDetailMapper;
     private final BusinessValidator validator;
@@ -57,11 +58,16 @@ public class AppointmentService {
         Garage garage = garageRepo.findById(request.getGarageId())
                 .orElseThrow(() -> new GarageNotFoundException("Garage not found"));
 
+        // Only the vehicle's owner (or, for a company vehicle, the company owner / its drivers) may book
+        VehicleBookingAccessService.BookingVehicle bookingVehicle =
+                vehicleBookingAccessService.authorizeBooking(request.getVehicleId(), request.getCustomerId());
+
         // Create appointment
         AppointmentDetails appointment = AppointmentDetails.builder()
                 .garage(garage)
                 .vehicleId(request.getVehicleId())
                 .customerId(request.getCustomerId())
+                .companyId(bookingVehicle.companyId())
                 .scheduleDate(request.getScheduleDate())
                 .status(Status.CONFIRMED)
                 .insertTms(DateHelper.dbDate())

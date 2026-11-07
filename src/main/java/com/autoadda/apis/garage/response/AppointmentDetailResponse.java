@@ -34,6 +34,8 @@ public class AppointmentDetailResponse {
     private Boolean isSubscriptionUsed;
     private Integer customerId;
     private Integer vehicleId;
+    /** Set for company (fleet / showroom) vehicles; null for privately owned ones. */
+    private Long companyId;
     private AppointmentSlotResponse slot;
     private Integer technicianId;
     private VehicleDetailResponse vehicle;
