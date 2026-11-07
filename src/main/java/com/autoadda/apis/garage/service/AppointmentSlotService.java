@@ -38,6 +38,7 @@ public class AppointmentSlotService {
     private final AppointmentServiceRepository appointmentServiceRepository;
     private final VehicleBookingValidationService vehicleBookingValidationService;
     private final SubscriptionValidationService subscriptionValidationService;
+    private final VehicleBookingAccessService vehicleBookingAccessService;
     private final GarageSubscriptionRepository garageSubscriptionRepository;
 
     /**
@@ -123,6 +124,9 @@ public class AppointmentSlotService {
 
         Integer userId = Integer.parseInt ( autoAddaId );
 
+        // Only the vehicle's owner (or, for a company vehicle, the company owner / its drivers) may book
+        VehicleBookingAccessService.BookingVehicle bookingVehicle = vehicleBookingAccessService.authorizeBooking ( vehicleId, userId );
+
         // Fetch slot with pessimistic write lock to prevent concurrent bookings
         AppointmentSlot slot = slotRepository.findByGarageIdAndStartTime ( garageId, date, time )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Slot not available or fully booked" ) );
@@ -154,6 +158,7 @@ public class AppointmentSlotService {
                 .serviceStartTime ( time ).status ( Status.CONFIRMED ).comments ( "Booked via platform" )
                 .vehicleId ( vehicleId )
                 .customerId ( userId )
+                .companyId ( bookingVehicle.companyId ( ) )
                 .selectedGarageServiceIds ( selectedGarageServiceIds )
                 .appointmentReferenceId ( appointmentService.generateAppointmentCode ( ) )
                 .slot ( slot )

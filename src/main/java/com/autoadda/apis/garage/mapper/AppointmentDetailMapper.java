@@ -66,6 +66,7 @@ private final GarageSubscriptionMapper garageSubscriptionMapper;
         }
 
         appointmentDetailResponse.setVehicleId ( appointmentDetail.getVehicleId ( ) );
+        appointmentDetailResponse.setCompanyId ( appointmentDetail.getCompanyId ( ) );
         log.info ( "-------------->19" );
 
         appointmentDetailResponse.setVehicle ( vehicleClient.getVehicleDetailsByIdResponse ( appointmentDetail.getVehicleId ( ) ) );

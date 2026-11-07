@@ -60,6 +60,10 @@ public class AppointmentDetails {
     @Column(name = "vehicle_id")
     private Integer vehicleId;
 
+    /** Company (fleet / showroom) the vehicle belonged to when booked; null for privately owned vehicles. */
+    @Column(name = "company_id")
+    private Long companyId;
+
     @ManyToOne
     private AppointmentSlot slot;
 

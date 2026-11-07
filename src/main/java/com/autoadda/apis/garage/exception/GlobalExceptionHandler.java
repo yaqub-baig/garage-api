@@ -137,6 +137,12 @@ public class GlobalExceptionHandler {
         return buildResponse (  HttpStatus.UNAUTHORIZED, ErrorMessage.ERROR_UNAUTHORIZED );
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<GenericResponse> handleForbidden(ForbiddenException ex) {
+        log.warn ( "Forbidden: {}", ex.getMessage ( ) );
+        return buildResponse (  HttpStatus.FORBIDDEN, ex.getMessage ( ) );
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<GenericResponse> handleResourceNotFound(ResourceNotFoundException ex) {
         log.warn ( "Resource not found", ex );

@@ -25,6 +25,18 @@
 | `/status` | PUT | Update appointment status |
 | `/{appointmentId}` | GET | Get appointment details |
 
+### Who can book a vehicle
+`POST /appointments/{garageId}/book` (the user in `X-Auto-Adda-Id`) and `POST /appointments` (the `customerId` in the body) check the vehicle's ownership with vehicle-api first:
+
+| Vehicle | Allowed to book |
+|---------|-----------------|
+| Privately owned (`companyId` null) | its owner only |
+| Company / fleet / showroom (`companyId` set) | the user who registered it, the company owner, or one of the company's drivers |
+
+Anyone else gets **403** (`You can only book services for your own vehicles` / `This vehicle belongs to a company…`). An unknown or deleted vehicle gives **404**. If vehicle-api can't be reached, the booking is refused with **400** (`Could not verify the vehicle right now…`).
+
+Appointments now carry `companyId` (null for private vehicles) in every appointment response, so company bookings can be told apart from personal ones.
+
 ## Garage Management
 **Controller:** `GarageController`  
 **Base Path:** `/garages`
