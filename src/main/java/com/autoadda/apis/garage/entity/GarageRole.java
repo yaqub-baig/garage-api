@@ -13,8 +13,10 @@ import java.util.Set;
  * A role defined by a garage (e.g. Admin, HR, Front Desk) with the permissions it grants.
  */
 @Entity
-@Table(name = "garage_role",
-        uniqueConstraints = @UniqueConstraint(name = "uk_garage_role_name", columnNames = {"garage_id", "name"}))
+// Not "garage_role": older databases still contain a legacy garage_role table (role_code / description)
+// from an entity removed long ago, and ddl-auto=update cannot reshape it.
+@Table(name = "garage_team_role",
+        uniqueConstraints = @UniqueConstraint(name = "uk_garage_team_role_name", columnNames = {"garage_id", "name"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,7 +40,7 @@ public class GarageRole {
     private String description;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "garage_role_permission", joinColumns = @JoinColumn(name = "role_id"))
+    @CollectionTable(name = "garage_team_role_permission", joinColumns = @JoinColumn(name = "role_id"))
     @Column(name = "permission", length = 40)
     @Enumerated(EnumType.STRING)
     @Builder.Default

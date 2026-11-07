@@ -44,7 +44,7 @@ public class GarageTeamBackfillRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         try {
             List<Integer> garagesWithoutRoles = nativeIds(
-                    "SELECT g.id FROM garage g LEFT JOIN garage_role r ON r.garage_id = g.id WHERE r.id IS NULL");
+                    "SELECT g.id FROM garage g LEFT JOIN garage_team_role r ON r.garage_id = g.id WHERE r.id IS NULL");
             garagesWithoutRoles.forEach(id -> transactionTemplate.executeWithoutResult(s ->
                     garageRepository.findById(id).ifPresent(roleService::seedDefaultRoles)));
 
