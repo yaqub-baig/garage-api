@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.RequestingGarageTechnicianRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.RequestingGarageTechnicianResponse;
@@ -24,6 +27,8 @@ import java.util.List;
 public class RequestingGarageTechnicianController {
 
     private final RequestingGarageTechnicianService service;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     // ====================================================================================
     // SEND REQUEST
@@ -35,7 +40,9 @@ public class RequestingGarageTechnicianController {
     @PostMapping("/garage/send")
     public ResponseEntity<GenericResponse> sendRequestFromGarage(
             @Valid @RequestBody RequestingGarageTechnicianRequest request,
-            @RequestParam String garageId) {
+            @RequestParam String garageId,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, Integer.valueOf(garageId), GaragePermission.TEAM_MANAGE);
 
         log.info("Garage {} sending request to technician {}", garageId, request.getTechnicianId());
 
@@ -83,14 +90,18 @@ public class RequestingGarageTechnicianController {
     @PutMapping("/garage/{requestId}/approve")
     public ResponseEntity<GenericResponse> garageApproveRequest(
             @PathVariable Integer requestId,
-            @RequestParam String garageId) {
+            @RequestParam String garageId,
+            @RequestParam(required = false) Integer roleId,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, Integer.valueOf(garageId), GaragePermission.TEAM_MANAGE);
 
         log.info("Garage {} approving request {}", garageId, requestId);
 
         RequestingGarageTechnicianResponse response = service.approveRequest(
                 requestId,
                 Integer.parseInt(garageId),
-                SendBy.GARAGE);
+                SendBy.GARAGE,
+                roleId);
 
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
                 "Request approved successfully. Technician has been added to your garage.", response));
@@ -102,7 +113,9 @@ public class RequestingGarageTechnicianController {
     @PutMapping("/garage/{requestId}/reject")
     public ResponseEntity<GenericResponse> garageRejectRequest(
             @PathVariable Integer requestId,
-            @RequestParam String garageId) {
+            @RequestParam String garageId,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, Integer.valueOf(garageId), GaragePermission.TEAM_MANAGE);
 
         log.info("Garage {} rejecting request {}", garageId, requestId);
 

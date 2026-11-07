@@ -20,4 +20,5 @@ public class UpdateInventoryItemRequest {
     private String binLocation;
     private ProductCondition productCondition;
     private String notes;
+    private Long voiceNoteId;
 }

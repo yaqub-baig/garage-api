@@ -6,6 +6,7 @@
 - [Garage Services](#garage-services)
 - [Garage Subscriptions](#garage-subscriptions)
 - [Technician Management](#technician-management)
+- [Garage Team Management](#garage-team-management)
 - [Roadside Assistance](#roadside-assistance)
 - [Pickup & Drop](#pickup--drop)
 - [Invoicing](#invoicing)
@@ -75,6 +76,31 @@
 | `/{id}` | GET | Get technician by ID |
 | `/{id}/delete` | DELETE | Delete a technician |
 
+## Garage Team Management
+**Controller:** `GarageTeamController`  
+**Base Path:** `/garages/{garageId}/team`
+
+Each garage has team members with custom roles (a set of `GaragePermission`s). Every call acts as the user in the `X-Auto-Adda-Id` header. Garage-side write endpoints across the API now check these permissions and return **403** when the caller lacks them; the garage owner always passes. Frontend guide: [GARAGE_TEAM_FRONTEND_INTEGRATION.md](GARAGE_TEAM_FRONTEND_INTEGRATION.md).
+
+| Endpoint | Method | Permission | Description |
+|----------|--------|------------|-------------|
+| `/me` | GET | — | Caller's role and effective permissions |
+| `/members` | GET | TEAM_VIEW | List team members |
+| `/members/{memberId}/role` | PUT | TEAM_MANAGE | Change a member's role |
+| `/members/{memberId}/status` | PUT | TEAM_MANAGE | Suspend / reactivate a member |
+| `/members/{memberId}` | DELETE | TEAM_MANAGE | Remove a member |
+| `/roles` | GET | TEAM_VIEW | List roles |
+| `/roles` | POST | ROLE_MANAGE | Create a role |
+| `/roles/{roleId}` | PUT | ROLE_MANAGE | Edit a role |
+| `/roles/{roleId}` | DELETE | ROLE_MANAGE | Delete an unused role |
+| `/invites` | POST | TEAM_MANAGE | Invite by phone with a role |
+| `/invites` | GET | TEAM_VIEW | Pending invites |
+| `/invites/{inviteId}` | DELETE | TEAM_MANAGE | Cancel an invite |
+| `/team/invites/mine` (no garage prefix) | GET | — | Invites waiting for the caller |
+| `/team/permissions` (no garage prefix) | GET | — | Permission catalogue |
+
+Config: `garage.permissions.enforcement=ENFORCE` (default) or `LOG_ONLY` to log denials without blocking.
+
 ## Roadside Assistance
 **Controller:** `RoadsideAssistanceController`  
 **Base Path:** `/api/roadside-assistance`
@@ -136,6 +162,29 @@
 |----------|--------|-------------|
 | `/upload` | POST | Upload media files |
 | `/delete-image/{id}` | DELETE | Delete a media file |
+
+### Voice notes
+Every note / comment / remark field can carry one optional voice recording. Frontend guide with per-screen changes and sample code: [VOICE_NOTES_FRONTEND_INTEGRATION.md](VOICE_NOTES_FRONTEND_INTEGRATION.md).
+
+1. Upload the recording to `POST /mediafiles/upload` (field `files`). Audio (`audio/*`, or `.mp3 .m4a .aac .wav .ogg .opus .amr .flac`) is stored under `uploads/audios/`.
+2. Send the returned media file `id` next to the text field. Only audio files are accepted (non-audio id → 400).
+3. Responses return the recording as a media file object (`id`, `mediaType`, `fileUrl`, …).
+
+On update endpoints, omitting the id keeps the existing recording.
+
+| Text field | Request field | Response field | Where |
+|------------|---------------|----------------|-------|
+| `notes` | `voiceNoteId` | `voiceNote` | part request create/update, garage procurement, working tools add/update, inventory item add/update, stock add/remove/adjust, invoice generate, garage sale finalize, pickup/drop create |
+| `notes` (query) | `voiceNoteId` (query) | `voiceNote` | `POST /invoices/work-order/{id}/auto-generate` |
+| `comments` | `voiceNoteId` | `voiceNote` (on invoice) | invoice pay |
+| `notes` | `voiceNoteId` | `resolutionVoiceNote` | inventory alert resolve/dismiss |
+| `partRequestNotes` | `partRequestVoiceNoteId` | part request `voiceNote` | job card status → `WAITING_FOR_PARTS` |
+| `comments` | `voiceNoteId` | `voiceNote` | appointment status update, job card assign (also via work order update), job card additional request |
+| `comment` | `voiceNoteId` | `voiceNote` | vehicle received create/update |
+| `comments` / `customerComments` | `voiceNoteId` / `customerVoiceNoteId` | `customerVoiceNote` | delivery checklist / customer delivery approval |
+| `customerComments` | `customerVoiceNoteId` | `customerVoiceNote` | customer part response |
+| `customerNegotiatedComment` / `garageNegotiatedComment` | `customerNegotiatedVoiceNoteId` / `garageNegotiatedVoiceNoteId` | `customerNegotiatedVoiceNote` / `garageNegotiatedVoiceNote` | work order update |
+| `remarks` (query) | `voiceNoteId` (query) | `voiceNote` | roadside assistance status, insurance claim status (`approvalVoiceNote`) |
 
 ## Communication Preferences
 **Controller:** `CommunicationPreferenceController`  

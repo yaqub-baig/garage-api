@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.*;
 import com.autoadda.apis.garage.response.*;
 import com.autoadda.apis.garage.service.GarageInventoryService;
@@ -17,6 +20,8 @@ import java.util.List;
 public class GarageInventoryController {
 
     private final GarageInventoryService inventoryService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     /**
      * Add a new inventory item to garage
@@ -24,7 +29,9 @@ public class GarageInventoryController {
      */
     @PostMapping
     public ResponseEntity<GenericResponse> addInventoryItem(
-            @RequestBody AddInventoryItemRequest request) {
+            @RequestBody AddInventoryItemRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, request.getGarageId(), GaragePermission.INVENTORY_MANAGE);
         log.info("Adding inventory item for garage: {}", request.getGarageId());
         GarageInventoryItemResponse response = inventoryService.addInventoryItem(request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
@@ -64,7 +71,9 @@ public class GarageInventoryController {
     @PutMapping("/{itemId}")
     public ResponseEntity<GenericResponse> updateInventoryItem(
             @PathVariable Integer itemId,
-            @RequestBody UpdateInventoryItemRequest request) {
+            @RequestBody UpdateInventoryItemRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofInventoryItem(itemId), GaragePermission.INVENTORY_MANAGE);
         log.info("Updating inventory item: {}", itemId);
         GarageInventoryItemResponse response = inventoryService.updateInventoryItem(itemId, request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
@@ -78,7 +87,9 @@ public class GarageInventoryController {
     @PostMapping("/{itemId}/add-stock")
     public ResponseEntity<GenericResponse> addStock(
             @PathVariable Integer itemId,
-            @RequestBody AddStockRequest request) {
+            @RequestBody AddStockRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofInventoryItem(itemId), GaragePermission.INVENTORY_MANAGE);
         log.info("Adding stock to item: {}", itemId);
         request.setInventoryItemId(itemId);
         GarageInventoryItemResponse response = inventoryService.addStock(request);
@@ -93,7 +104,9 @@ public class GarageInventoryController {
     @PostMapping("/{itemId}/remove-stock")
     public ResponseEntity<GenericResponse> removeStock(
             @PathVariable Integer itemId,
-            @RequestBody RemoveStockRequest request) {
+            @RequestBody RemoveStockRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofInventoryItem(itemId), GaragePermission.INVENTORY_MANAGE);
         log.info("Removing stock from item: {}", itemId);
         request.setInventoryItemId(itemId);
         GarageInventoryItemResponse response = inventoryService.removeStock(request);
@@ -108,7 +121,9 @@ public class GarageInventoryController {
     @PostMapping("/{itemId}/adjust-stock")
     public ResponseEntity<GenericResponse> adjustStock(
             @PathVariable Integer itemId,
-            @RequestBody AdjustStockRequest request) {
+            @RequestBody AdjustStockRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofInventoryItem(itemId), GaragePermission.INVENTORY_MANAGE);
         log.info("Adjusting stock for item: {}", itemId);
         request.setInventoryItemId(itemId);
         GarageInventoryItemResponse response = inventoryService.adjustStock(request);
@@ -203,7 +218,9 @@ public class GarageInventoryController {
      */
     @DeleteMapping("/{itemId}")
     public ResponseEntity<GenericResponse> deactivateInventoryItem(
-            @PathVariable Integer itemId) {
+            @PathVariable Integer itemId,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofInventoryItem(itemId), GaragePermission.INVENTORY_MANAGE);
         log.info("Deactivating inventory item: {}", itemId);
         inventoryService.deactivateInventoryItem(itemId);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(

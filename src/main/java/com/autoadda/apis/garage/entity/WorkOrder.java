@@ -48,8 +48,16 @@ public class WorkOrder {
     private Double customerNegotiatedAmount;
     private String customerNegotiatedComment;
 
+    @ManyToOne
+    @JoinColumn(name = "customer_negotiated_voice_note_id")
+    private MediaFile customerNegotiatedVoiceNote;
+
     private Double garageNegotiatedAmount;
     private String garageNegotiatedComment;
+
+    @ManyToOne
+    @JoinColumn(name = "garage_negotiated_voice_note_id")
+    private MediaFile garageNegotiatedVoiceNote;
 
     private LocalDateTime workStartDate;
     private LocalDateTime workCompletedDate;

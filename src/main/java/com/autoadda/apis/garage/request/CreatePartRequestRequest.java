@@ -17,4 +17,5 @@ public class CreatePartRequestRequest {
     private Integer technicianId;
     private List<PartRequestItemDto> items;
     private String notes;
+    private Long voiceNoteId;
 }

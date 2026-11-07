@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.entity.GarageService;
 import com.autoadda.apis.garage.request.GarageServiceRequest;
 import com.autoadda.apis.garage.request.GarageServiceUpdateRequest;
@@ -19,9 +22,13 @@ import java.util.Optional;
 public class GarageServiceController {
 
     private final GarageServiceManagementService garageServiceService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     @PostMapping
-    public ResponseEntity<GarageService> create(@RequestBody GarageServiceRequest garageService) {
+    public ResponseEntity<GarageService> create(@RequestBody GarageServiceRequest garageService,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageService.getGarageId(), GaragePermission.SERVICES_MANAGE);
         return ResponseEntity.ok(garageServiceService.createGarageService(garageService));
     }
 
@@ -31,12 +38,16 @@ public class GarageServiceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GarageService> update(@PathVariable Integer id, @RequestBody GarageServiceUpdateRequest updated) {
+    public ResponseEntity<GarageService> update(@PathVariable Integer id, @RequestBody GarageServiceUpdateRequest updated,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofGarageService(id), GaragePermission.SERVICES_MANAGE);
         return ResponseEntity.ok(garageServiceService.updateGarageService(id, updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofGarageService(id), GaragePermission.SERVICES_MANAGE);
         garageServiceService.deleteGarageService(id);
         return ResponseEntity.noContent().build();
     }

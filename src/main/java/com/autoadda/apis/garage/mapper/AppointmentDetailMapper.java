@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
@@ -20,6 +21,7 @@ import java.util.List;
 @Slf4j
 public class AppointmentDetailMapper {
     private final SlotMapper appointmentSlotMapper;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final GarageMapper garageMapper;
     private final VehicleClient vehicleClient;
 private final GarageSubscriptionMapper garageSubscriptionMapper;
@@ -38,6 +40,7 @@ private final GarageSubscriptionMapper garageSubscriptionMapper;
         appointmentDetailResponse.setServiceEndTime ( appointmentDetail.getServiceEndTime ( ) );
         appointmentDetailResponse.setDeliveryTime ( appointmentDetail.getDeliveryTime ( ) );
         appointmentDetailResponse.setComments ( appointmentDetail.getComments ( ) );
+        appointmentDetailResponse.setVoiceNote ( voiceNoteHelper.toResponse ( appointmentDetail.getVoiceNote ( ) ) );
         appointmentDetailResponse.setStatus ( appointmentDetail.getStatus ( ) );
         log.info ( "-------------->17" );
 

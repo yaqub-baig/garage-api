@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.ResolveAlertRequest;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.InventoryAlertResponse;
@@ -18,6 +21,8 @@ import java.util.List;
 public class InventoryAlertController {
 
     private final InventoryAlertService alertService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     /**
      * Get all active alerts for a garage
@@ -52,7 +57,9 @@ public class InventoryAlertController {
     @PutMapping("/{alertId}/resolve")
     public ResponseEntity<GenericResponse> resolveAlert(
             @PathVariable Integer alertId,
-            @RequestBody ResolveAlertRequest request) {
+            @RequestBody ResolveAlertRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofInventoryAlert(alertId), GaragePermission.INVENTORY_MANAGE);
         log.info("Resolving alert: {}", alertId);
         InventoryAlertResponse response = alertService.resolveAlert(alertId, request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
@@ -66,7 +73,9 @@ public class InventoryAlertController {
     @PutMapping("/{alertId}/dismiss")
     public ResponseEntity<GenericResponse> dismissAlert(
             @PathVariable Integer alertId,
-            @RequestBody ResolveAlertRequest request) {
+            @RequestBody ResolveAlertRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofInventoryAlert(alertId), GaragePermission.INVENTORY_MANAGE);
         log.info("Dismissing alert: {}", alertId);
         InventoryAlertResponse response = alertService.dismissAlert(alertId, request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(

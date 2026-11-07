@@ -137,6 +137,12 @@ public class GlobalExceptionHandler {
         return buildResponse (  HttpStatus.UNAUTHORIZED, ErrorMessage.ERROR_UNAUTHORIZED );
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<GenericResponse> handleForbidden(ForbiddenException ex) {
+        log.warn ( "Forbidden: {}", ex.getMessage ( ) );
+        return buildResponse (  HttpStatus.FORBIDDEN, ex.getMessage ( ) );
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<GenericResponse> handleResourceNotFound(ResourceNotFoundException ex) {
         log.warn ( "Resource not found", ex );
@@ -173,9 +179,9 @@ public class GlobalExceptionHandler {
         return buildResponse (  HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessage.ERROR_INTERNAL_SERVER );
     }
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<GenericResponse> handleGenericException(BadRequestException ex) {
-        log.error (UNHANDLED_EXCEPTION, ex );
-        return buildResponse (  HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessage.ERROR_INTERNAL_SERVER );
+    public ResponseEntity<GenericResponse> handleBadRequest(BadRequestException ex) {
+        log.warn ( "Bad request: {}", ex.getMessage ( ) );
+        return buildResponse (  HttpStatus.BAD_REQUEST, ex.getMessage ( ) );
     }
     @ExceptionHandler(InsufficientPointsException.class)
     public ResponseEntity<GenericResponse> handleGenericException(InsufficientPointsException ex) {

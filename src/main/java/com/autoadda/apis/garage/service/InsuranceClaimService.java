@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.InsuranceClaim;
 import com.autoadda.apis.garage.entity.InsuranceClaimDocument;
 import com.autoadda.apis.garage.repository.InsuranceClaimDocumentRepository;
@@ -19,6 +20,7 @@ public class InsuranceClaimService {
 
     public static final String CLAIM_NOT_FOUND = "Claim not found";
     private final InsuranceClaimRepository claimRepo;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final InsuranceClaimDocumentRepository docRepo;
 
     /**
@@ -40,15 +42,17 @@ public class InsuranceClaimService {
      * @param claimId        The ID of the claim to be updated.
      * @param status         The new status to set for the claim.
      * @param remarks        Any remarks related to the status update.
+     * @param voiceNoteId    Optional uploaded audio recording for the remarks.
      * @param approvedAmount The amount approved for the claim, if applicable.
      * @return The updated insurance claim.
      */
     @Transactional
-    public InsuranceClaim updateClaimStatus(Integer claimId, Status status, String remarks, BigDecimal approvedAmount) {
+    public InsuranceClaim updateClaimStatus(Integer claimId, Status status, String remarks, Long voiceNoteId, BigDecimal approvedAmount) {
         InsuranceClaim claim = claimRepo.findById ( claimId ).orElseThrow ( () -> new RuntimeException (CLAIM_NOT_FOUND) );
 
         claim.setStatus ( status );
         claim.setApprovalRemarks ( remarks );
+        claim.setApprovalVoiceNote ( voiceNoteHelper.resolve ( voiceNoteId ) );
         claim.setApprovedAmount ( approvedAmount );
         claim.setUpdatedAt ( LocalDateTime.now ( ) );
 

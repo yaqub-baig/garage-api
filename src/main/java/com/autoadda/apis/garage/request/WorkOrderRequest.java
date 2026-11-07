@@ -18,6 +18,8 @@ public class WorkOrderRequest {
     private Boolean customerAcknowledged;
     private Double customerNegotiatedAmount;
     private String customerNegotiatedComment;
+    private Long customerNegotiatedVoiceNoteId;
     private Double garageNegotiatedAmount;
     private String garageNegotiatedComment;
+    private Long garageNegotiatedVoiceNoteId;
 }

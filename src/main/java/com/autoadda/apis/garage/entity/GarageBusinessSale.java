@@ -38,6 +38,10 @@ public class GarageBusinessSale {
     @Column(name = "notes", length = 1000)
     private String notes;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     @Column(name = "is_active")
     @Builder.Default
     private Boolean isActive = true;

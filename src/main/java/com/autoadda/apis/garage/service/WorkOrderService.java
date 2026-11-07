@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.entity.Garage;
@@ -43,6 +44,7 @@ public class WorkOrderService {
     private final NotificationDispatchService notificationDispatchService;
     private final NotificationMessageBuilder notificationMessageBuilder;
     private final VehicleDeliveryRepository vehicleDeliveryRepository;
+    private final VoiceNoteHelper voiceNoteHelper;
 
 
     /**
@@ -213,11 +215,17 @@ public class WorkOrderService {
         if (request.getCustomerNegotiatedComment() != null) {
             workOrder.setCustomerNegotiatedComment(request.getCustomerNegotiatedComment());
         }
+        if (request.getCustomerNegotiatedVoiceNoteId() != null) {
+            workOrder.setCustomerNegotiatedVoiceNote(voiceNoteHelper.resolve(request.getCustomerNegotiatedVoiceNoteId()));
+        }
         if (request.getGarageNegotiatedAmount() != null) {
             workOrder.setGarageNegotiatedAmount(request.getGarageNegotiatedAmount());
         }
         if (request.getGarageNegotiatedComment() != null) {
             workOrder.setGarageNegotiatedComment(request.getGarageNegotiatedComment());
+        }
+        if (request.getGarageNegotiatedVoiceNoteId() != null) {
+            workOrder.setGarageNegotiatedVoiceNote(voiceNoteHelper.resolve(request.getGarageNegotiatedVoiceNoteId()));
         }
         if (request.getStatus() != null) {
             if (!workOrderStatusFlowService.isValidTransition(workOrder.getStatus(), request.getStatus())) {
@@ -309,6 +317,7 @@ public class WorkOrderService {
                     .paymentMethod(invoice.getPaymentMethod())
                     .isPaid(invoice.getIsPaid())
                     .notes(invoice.getNotes())
+                    .voiceNote(voiceNoteHelper.toResponse(invoice.getVoiceNote()))
                     .createdAt(invoice.getCreatedAt())
                     .build();
         }
@@ -328,6 +337,7 @@ public class WorkOrderService {
                     .deliveryDate(delivery.getDeliveryDate())
                     .customerApproved(delivery.getCustomerApproved())
                     .customerComments(delivery.getCustomerComments())
+                    .customerVoiceNote(voiceNoteHelper.toResponse(delivery.getCustomerVoiceNote()))
                     .rejectionReason(delivery.getRejectionReason())
                     .attemptNumber(delivery.getAttemptNumber())
                     .deliveryPhotos(photoUrls)

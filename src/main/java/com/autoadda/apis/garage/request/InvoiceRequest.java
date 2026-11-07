@@ -20,4 +20,5 @@ public class InvoiceRequest {
     private Integer loyaltyPointsToUse;
     private PaymentMethod paymentMethod; // "CASH", "CREDIT_CARD", "ONLINE"
     private String notes;
+    private Long voiceNoteId;
 }

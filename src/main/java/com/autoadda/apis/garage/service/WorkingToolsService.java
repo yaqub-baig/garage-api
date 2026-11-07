@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.WorkingTools;
@@ -29,6 +30,7 @@ public class WorkingToolsService {
     private final GarageRepository garageRepo;
     private final MediaFileRepository mediaFileRepository;
     private final WorkingToolsMapper mapper;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     /**
      * Add a new tool/equipment entry to a garage
@@ -58,6 +60,7 @@ public class WorkingToolsService {
                 .quantity(request.getQuantity() != null ? request.getQuantity() : 1)
                 .condition(request.getCondition())
                 .notes(request.getNotes())
+                .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                 .toolImage(toolImage)
                 .build();
 
@@ -126,6 +129,9 @@ public class WorkingToolsService {
         }
         if (request.getNotes() != null) {
             tool.setNotes(request.getNotes());
+        }
+        if (request.getVoiceNoteId() != null) {
+            tool.setVoiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()));
         }
         if (request.getToolImageId() != null) {
             tool.setToolImage(resolveToolImage(request.getToolImageId()));

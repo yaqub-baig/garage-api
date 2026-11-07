@@ -26,8 +26,10 @@ public class WorkOrderResponse {
     private Boolean customerAcknowledged;
     private Double customerNegotiatedAmount1;
     private String customerNegotiatedComment;
+    private MediaFileResponse customerNegotiatedVoiceNote;
     private Double garageNegotiatedAmount1;
     private String garageNegotiatedComment;
+    private MediaFileResponse garageNegotiatedVoiceNote;
     private List<StatusTimelineEntry> statusTimeline;
     private Map<WorkOrderStatus, LocalDateTime> statusTimestamps;
     private LocalDateTime receivedAt;

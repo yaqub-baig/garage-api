@@ -18,4 +18,5 @@ public class JobCardStatusRequest {
     // Part request details (required when status is WAITING_FOR_PARTS)
     private List<PartRequestItemDto> partRequestItems;
     private String partRequestNotes;
+    private Long partRequestVoiceNoteId;
 }

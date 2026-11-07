@@ -11,5 +11,6 @@ public class CustomerDeliveryApprovalRequest {
 
     private Boolean approved;
     private String customerComments;
+    private Long customerVoiceNoteId;
     private String rejectionReason; // Required if approved = false
 }

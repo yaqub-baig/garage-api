@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.TechnicianRequest;
 import com.autoadda.apis.garage.request.TechnicianSearchCriteria;
 import com.autoadda.apis.garage.response.GarageResponse;
@@ -21,9 +24,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TechnicianController {
     private final TechnicianService technicianService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
 
     @PostMapping
-    public ResponseEntity<TechnicianResponse> addTechnician(@RequestBody TechnicianRequest request) {
+    public ResponseEntity<TechnicianResponse> addTechnician(@RequestBody TechnicianRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        if (request.getGarageIds() != null) request.getGarageIds().forEach(gid -> guard.require(caller, gid, GaragePermission.TEAM_MANAGE));
+        if (request.getGarageId() != null) guard.require(caller, request.getGarageId(), GaragePermission.TEAM_MANAGE);
         TechnicianResponse created = technicianService.onboardTechnician(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -72,7 +80,9 @@ public class TechnicianController {
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<TechnicianResponse> updateTechnician(@PathVariable Integer id, @RequestBody TechnicianRequest request) {
+    public ResponseEntity<TechnicianResponse> updateTechnician(@PathVariable Integer id, @RequestBody TechnicianRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        if (request.getGarageIds() != null) request.getGarageIds().forEach(gid -> guard.require(caller, gid, GaragePermission.TEAM_MANAGE));
         return new ResponseEntity<>(technicianService.updateTechnician(id, request), HttpStatus.OK);
 
     }

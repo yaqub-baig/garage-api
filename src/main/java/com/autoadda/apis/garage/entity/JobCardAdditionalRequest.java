@@ -37,6 +37,10 @@ public class JobCardAdditionalRequest {
     @Column(name = "comments")
     private String comments;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     @Column(name = "insert_tms")
     private LocalDate insertTms;
 

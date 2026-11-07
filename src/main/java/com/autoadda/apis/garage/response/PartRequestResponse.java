@@ -29,4 +29,5 @@ public class PartRequestResponse {
     private List<PartRequestItemResponse> items;
     private CustomerPartResponseResponse customerResponse;
     private String notes;
+    private MediaFileResponse voiceNote;
 }

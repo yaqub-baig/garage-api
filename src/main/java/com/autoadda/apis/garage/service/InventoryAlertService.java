@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.InventoryAlert;
 import com.autoadda.apis.garage.entity.Technician;
 import com.autoadda.apis.garage.exception.ResourceNotFoundException;
@@ -24,6 +25,7 @@ public class InventoryAlertService {
     private final InventoryAlertRepository alertRepo;
     private final TechnicianRepository technicianRepo;
     private final GarageInventoryMapper mapper;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     /**
      * Get all active alerts for a garage
@@ -73,7 +75,7 @@ public class InventoryAlertService {
         Technician technician = technicianRepo.findById(request.getTechnicianId())
                 .orElseThrow(() -> new ResourceNotFoundException("Technician not found"));
 
-        alert.resolve(technician, request.getNotes());
+        alert.resolve(technician, request.getNotes(), voiceNoteHelper.resolve(request.getVoiceNoteId()));
         alert = alertRepo.save(alert);
 
         log.info("Alert resolved: {}", alertId);
@@ -94,7 +96,7 @@ public class InventoryAlertService {
         Technician technician = technicianRepo.findById(request.getTechnicianId())
                 .orElseThrow(() -> new ResourceNotFoundException("Technician not found"));
 
-        alert.dismiss(technician, request.getNotes());
+        alert.dismiss(technician, request.getNotes(), voiceNoteHelper.resolve(request.getVoiceNoteId()));
         alert = alertRepo.save(alert);
 
         log.info("Alert dismissed: {}", alertId);

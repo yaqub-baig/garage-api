@@ -35,6 +35,7 @@ public class GarageInventoryItemResponse {
     private LocalDateTime lastRestockedAt;
     private ProductCondition productCondition;
     private String notes;
+    private MediaFileResponse voiceNote;
 
     // Part image information
     private Long partImageId;

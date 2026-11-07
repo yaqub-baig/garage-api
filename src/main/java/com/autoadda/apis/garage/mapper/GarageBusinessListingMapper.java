@@ -1,5 +1,7 @@
 package com.autoadda.apis.garage.mapper;
 
+import lombok.RequiredArgsConstructor;
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.GarageBusinessListing;
 import com.autoadda.apis.garage.entity.GarageBusinessSale;
 import com.autoadda.apis.garage.entity.GarageBusinessSaleInvoice;
@@ -12,7 +14,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class GarageBusinessListingMapper {
+
+    private final VoiceNoteHelper voiceNoteHelper;
 
     public GarageBusinessListingResponse entityToResponse(GarageBusinessListing listing) {
         if (listing == null) {
@@ -64,6 +69,7 @@ public class GarageBusinessListingMapper {
                 .paymentMode(sale.getPaymentMode())
                 .saleDate(sale.getSaleDate())
                 .notes(sale.getNotes())
+                .voiceNote(voiceNoteHelper.toResponse(sale.getVoiceNote()))
                 .build();
     }
 

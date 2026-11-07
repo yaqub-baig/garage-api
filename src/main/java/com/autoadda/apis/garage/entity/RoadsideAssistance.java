@@ -39,5 +39,9 @@ public class RoadsideAssistance {
 
     private String remarks;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     private LocalDateTime completedAt;
 }

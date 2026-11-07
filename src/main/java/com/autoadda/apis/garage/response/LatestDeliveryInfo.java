@@ -20,6 +20,7 @@ public class LatestDeliveryInfo {
     private LocalDateTime deliveryDate;
     private Boolean customerApproved;
     private String customerComments;
+    private MediaFileResponse customerVoiceNote;
     private String rejectionReason;
     private Integer attemptNumber;
     private List<String> deliveryPhotos;

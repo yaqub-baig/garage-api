@@ -26,8 +26,9 @@ public class InsuranceClaimController {
 
     @PutMapping("/{claimId}/status")
     public ResponseEntity<InsuranceClaim> updateStatus(@PathVariable Integer claimId, @RequestParam Status status,
-                                                       @RequestParam(required = false) String remarks, @RequestParam(required = false) BigDecimal approvedAmount) {
-        return ResponseEntity.ok(claimService.updateClaimStatus(claimId, status, remarks, approvedAmount));
+                                                       @RequestParam(required = false) String remarks, @RequestParam(required = false) Long voiceNoteId,
+                                                       @RequestParam(required = false) BigDecimal approvedAmount) {
+        return ResponseEntity.ok(claimService.updateClaimStatus(claimId, status, remarks, voiceNoteId, approvedAmount));
     }
 
     @PostMapping("/{claimId}/documents")

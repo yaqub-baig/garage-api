@@ -112,4 +112,22 @@ public interface RequestingGarageTechnicianRepository extends JpaRepository<Requ
            "AND r.sendBy = 'GARAGE' " +
            "AND r.approvalStatus = 'HOLD'")
     long countPendingRequestsForTechnician(@Param("technicianId") Integer technicianId);
+
+    // ---- Team invites ----
+
+    long countByRoleIdAndApprovalStatus(Integer roleId, com.autoadda.apis.garage.util.ApprovalStatus status);
+
+    @Query("SELECT r FROM RequestingGarageAndTechnician r LEFT JOIN FETCH r.technician LEFT JOIN FETCH r.role " +
+           "WHERE r.garage.id = :garageId AND r.sendBy = 'GARAGE' AND r.approvalStatus = 'HOLD' " +
+           "ORDER BY r.requestedAt DESC")
+    List<RequestingGarageAndTechnician> findPendingInvitesByGarage(@Param("garageId") Integer garageId);
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM RequestingGarageAndTechnician r " +
+           "WHERE r.garage.id = :garageId AND r.technician IS NULL AND r.invitedPhone = :phone " +
+           "AND r.approvalStatus = 'HOLD'")
+    boolean existsPendingPhoneInvite(@Param("garageId") Integer garageId, @Param("phone") String phone);
+
+    @Query("SELECT r FROM RequestingGarageAndTechnician r " +
+           "WHERE r.technician IS NULL AND r.invitedPhone = :phone AND r.approvalStatus = 'HOLD'")
+    List<RequestingGarageAndTechnician> findUnclaimedInvitesByPhone(@Param("phone") String phone);
 }

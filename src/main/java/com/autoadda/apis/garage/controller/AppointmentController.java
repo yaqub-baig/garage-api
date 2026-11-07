@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.entity.AppointmentDetails;
 import com.autoadda.apis.garage.exception.GarageNotFoundException;
 import com.autoadda.apis.garage.request.AppointmentStatusRequest;
@@ -29,6 +32,8 @@ import java.util.Map;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
     private final AppointmentSlotService appointmentSlotService;
 
 
@@ -61,7 +66,9 @@ public class AppointmentController {
     }
 
     @PutMapping("/status")
-    public ResponseEntity<GenericResponse> updateAppointmentStatus(@RequestBody AppointmentStatusRequest request) {
+    public ResponseEntity<GenericResponse> updateAppointmentStatus(@RequestBody AppointmentStatusRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofAppointment(request.getAppointmentId()), GaragePermission.APPOINTMENT_MANAGE);
         AppointmentDetails updated = appointmentService.updateAppointmentStatus(request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(updated));
     }

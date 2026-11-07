@@ -17,6 +17,7 @@ public class VehicleReceivedRequest {
     private Integer receiverId;
     private List<Long> vehicleImages= new ArrayList<>();
     private String comment;
+    private Long voiceNoteId;
     private Boolean isMainKeyReceived;
     private Boolean isSpareKeyReceived;
     private Boolean isToolKitReceived;

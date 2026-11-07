@@ -1,5 +1,7 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.entity.MediaFile;
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.*;
@@ -36,6 +38,7 @@ public class JobCardService {
     public static final String UNKNOWN = "UNKNOWN";
     public static final String APPOINTMENT_NOT_FOUND = "Appointment not found";
     private final JobCardRepository jobCardRepo;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final JobcardStatusActivityRepository jobcardStatusActivityRepo;
     private final AppointmentServiceRepository appointmentServiceRepo;
     private final GarageRepository garageRepo;
@@ -73,6 +76,7 @@ public class JobCardService {
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Technician not found" ) );
 
         log.info ( "6" );
+        MediaFile voiceNote = voiceNoteHelper.resolve ( request.getVoiceNoteId ( ) );
         JobCard jobCard = JobCard.builder ( )
                 .appointment ( appointment )
                 .garage ( garage )
@@ -82,6 +86,7 @@ public class JobCardService {
                 .createdAt ( DateHelper.dbDate ( )
                         .atTime ( LocalTime.now ( ) ) )
                 .comments ( request.getComments ( ) )
+                .voiceNote ( voiceNote )
                 .build ( );
 
         log.info ( "7" );
@@ -94,6 +99,7 @@ public class JobCardService {
                 .memberId ( request.getMemberId ( ) )
                 .memberType ( request.getMemberType ( ) )
                 .comments ( request.getComments ( ) )
+                .voiceNote ( voiceNote )
                 .insertTms( DateHelper.dbDate ( ) )
                 .build ( ) );
 
@@ -148,6 +154,7 @@ public class JobCardService {
         Technician technician = technicianRepo.findById ( request.getTechnicianId ( ) )
                 .orElseThrow ( () -> new ResourceNotFoundException ( "Technician not found" ) );
 
+        MediaFile voiceNote = voiceNoteHelper.resolve ( request.getVoiceNoteId ( ) );
         JobCard jobCard = JobCard.builder ( )
                 .appointment ( appointment )
                 .garage ( appointment.getGarage ( ) )
@@ -157,6 +164,7 @@ public class JobCardService {
                 .createdAt ( DateHelper.dbDate ( )
                         .atTime ( LocalTime.now ( ) ) )
                 .comments ( request.getComments ( ) )
+                .voiceNote ( voiceNote )
                 .workOrder ( workOrder )
                 .build ( );
 
@@ -169,6 +177,7 @@ public class JobCardService {
                 .memberId ( request.getMemberId ( ) )
                 .memberType ( request.getMemberType ( ) )
                 .comments ( request.getComments ( ) )
+                .voiceNote ( voiceNote )
                 .insertTms( DateHelper.dbDate ( ) )
                 .build ( ) );
 
@@ -329,6 +338,7 @@ public class JobCardService {
                     .technicianId(request.getMemberId())
                     .items(request.getPartRequestItems())
                     .notes(request.getPartRequestNotes())
+                    .voiceNoteId(request.getPartRequestVoiceNoteId())
                     .build();
 
             PartRequestResponse partRequestResponse = partRequestService.createPartRequest(partRequest);

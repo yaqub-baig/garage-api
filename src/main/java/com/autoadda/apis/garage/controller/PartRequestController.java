@@ -1,5 +1,8 @@
 package com.autoadda.apis.garage.controller;
 
+import com.autoadda.apis.garage.util.GaragePermission;
+import com.autoadda.apis.garage.service.GarageResolver;
+import com.autoadda.apis.garage.service.GarageAccessGuard;
 import com.autoadda.apis.garage.request.*;
 import com.autoadda.apis.garage.response.GenericResponse;
 import com.autoadda.apis.garage.response.JobCardResponse;
@@ -20,6 +23,8 @@ import java.util.List;
 public class PartRequestController {
 
     private final PartRequestService partRequestService;
+    private final GarageAccessGuard guard;
+    private final GarageResolver garageResolver;
     private final JobCardService jobCardService;
 
     /**
@@ -27,7 +32,9 @@ public class PartRequestController {
      */
     @PostMapping
     public ResponseEntity<GenericResponse> createPartRequest(
-            @RequestBody CreatePartRequestRequest request) {
+            @RequestBody CreatePartRequestRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofJobCard(request.getJobCardId()), GaragePermission.PART_REQUEST_MANAGE);
         log.info("Creating part request for job card: {}", request.getJobCardId());
         PartRequestResponse response = partRequestService.createPartRequest(request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Part request created successfully", response));
@@ -38,7 +45,9 @@ public class PartRequestController {
      */
     @PutMapping("/jobcard/status")
     public ResponseEntity<GenericResponse> updateJobCardStatusWithPartRequest(
-            @RequestBody JobCardStatusRequest request) {
+            @RequestBody JobCardStatusRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofJobCard(request.getJobcardId()), GaragePermission.JOB_CARD_UPDATE);
         log.info("Updating job card status with part request: {}", request.getJobcardId());
         JobCardResponse response = jobCardService.updateJobCardStatusWithPartRequest(request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Job card status updated successfully", response));
@@ -60,7 +69,9 @@ public class PartRequestController {
     @PutMapping("/{id}")
     public ResponseEntity<GenericResponse> updatePartRequest(
             @PathVariable Integer id,
-            @RequestBody UpdatePartRequestRequest request) {
+            @RequestBody UpdatePartRequestRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofPartRequest(id), GaragePermission.PART_REQUEST_MANAGE);
         log.info("Updating part request: {}", id);
         PartRequestResponse response = partRequestService.updatePartRequest(id, request);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse("Part request updated successfully", response));
@@ -132,7 +143,9 @@ public class PartRequestController {
     @PostMapping("/{id}/procurement")
     public ResponseEntity<GenericResponse> addGarageProcurement(
             @PathVariable Integer id,
-            @RequestBody GarageProcurementRequest request) {
+            @RequestBody GarageProcurementRequest request,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofPartRequest(id), GaragePermission.PART_REQUEST_MANAGE);
         log.info("Adding garage procurement for part request: {}", id);
 
         // Set the part request ID if not already set
@@ -149,7 +162,9 @@ public class PartRequestController {
      * Mark all parts as received when customer delivers them
      */
     @PutMapping("/{id}/mark-received")
-    public ResponseEntity<GenericResponse> markPartReceived(@PathVariable Integer id) {
+    public ResponseEntity<GenericResponse> markPartReceived(@PathVariable Integer id,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofPartRequest(id), GaragePermission.PART_REQUEST_MANAGE);
         log.info("Marking all parts as received for part request: {}", id);
         PartRequestResponse response = partRequestService.markPartReceived(id);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(
@@ -161,7 +176,9 @@ public class PartRequestController {
      * Allows for partial deliveries
      */
     @PutMapping("/item/{itemId}/mark-received")
-    public ResponseEntity<GenericResponse> markPartItemReceived(@PathVariable Integer itemId) {
+    public ResponseEntity<GenericResponse> markPartItemReceived(@PathVariable Integer itemId,
+            @RequestHeader(value = "X-Auto-Adda-Id", required = false) String caller) {
+        guard.require(caller, garageResolver.ofPartRequestItem(itemId), GaragePermission.PART_REQUEST_MANAGE);
         log.info("Marking individual part item as received: {}", itemId);
         PartRequestResponse response = partRequestService.markPartItemReceived(itemId);
         return ResponseEntity.ok(GenericResponse.makeSuccessResponse(

@@ -34,4 +34,5 @@ public class AddInventoryItemRequest {
     private String shelfLocation;
     private String binLocation;
     private String notes;
+    private Long voiceNoteId;
 }

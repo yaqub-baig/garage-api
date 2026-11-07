@@ -20,6 +20,7 @@ public class VehicleRecievedResponse {
     private TechnicianResponse recievedBy;
     private LocalDateTime recievedTime;
     private String comment;
+    private MediaFileResponse voiceNote;
     private List<MediaFile> vehicleRecievedImages;
     private Boolean isMainKeyReceived;
     private Boolean isSpareKeyReceived;

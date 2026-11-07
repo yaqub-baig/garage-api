@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.RoadsideAssistance;
 import com.autoadda.apis.garage.repository.RoadsideAssistanceRepository;
 import com.autoadda.apis.garage.util.Status;
@@ -17,6 +18,7 @@ public class RoadsideAssistanceService {
 
 
     private final RoadsideAssistanceRepository assistanceRepository;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     /**
      * Creates a new roadside assistance request.
@@ -47,10 +49,11 @@ public class RoadsideAssistanceService {
      * @param requestId the ID of the request to update
      * @param status    the new status to set
      * @param remarks   any remarks associated with the status update
+     * @param voiceNoteId optional uploaded audio recording for the remarks
      * @return the updated roadside assistance request
      */
     @Transactional
-    public RoadsideAssistance updateStatus(Integer requestId, Status status, String remarks) {
+    public RoadsideAssistance updateStatus(Integer requestId, Status status, String remarks, Long voiceNoteId) {
         RoadsideAssistance request = assistanceRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
         request.setStatus(status);
@@ -58,6 +61,7 @@ public class RoadsideAssistanceService {
             request.setCompletedAt(LocalDateTime.now());
         }
         request.setRemarks(remarks);
+        request.setVoiceNote(voiceNoteHelper.resolve(voiceNoteId));
         return assistanceRepository.save(request);
     }
 

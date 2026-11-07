@@ -16,4 +16,5 @@ public class InvoicePayRequest {
     private Double amountPaid;
     private String transactionId;
     private String comments;
+    private Long voiceNoteId;
 }

@@ -49,6 +49,10 @@ public class GarageProcurement {
     @Column(name = "notes")
     private String notes;
 
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
     @PrePersist
     protected void onCreate() {
         if (procurementDate == null) {

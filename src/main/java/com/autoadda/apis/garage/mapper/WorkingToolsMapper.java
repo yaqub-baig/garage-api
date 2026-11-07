@@ -1,11 +1,16 @@
 package com.autoadda.apis.garage.mapper;
 
+import lombok.RequiredArgsConstructor;
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.WorkingTools;
 import com.autoadda.apis.garage.response.WorkingToolResponse;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class WorkingToolsMapper {
+
+    private final VoiceNoteHelper voiceNoteHelper;
 
     public WorkingToolResponse entityToResponse(WorkingTools tool) {
         if (tool == null) {
@@ -25,6 +30,7 @@ public class WorkingToolsMapper {
                 .createdAt(tool.getCreatedAt())
                 .updatedAt(tool.getUpdatedAt())
                 .notes(tool.getNotes())
+                .voiceNote(voiceNoteHelper.toResponse(tool.getVoiceNote()))
                 .toolImageId(tool.getToolImage() != null ? tool.getToolImage().getId() : null)
                 .toolImageUrl(tool.getToolImage() != null ? tool.getToolImage().getFilePath() : null)
                 .toolImageFileName(tool.getToolImage() != null ? tool.getToolImage().getFileName() : null)

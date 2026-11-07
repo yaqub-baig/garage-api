@@ -19,4 +19,5 @@ public class GarageBusinessSaleResponse {
     private String paymentMode;
     private LocalDate saleDate;
     private String notes;
+    private MediaFileResponse voiceNote;
 }

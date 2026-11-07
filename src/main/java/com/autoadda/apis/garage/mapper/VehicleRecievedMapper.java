@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.VehicleReceived;
 import com.autoadda.apis.garage.response.VehicleRecievedResponse;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class VehicleRecievedMapper {
     private final AppointmentDetailMapper appointmentDetailMapper;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final VehicleClient vehicleClient;
     private final TechnicianMapper technicianMapper;
 
@@ -22,6 +24,7 @@ public class VehicleRecievedMapper {
         vehicleRecievedResponse.setVehicleRecievedImages ( save.getVehiclePhotos ( ) );
         vehicleRecievedResponse.setRecievedTime ( save.getCreatedAt ( ) );
         vehicleRecievedResponse.setComment ( save.getComment ( ) );
+        vehicleRecievedResponse.setVoiceNote ( voiceNoteHelper.toResponse ( save.getVoiceNote ( ) ) );
         vehicleRecievedResponse.setIsMainKeyReceived ( save.getIsMainKeyReceived ( ) != null ? save.getIsMainKeyReceived ( ) : Boolean.FALSE );
         vehicleRecievedResponse.setIsSpareKeyReceived ( save.getIsSpareKeyReceived ( ) != null ? save.getIsSpareKeyReceived ( ) : Boolean.FALSE );
         vehicleRecievedResponse.setIsToolKitReceived ( save.getIsToolKitReceived ( ) != null ? save.getIsToolKitReceived ( ) : Boolean.FALSE );

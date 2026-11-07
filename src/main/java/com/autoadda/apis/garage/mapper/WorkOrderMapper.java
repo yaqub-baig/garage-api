@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.WorkOrder;
 import com.autoadda.apis.garage.repository.GarageRatingRepository;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class WorkOrderMapper {
 
     private final AppointmentDetailMapper appointmentDetailMapper;
+    private final VoiceNoteHelper voiceNoteHelper;
     private final JobCardMapper jobCardMapper;
     private final GarageMapper garageMapper;
     private final GarageRatingRepository  garageRatingRepository;
@@ -59,8 +61,10 @@ public class WorkOrderMapper {
         workOrderResponse.setCustomerAcknowledged ( save.getCustomerAcknowledged ( ) );
         workOrderResponse.setGarageNegotiatedAmount1 ( save.getGarageNegotiatedAmount ( ) );
         workOrderResponse.setGarageNegotiatedComment ( save.getGarageNegotiatedComment ( ) );
+        workOrderResponse.setGarageNegotiatedVoiceNote ( voiceNoteHelper.toResponse ( save.getGarageNegotiatedVoiceNote ( ) ) );
         workOrderResponse.setCustomerNegotiatedAmount1 ( save.getCustomerNegotiatedAmount ( ) );
         workOrderResponse.setCustomerNegotiatedComment ( save.getCustomerNegotiatedComment ( ) );
+        workOrderResponse.setCustomerNegotiatedVoiceNote ( voiceNoteHelper.toResponse ( save.getCustomerNegotiatedVoiceNote ( ) ) );
         var vehicleReceived = vehicleReceivedRepository.findByAppointmentId(save.getAppointment().getId());
         workOrderResponse.setReceivedAt(vehicleReceived != null ? vehicleReceived.getCreatedAt() : null);
         // Set status timestamps

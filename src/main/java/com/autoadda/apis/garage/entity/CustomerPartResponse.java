@@ -41,6 +41,10 @@ public class CustomerPartResponse {
     @Column(name = "customer_comments")
     private String customerComments;
 
+    @ManyToOne
+    @JoinColumn(name = "customer_voice_note_id")
+    private MediaFile customerVoiceNote;
+
     @PrePersist
     protected void onCreate() {
         if (responseDate == null) {

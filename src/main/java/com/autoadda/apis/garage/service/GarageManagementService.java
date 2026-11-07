@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.*;
 import com.autoadda.apis.garage.exception.AlreadyExistsException;
@@ -64,6 +65,8 @@ public class GarageManagementService {
     private final AppointmentDetailsRepository appointmentDetailsRepository;
     private final GarageSearchHelper garageSearchHelper;
     private final LocationRepository locationRepository;
+    private final VoiceNoteHelper voiceNoteHelper;
+    private final GarageTeamService garageTeamService;
 
     Garage mapToEntity(GarageRequest garageRequest) {
         Garage garage = new Garage();
@@ -176,6 +179,8 @@ public class GarageManagementService {
         slotGenerationService.generateSlotsForDays(saved, 60);
         Technician technician = onboardTechnician(saved.getId(), new Technician(), saved.getGarageOwner());
         log.info("owner is added as a technician here "+technician.getFirstName());
+        // Default team roles (Owner, Admin, Manager, HR, Technician) + the owner's membership
+        garageTeamService.addOwner(saved, technician);
         return garageMapper.entityToResponse(saved);
     }
 
@@ -627,6 +632,7 @@ public class GarageManagementService {
     @Transactional
     public PickupDropRequest createPickupDropRequest(PickupDropRequest request) {
         request.setStatus(Status.REQUESTED);
+        request.setVoiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()));
         return pickupDropRequestRepository.save(request);
     }
 

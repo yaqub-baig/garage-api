@@ -30,5 +30,6 @@ public class InventoryTransactionResponse {
     private String receiptNumber;
     private String reason;
     private String notes;
+    private MediaFileResponse voiceNote;
     private LocalDateTime transactionDate;
 }

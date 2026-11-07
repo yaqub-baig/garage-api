@@ -34,6 +34,10 @@ public class InsuranceClaim {
 
     private String approvalRemarks;
 
+    @ManyToOne
+    @JoinColumn(name = "approval_voice_note_id")
+    private MediaFile approvalVoiceNote;
+
     private BigDecimal estimatedAmount;
     private BigDecimal approvedAmount;
 

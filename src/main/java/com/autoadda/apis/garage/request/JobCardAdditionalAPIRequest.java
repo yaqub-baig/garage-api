@@ -17,4 +17,5 @@ public class JobCardAdditionalAPIRequest {
     private Status status;
     private String requestType;
     private String comments;
+    private Long voiceNoteId;
 }

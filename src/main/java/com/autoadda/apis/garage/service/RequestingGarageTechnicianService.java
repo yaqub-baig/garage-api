@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.entity.GarageRole;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.RequestingGarageAndTechnician;
 import com.autoadda.apis.garage.entity.Technician;
@@ -49,6 +50,8 @@ public class RequestingGarageTechnicianService {
     private final RequestingGarageTechnicianMapper mapper;
     private final NotificationDispatchService notificationDispatchService;
     private final NotificationMessageBuilder notificationMessageBuilder;
+    private final GarageTeamService teamService;
+    private final GarageRoleService roleService;
 
     /**
      * Send a new collaboration request between garage and technician
@@ -90,6 +93,9 @@ public class RequestingGarageTechnicianService {
         entity.setSendBy(sendBy);
         entity.setApprovalStatus(ApprovalStatus.HOLD);
         entity.setDescription(request.getDescription());
+        if (sendBy == SendBy.GARAGE && request.getRoleId() != null) {
+            entity.setRole(roleService.assignableRole(garage.getId(), request.getRoleId()));
+        }
 
         // 6. Save and return
         RequestingGarageAndTechnician saved = requestRepository.save(entity);
@@ -109,6 +115,19 @@ public class RequestingGarageTechnicianService {
             Integer requestId,
             Integer approverId,
             SendBy approverType) {
+        return approveRequest(requestId, approverId, approverType, null);
+    }
+
+    /**
+     * Approve a pending request. {@code roleId} lets the garage pick the team role when approving a
+     * technician's join request; otherwise the role on the invite (or the garage's default member role) is used.
+     */
+    @Transactional
+    public RequestingGarageTechnicianResponse approveRequest(
+            Integer requestId,
+            Integer approverId,
+            SendBy approverType,
+            Integer roleId) {
 
         log.info("Approving request {} by {} with id {}", requestId, approverType, approverId);
 
@@ -125,18 +144,16 @@ public class RequestingGarageTechnicianService {
         // 3. Validate approver is the recipient
         validateApprover(request, approverId, approverType);
 
-        // 4. Create the relationship by adding to technician's garage set
+        // 4. Add the technician to the garage's team (also creates the technician_garage link)
         Technician technician = request.getTechnician();
         Garage garage = request.getGarage();
 
-        if (technician.getGarages() == null) {
-            technician.setGarages(new java.util.HashSet<>());
-        }
-        technician.getGarages().add(garage);
-
-        // Save technician to persist the many-to-many relationship
-        technicianRepository.save(technician);
-        log.info("Created link between garage {} and technician {}", garage.getId(), technician.getId());
+        GarageRole role = roleId != null
+                ? roleService.assignableRole(garage.getId(), roleId)
+                : request.getRole() != null ? request.getRole() : roleService.defaultMemberRole(garage);
+        request.setRole(role);
+        teamService.addMember(garage, technician, role, request.getInvitedBy());
+        log.info("Added technician {} to garage {} team as '{}'", technician.getId(), garage.getId(), role.getName());
 
         // 5. Update request status to ACCEPTED
         request.setApprovalStatus(ApprovalStatus.ACCEPTED);

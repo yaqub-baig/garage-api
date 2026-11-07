@@ -170,4 +170,7 @@ public interface GarageRepository extends JpaRepository<Garage, Integer> {
      * Find garages by verification status (using new enum)
      */
     List<Garage> findByAccountStatus(GarageVerificationStatus status);
+
+    @Query("SELECT g.garageOwner FROM Garage g WHERE g.id = :garageId")
+    Optional<Integer> findOwnerIdById(@Param("garageId") Integer garageId);
 }

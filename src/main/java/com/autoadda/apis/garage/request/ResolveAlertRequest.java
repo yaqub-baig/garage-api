@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ResolveAlertRequest {
     private Integer technicianId;
     private String notes;
+    private Long voiceNoteId;
 }

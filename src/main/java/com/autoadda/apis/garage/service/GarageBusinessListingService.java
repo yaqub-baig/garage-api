@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.entity.Garage;
 import com.autoadda.apis.garage.entity.GarageBusinessListing;
@@ -53,6 +54,7 @@ public class GarageBusinessListingService {
     private final AuthClient authClient;
     private final MediaFileRepository mediaFileRepository;
     private final GarageBusinessListingMapper mapper;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     @Transactional
     public GarageBusinessListingResponse createListing(String autoAddaId, AddGarageBusinessListingRequest request) {
@@ -223,6 +225,7 @@ public class GarageBusinessListingService {
                 .salePrice(request.getSalePrice())
                 .paymentMode(request.getPaymentMode())
                 .notes(request.getNotes())
+                .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                 .build();
         sale = saleRepo.save(sale);
 

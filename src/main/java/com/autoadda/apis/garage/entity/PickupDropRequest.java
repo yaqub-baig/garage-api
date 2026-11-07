@@ -39,4 +39,12 @@ public class PickupDropRequest {
     private Integer assignedDriverId; // Optional
 
     private String notes;
+
+    @ManyToOne
+    @JoinColumn(name = "voice_note_id")
+    private MediaFile voiceNote;
+
+    /** Id of an uploaded audio file (POST /mediafiles/upload); resolved into {@link #voiceNote} on create. */
+    @Transient
+    private Long voiceNoteId;
 }

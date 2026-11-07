@@ -42,6 +42,10 @@ public class VehicleDelivery {
     @Column(name = "customer_comments", length = 2000)
     private String customerComments;
 
+    @ManyToOne
+    @JoinColumn(name = "customer_voice_note_id")
+    private MediaFile customerVoiceNote;
+
     @Column(name = "rejection_reason", length = 1000)
     private String rejectionReason;
 

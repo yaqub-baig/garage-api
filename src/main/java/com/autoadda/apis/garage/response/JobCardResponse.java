@@ -29,6 +29,7 @@ public class JobCardResponse {
     private AppointmentServiceResponse appointmentService;
     private Integer workOrderId;
     private String comments;
+    private MediaFileResponse voiceNote;
     private List<JobCardStatusTimelineEntry> statusTimeline;
     private Map<JobCardStatus, LocalDateTime> statusTimestamps;
 }

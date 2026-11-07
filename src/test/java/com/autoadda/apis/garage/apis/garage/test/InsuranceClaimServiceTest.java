@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.apis.garage.test;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +39,9 @@ class InsuranceClaimServiceTest {
     @Mock
     private InsuranceClaimDocumentRepository docRepo;
 
+    @Mock
+    private VoiceNoteHelper voiceNoteHelper;
+
     private InsuranceClaim mockClaim;
     private InsuranceClaimDocument mockDoc;
 
@@ -75,7 +79,7 @@ class InsuranceClaimServiceTest {
         when(claimRepo.save(any())).thenReturn(mockClaim);
 
         InsuranceClaim updated = insuranceClaimService.updateClaimStatus(
-                1, Status.APPROVED, "Approved", BigDecimal.valueOf(1500));
+                1, Status.APPROVED, "Approved", null, BigDecimal.valueOf(1500));
 
         assertEquals(Status.APPROVED, updated.getStatus());
         assertEquals("Approved", updated.getApprovalRemarks());
@@ -150,7 +154,7 @@ class InsuranceClaimServiceTest {
         when(claimRepo.findById(999)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () ->
-                insuranceClaimService.updateClaimStatus(999, Status.REJECTED, "Invalid", BigDecimal.ZERO));
+                insuranceClaimService.updateClaimStatus(999, Status.REJECTED, "Invalid", null, BigDecimal.ZERO));
     }
 
     @Test

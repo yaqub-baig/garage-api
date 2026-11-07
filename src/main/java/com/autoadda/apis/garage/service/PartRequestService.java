@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.service;
 
+import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.clients.AuthClient;
 import com.autoadda.apis.garage.clients.VehicleClient;
 import com.autoadda.apis.garage.entity.*;
@@ -37,6 +38,7 @@ public class PartRequestService {
     private final InvoiceLineItemRepository invoiceLineItemRepo;
     private final NotificationDispatchService notificationDispatchService;
     private final NotificationMessageBuilder notificationMessageBuilder;
+    private final VoiceNoteHelper voiceNoteHelper;
 
     /**
      * Create or update a part request when technician updates job status to WAITING_FOR_PARTS
@@ -72,6 +74,7 @@ public class PartRequestService {
             // Update part request fields
             partRequest.setRequestedBy(technician);
             partRequest.setNotes(request.getNotes());
+            partRequest.setVoiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()));
             partRequest.setRequestDate(LocalDateTime.now());
 
             // Reset status only if customer hasn't responded yet
@@ -92,6 +95,7 @@ public class PartRequestService {
                     .customerId(customerId)
                     .vehicleId(vehicleId)
                     .notes(request.getNotes())
+                    .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                     .build();
 
             partRequest = partRequestRepo.save(partRequest);
@@ -139,14 +143,20 @@ public class PartRequestService {
 
         // Validate at least one field is provided
         if ((request.getNotes() == null || request.getNotes().trim().isEmpty()) &&
+                request.getVoiceNoteId() == null &&
                 (request.getItems() == null || request.getItems().isEmpty())) {
-            throw new IllegalArgumentException("At least one field (notes or items) must be provided for update");
+            throw new IllegalArgumentException("At least one field (notes, voice note or items) must be provided for update");
         }
 
         // Update notes if provided
         if (request.getNotes() != null && !request.getNotes().trim().isEmpty()) {
             partRequest.setNotes(request.getNotes());
             log.info("Updated notes for part request {}", partRequestId);
+        }
+
+        // Update voice note if provided
+        if (request.getVoiceNoteId() != null) {
+            partRequest.setVoiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()));
         }
 
         // Update items if provided
@@ -211,6 +221,7 @@ public class PartRequestService {
                 .partCondition(request.getPartCondition())
                 .expectedDeliveryDate(request.getExpectedDeliveryDate())
                 .customerComments(request.getCustomerComments())
+                .customerVoiceNote(voiceNoteHelper.resolve(request.getCustomerVoiceNoteId()))
                 .build();
 
         customerPartResponseRepo.save(customerResponse);
@@ -280,6 +291,7 @@ public class PartRequestService {
                 .receiptNumber(request.getReceiptNumber())
                 .procuredBy(procuredBy)
                 .notes(request.getNotes())
+                .voiceNote(voiceNoteHelper.resolve(request.getVoiceNoteId()))
                 .build();
 
         garageProcurementRepo.save(procurement);
@@ -647,6 +659,7 @@ public class PartRequestService {
                 .items(itemResponses)
                 .customerResponse(customerResponseResponse)
                 .notes(partRequest.getNotes())
+                .voiceNote(voiceNoteHelper.toResponse(partRequest.getVoiceNote()))
                 .build();
     }
 
@@ -683,6 +696,7 @@ public class PartRequestService {
                 .procurementDate(procurement.getProcurementDate())
                 .procuredByUserName(procuredByName)
                 .notes(procurement.getNotes())
+                .voiceNote(voiceNoteHelper.toResponse(procurement.getVoiceNote()))
                 .build();
     }
 
@@ -694,6 +708,7 @@ public class PartRequestService {
                 .responseDate(response.getResponseDate())
                 .expectedDeliveryDate(response.getExpectedDeliveryDate())
                 .customerComments(response.getCustomerComments())
+                .customerVoiceNote(voiceNoteHelper.toResponse(response.getCustomerVoiceNote()))
                 .build();
     }
 }

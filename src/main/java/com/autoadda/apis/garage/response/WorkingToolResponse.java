@@ -25,6 +25,7 @@ public class WorkingToolResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String notes;
+    private MediaFileResponse voiceNote;
 
     // Tool image information
     private Long toolImageId;
