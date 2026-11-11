@@ -37,4 +37,7 @@ public class WorkOrderResponse {
     // Delivery status fields for frontend
     private DeliveryStatus currentDeliveryStatus;
     private Boolean canInitiateDelivery;
+
+    /** Parts for this work order's job cards: items, customer choice, procurement and a timeline. */
+    private List<PartRequestResponse> partRequests;
 }

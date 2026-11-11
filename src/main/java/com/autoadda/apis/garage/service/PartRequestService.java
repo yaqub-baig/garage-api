@@ -39,6 +39,7 @@ public class PartRequestService {
     private final NotificationDispatchService notificationDispatchService;
     private final NotificationMessageBuilder notificationMessageBuilder;
     private final VoiceNoteHelper voiceNoteHelper;
+    private final com.autoadda.apis.garage.mapper.PartRequestMapper partRequestMapper;
 
     /**
      * Create or update a part request when technician updates job status to WAITING_FOR_PARTS
@@ -79,7 +80,7 @@ public class PartRequestService {
 
             // Reset status only if customer hasn't responded yet
             if (partRequest.getStatus() == PartRequestStatus.PENDING_CUSTOMER_RESPONSE) {
-                partRequest.setStatus(PartRequestStatus.PENDING_CUSTOMER_RESPONSE);
+                partRequest.updateStatus(PartRequestStatus.PENDING_CUSTOMER_RESPONSE);
                 partRequest.setCustomerResponseDate(null);
             }
 
@@ -234,14 +235,14 @@ public class PartRequestService {
                 item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_WILL_PROVIDE);
                 partRequestItemRepo.save(item);
             }
-            partRequest.setStatus(PartRequestStatus.WAITING_FOR_CUSTOMER_DELIVERY);
+            partRequest.updateStatus(PartRequestStatus.WAITING_FOR_CUSTOMER_DELIVERY);
         } else {
             // Garage will procure all items
             for (PartRequestItem item : items) {
                 item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.PENDING_PROCUREMENT);
                 partRequestItemRepo.save(item);
             }
-            partRequest.setStatus(PartRequestStatus.GARAGE_WILL_PROCURE);
+            partRequest.updateStatus(PartRequestStatus.GARAGE_WILL_PROCURE);
         }
 
         partRequest.setCustomerResponseDate(LocalDateTime.now());
@@ -310,13 +311,13 @@ public class PartRequestService {
 
         // Update parent part request status only if all items are procured
         if (allItemsProcured) {
-            partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
+            partRequest.updateStatus(PartRequestStatus.PART_RECEIVED);
             partRequestRepo.save(partRequest);
             log.info("All items procured/provided. Updated part request {} status to PART_RECEIVED", partRequest.getId());
         } else {
             // Update to GARAGE_PROCURING if not already
             if (partRequest.getStatus() != PartRequestStatus.GARAGE_PROCURING) {
-                partRequest.setStatus(PartRequestStatus.GARAGE_PROCURING);
+                partRequest.updateStatus(PartRequestStatus.GARAGE_PROCURING);
                 partRequestRepo.save(partRequest);
             }
             long procuredCount = allItems.stream()
@@ -353,10 +354,11 @@ public class PartRequestService {
         List<PartRequestItem> items = partRequestItemRepo.findByPartRequestId(partRequestId);
         for (PartRequestItem item : items) {
             item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED);
+            item.setReceivedAt(LocalDateTime.now());
             partRequestItemRepo.save(item);
         }
 
-        partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
+        partRequest.updateStatus(PartRequestStatus.PART_RECEIVED);
         partRequestRepo.save(partRequest);
 
         log.info("All {} parts marked as customer-provided successfully", items.size());
@@ -384,6 +386,7 @@ public class PartRequestService {
 
         // Mark this specific item as customer provided
         item.setProcurementStatus(com.autoadda.apis.garage.util.ItemProcurementStatus.CUSTOMER_PROVIDED);
+        item.setReceivedAt(LocalDateTime.now());
         partRequestItemRepo.save(item);
 
         log.info("Part item {} marked as customer-provided", partRequestItemId);
@@ -395,7 +398,7 @@ public class PartRequestService {
 
         // Update parent part request status only if all items are provided
         if (allItemsProvided) {
-            partRequest.setStatus(PartRequestStatus.PART_RECEIVED);
+            partRequest.updateStatus(PartRequestStatus.PART_RECEIVED);
             partRequestRepo.save(partRequest);
             log.info("All items customer-provided. Updated part request {} status to PART_RECEIVED", partRequest.getId());
         } else {
@@ -565,6 +568,7 @@ public class PartRequestService {
 
             // Mark this item as added to invoice
             item.setAddedToInvoice(true);
+            item.setAddedToInvoiceAt(LocalDateTime.now());
             partRequestItemRepo.save(item);
 
             // Recalculate invoice totals
@@ -595,7 +599,7 @@ public class PartRequestService {
 
                 // Only update parent status if all garage-procured items are added to invoice
                 if (allAddedToInvoice) {
-                    partRequest.setStatus(PartRequestStatus.ADDED_TO_INVOICE);
+                    partRequest.updateStatus(PartRequestStatus.ADDED_TO_INVOICE);
                     partRequestRepo.save(partRequest);
                     log.info("All procured items added to invoice. Updated part request {} status to ADDED_TO_INVOICE",
                             partRequest.getId());
@@ -618,97 +622,19 @@ public class PartRequestService {
      * Convert entity to response DTO
      */
     private PartRequestResponse convertToResponse(PartRequest partRequest) {
-        // Get vehicle details
-        String vehicleDetails = "";
+        return partRequestMapper.toResponse(partRequest, vehicleLabel(partRequest.getVehicleId()));
+    }
+
+    /** "Brand Model - Number" for the part request screens; empty when vehicle-api can't be reached. */
+    private String vehicleLabel(Integer vehicleId) {
         try {
-            VehicleDetailResponse vehicleResponse = vehicleClient.getVehicleDetailsByIdResponse(
-                    partRequest.getVehicleId());
+            VehicleDetailResponse vehicleResponse = vehicleClient.getVehicleDetailsByIdResponse(vehicleId);
             if (vehicleResponse != null) {
-                vehicleDetails = vehicleResponse.getBrand() + " " +
-                        vehicleResponse.getModel() + " - " +
-                        vehicleResponse.getNumber();
+                return vehicleResponse.getBrand() + " " + vehicleResponse.getModel() + " - " + vehicleResponse.getNumber();
             }
         } catch (Exception e) {
             log.error("Failed to fetch vehicle details", e);
         }
-
-        // Convert items
-        List<PartRequestItem> items = partRequestItemRepo.findByPartRequestId(partRequest.getId());
-        List<PartRequestItemResponse> itemResponses = items.stream()
-                .map(this::convertItemToResponse)
-                .toList();
-
-        // Convert customer response if exists
-        CustomerPartResponseResponse customerResponseResponse = null;
-        if (partRequest.getCustomerResponse() != null) {
-            customerResponseResponse = convertCustomerResponseToResponse(partRequest.getCustomerResponse());
-        }
-
-        return PartRequestResponse.builder()
-                .id(partRequest.getId())
-                .jobCardId(partRequest.getJobCard().getId())
-                .jobCardServiceName(partRequest.getJobCard().getService().getService().getAvailableService().getName())
-                .requestedByTechnicianId(partRequest.getRequestedBy().getId())
-                .requestedByTechnicianName(partRequest.getRequestedBy().getFirstName())
-                .status(partRequest.getStatus())
-                .requestDate(partRequest.getRequestDate())
-                .customerResponseDate(partRequest.getCustomerResponseDate())
-                .customerId(partRequest.getCustomerId())
-                .vehicleId(partRequest.getVehicleId())
-                .vehicleDetails(vehicleDetails)
-                .items(itemResponses)
-                .customerResponse(customerResponseResponse)
-                .notes(partRequest.getNotes())
-                .voiceNote(voiceNoteHelper.toResponse(partRequest.getVoiceNote()))
-                .build();
-    }
-
-    private PartRequestItemResponse convertItemToResponse(PartRequestItem item) {
-        GarageProcurementResponse procurementResponse = null;
-        if (item.getGarageProcurement() != null) {
-            procurementResponse = convertProcurementToResponse(item.getGarageProcurement());
-        }
-
-        return PartRequestItemResponse.builder()
-                .id(item.getId())
-                .partName(item.getPartName())
-                .partNumber(item.getPartNumber())
-                .quantity(item.getQuantity())
-                .description(item.getDescription())
-                .estimatedPrice(item.getEstimatedPrice())
-                .procurementStatus(item.getProcurementStatus())
-                .addedToInvoice(item.getAddedToInvoice())
-                .procurement(procurementResponse)
-                .build();
-    }
-
-    private GarageProcurementResponse convertProcurementToResponse(GarageProcurement procurement) {
-        String procuredByName = procurement.getProcuredBy() != null ?
-                procurement.getProcuredBy().getFirstName() : null;
-
-        return GarageProcurementResponse.builder()
-                .id(procurement.getId())
-                .supplierName(procurement.getSupplierName())
-                .supplierContact(procurement.getSupplierContact())
-                .purchasePrice(procurement.getPurchasePrice())
-                .partCondition(procurement.getPartCondition())
-                .receiptNumber(procurement.getReceiptNumber())
-                .procurementDate(procurement.getProcurementDate())
-                .procuredByUserName(procuredByName)
-                .notes(procurement.getNotes())
-                .voiceNote(voiceNoteHelper.toResponse(procurement.getVoiceNote()))
-                .build();
-    }
-
-    private CustomerPartResponseResponse convertCustomerResponseToResponse(CustomerPartResponse response) {
-        return CustomerPartResponseResponse.builder()
-                .id(response.getId())
-                .choice(response.getChoice())
-                .partCondition(response.getPartCondition())
-                .responseDate(response.getResponseDate())
-                .expectedDeliveryDate(response.getExpectedDeliveryDate())
-                .customerComments(response.getCustomerComments())
-                .customerVoiceNote(voiceNoteHelper.toResponse(response.getCustomerVoiceNote()))
-                .build();
+        return "";
     }
 }

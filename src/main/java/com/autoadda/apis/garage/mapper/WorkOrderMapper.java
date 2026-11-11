@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.mapper;
 
+import com.autoadda.apis.garage.repository.PartRequestRepository;
 import com.autoadda.apis.garage.util.VoiceNoteHelper;
 import com.autoadda.apis.garage.entity.JobCard;
 import com.autoadda.apis.garage.entity.WorkOrder;
@@ -29,6 +30,8 @@ public class WorkOrderMapper {
     private final GarageMapper garageMapper;
     private final GarageRatingRepository  garageRatingRepository;
     private final VehicleReceivedRepository   vehicleReceivedRepository;
+    private final PartRequestRepository partRequestRepository;
+    private final PartRequestMapper partRequestMapper;
 
     public WorkOrderResponse entityToResponse(WorkOrder save) {
         WorkOrderResponse workOrderResponse = new WorkOrderResponse ( );
@@ -76,6 +79,13 @@ public class WorkOrderMapper {
         // Set delivery status fields for frontend
         workOrderResponse.setCurrentDeliveryStatus ( save.getCurrentDeliveryStatus ( ) );
         workOrderResponse.setCanInitiateDelivery ( save.canInitiateDelivery ( ) );
+
+        // Parts used on this work order (one part request per job card that needed parts)
+        List<Integer> jobCardIds = save.getJobCards ( ).stream ( ).map ( JobCard::getId ).toList ( );
+        workOrderResponse.setPartRequests ( jobCardIds.isEmpty ( ) ? List.of ( ) : partRequestRepository
+                .findByJobCardIdIn ( jobCardIds ).stream ( )
+                .map ( partRequest -> partRequestMapper.toResponse ( partRequest, null ) )
+                .toList ( ) );
 
         return workOrderResponse;
     }

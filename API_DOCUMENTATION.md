@@ -113,6 +113,41 @@ Each garage has team members with custom roles (a set of `GaragePermission`s). E
 
 Config: `garage.permissions.enforcement=ENFORCE` (default) or `LOG_ONLY` to log denials without blocking.
 
+## Work Orders
+**Controller:** `WorkOrderController`  
+**Base Path:** `/work-orders`
+
+### Parts on a work order
+Every work-order response (`POST /`, `GET /workorder-by/{appointmentId}`, `PUT /update/{id}`, `GET /by-garage/{garageId}`, `GET /customer/{customerId}`) includes `partRequests`: one entry per job card that needed parts, empty when none did.
+
+```jsonc
+"partRequests": [{
+  "id": 1, "jobCardId": 1, "jobCardServiceName": "Brake service",
+  "status": "PART_RECEIVED", "requestedByTechnicianName": "Sara", "notes": "Pads worn", "voiceNote": null,
+  "customerResponse": { "choice": "GARAGE_PROCURE", "partCondition": "GENUINE", "customerComments": "Genuine please", ... },
+  "items": [{
+    "id": 1, "partName": "Brake pads", "partNumber": "BP-22", "quantity": 2, "estimatedPrice": 180.0,
+    "procurementStatus": "PROCURED", "addedToInvoice": false,
+    "procurement": { "supplierName": "Al Futtaim Parts", "purchasePrice": 170.0, "partCondition": "GENUINE",
+                     "receiptNumber": "R-881", "procuredByUserName": "Omar", "procurementDate": "…" },
+    "procuredAt": "…", "receivedAt": null, "addedToInvoiceAt": null
+  }],
+  "timeline": [
+    { "level": "REQUEST", "event": "PENDING_CUSTOMER_RESPONSE", "timestamp": "…", "description": "Parts requested, waiting for the customer to choose", "durationInMinutes": null },
+    { "level": "REQUEST", "event": "GARAGE_WILL_PROCURE", "timestamp": "…", "description": "Customer asked the garage to buy the parts", "durationInMinutes": 1 },
+    { "level": "ITEM", "event": "PART_PROCURED", "partRequestItemId": 1, "partName": "Brake pads", "description": "Garage bought Brake pads from Al Futtaim Parts", … },
+    { "level": "REQUEST", "event": "PART_RECEIVED", "description": "All parts received", … }
+  ]
+}]
+```
+
+- `timeline` is oldest first. `level: REQUEST` entries are status changes of the whole request (`event` = `PartRequestStatus`). `level: ITEM` entries are per part: `PART_PROCURED`, `PART_RECEIVED_FROM_CUSTOMER`, `PART_ADDED_TO_INVOICE`.
+- Part requests created before this release only show the request and the customer's choice; later steps had no recorded time.
+- `vehicleDetails` is null here (the work order already has the vehicle). The same `timeline` and item timestamps are also returned by `/part-requests/**`.
+
+### Service history
+`GET /vehicle/{vehicleId}` (completed / delivered work orders) returns `garage` with `garageArabicName` and `garageLogo` (same shape as `GarageResponse.garageLogo`; image URL is `{base-url}/uploads/{filePath}`).
+
 ## Roadside Assistance
 **Controller:** `RoadsideAssistanceController`  
 **Base Path:** `/api/roadside-assistance`

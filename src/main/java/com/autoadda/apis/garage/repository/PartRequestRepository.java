@@ -13,6 +13,8 @@ public interface PartRequestRepository extends JpaRepository<PartRequest, Intege
 
     Optional<PartRequest> findByJobCardId(Integer jobCardId);
 
+    List<PartRequest> findByJobCardIdIn(List<Integer> jobCardIds);
+
     List<PartRequest> findByCustomerId(Integer customerId);
 
     List<PartRequest> findByCustomerIdAndStatus(Integer customerId, PartRequestStatus status);

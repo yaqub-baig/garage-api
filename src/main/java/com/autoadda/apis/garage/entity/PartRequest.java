@@ -6,7 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -58,6 +60,15 @@ public class PartRequest {
     @JoinColumn(name = "voice_note_id")
     private MediaFile voiceNote;
 
+    /** When each status was reached (for the parts timeline). Empty for requests created before this existed. */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "part_request_status_timestamps", joinColumns = @JoinColumn(name = "part_request_id"))
+    @MapKeyColumn(name = "status", length = 40)
+    @MapKeyEnumerated(EnumType.STRING)
+    @Column(name = "timestamp")
+    @Builder.Default
+    private Map<PartRequestStatus, LocalDateTime> statusTimestamps = new EnumMap<>(PartRequestStatus.class);
+
     @PrePersist
     protected void onCreate() {
         if (requestDate == null) {
@@ -65,6 +76,21 @@ public class PartRequest {
         }
         if (status == null) {
             status = PartRequestStatus.PENDING_CUSTOMER_RESPONSE;
+        }
+        if (statusTimestamps == null) {
+            statusTimestamps = new EnumMap<>(PartRequestStatus.class);
+        }
+        statusTimestamps.putIfAbsent(status, requestDate);
+    }
+
+    /** Changes the status and records when it happened (no-op when the status is unchanged). */
+    public void updateStatus(PartRequestStatus newStatus) {
+        if (this.status != newStatus) {
+            this.status = newStatus;
+            if (statusTimestamps == null) {
+                statusTimestamps = new EnumMap<>(PartRequestStatus.class);
+            }
+            statusTimestamps.put(newStatus, LocalDateTime.now());
         }
     }
 }
