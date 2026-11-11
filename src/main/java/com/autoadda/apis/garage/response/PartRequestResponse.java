@@ -30,4 +30,6 @@ public class PartRequestResponse {
     private CustomerPartResponseResponse customerResponse;
     private String notes;
     private MediaFileResponse voiceNote;
+    /** Status changes and per-part events, oldest first. */
+    private List<PartStatusTimelineEntry> timeline;
 }

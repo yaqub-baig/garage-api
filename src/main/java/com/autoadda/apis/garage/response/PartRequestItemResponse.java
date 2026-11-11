@@ -21,4 +21,10 @@ public class PartRequestItemResponse {
     private ItemProcurementStatus procurementStatus;
     private Boolean addedToInvoice;
     private GarageProcurementResponse procurement;
+    /** When the garage bought this part (from the procurement record). */
+    private java.time.LocalDateTime procuredAt;
+    /** When the customer handed this part over. */
+    private java.time.LocalDateTime receivedAt;
+    /** When this part was added to the invoice. */
+    private java.time.LocalDateTime addedToInvoiceAt;
 }

@@ -293,6 +293,8 @@ public class WorkOrderService {
             garageInfo = GarageBasicInfo.builder()
                     .id(workOrder.getGarage().getId())
                     .garageBrandName(workOrder.getGarage().getGarageBrandName())
+                    .garageArabicName(workOrder.getGarage().getGarageArabicName())
+                    .garageLogo(workOrder.getGarage().getGarageLogo())
                     .name(workOrder.getGarage().getName())
                     .phoneNumber(workOrder.getGarage().getPhoneNumber())
                     .mobileNumber(workOrder.getGarage().getMobileNumber())

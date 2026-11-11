@@ -1,5 +1,6 @@
 package com.autoadda.apis.garage.response;
 
+import com.autoadda.apis.garage.entity.MediaFile;
 import com.autoadda.apis.garage.entity.Location;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +15,11 @@ public class GarageBasicInfo {
 
     private Integer id;
     private String garageBrandName;
+    private String garageArabicName;
     private String name;
     private String phoneNumber;
     private String mobileNumber;
     private Location location;
+    /** Same shape as GarageResponse.garageLogo; the image URL is {base-url}/uploads/{filePath}. */
+    private MediaFile garageLogo;
 }

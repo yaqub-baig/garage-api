@@ -47,6 +47,14 @@ public class PartRequestItem {
     @OneToOne(mappedBy = "partRequestItem", cascade = CascadeType.ALL)
     private GarageProcurement garageProcurement;
 
+    /** When the customer handed this part over (items the customer provides). */
+    @Column(name = "received_at")
+    private java.time.LocalDateTime receivedAt;
+
+    /** When this part was added to the work order's invoice. */
+    @Column(name = "added_to_invoice_at")
+    private java.time.LocalDateTime addedToInvoiceAt;
+
     @PrePersist
     protected void onCreate() {
         // Ensure procurement status is set before persisting
