@@ -294,6 +294,7 @@ public class WorkOrderService {
                     .id(workOrder.getGarage().getId())
                     .garageBrandName(workOrder.getGarage().getGarageBrandName())
                     .garageArabicName(workOrder.getGarage().getGarageArabicName())
+                    .trnNumber(workOrder.getGarage().getTrnNumber())
                     .garageLogo(workOrder.getGarage().getGarageLogo())
                     .name(workOrder.getGarage().getName())
                     .phoneNumber(workOrder.getGarage().getPhoneNumber())

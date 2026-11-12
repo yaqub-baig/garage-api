@@ -16,6 +16,7 @@ public class GarageBasicInfo {
     private Integer id;
     private String garageBrandName;
     private String garageArabicName;
+    private String trnNumber;
     private String name;
     private String phoneNumber;
     private String mobileNumber;

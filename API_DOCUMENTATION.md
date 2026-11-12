@@ -134,7 +134,7 @@ Every work-order response (`POST /`, `GET /workorder-by/{appointmentId}`, `PUT /
 - `vehicleDetails` is null here (the work order already has the vehicle). The same `timeline` and item timestamps are also returned by `/part-requests/**`.
 
 ### Service history
-`GET /vehicle/{vehicleId}` (completed / delivered work orders) returns `garage` with `garageArabicName` and `garageLogo` (same shape as `GarageResponse.garageLogo`; image URL is `{base-url}/uploads/{filePath}`).
+`GET /vehicle/{vehicleId}` (completed / delivered work orders) returns `garage` with `garageArabicName`, `trnNumber` and `garageLogo` (same shape as `GarageResponse.garageLogo`; image URL is `{base-url}/uploads/{filePath}`).
 
 ## Roadside Assistance
 **Controller:** `RoadsideAssistanceController`  
