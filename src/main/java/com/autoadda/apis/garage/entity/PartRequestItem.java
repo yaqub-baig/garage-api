@@ -55,6 +55,14 @@ public class PartRequestItem {
     @Column(name = "added_to_invoice_at")
     private java.time.LocalDateTime addedToInvoiceAt;
 
+    /** AutoAdda marketplace order this item was ordered through (part-api), while ORDERED / after receipt. */
+    @Column(name = "marketplace_order_id")
+    private Integer marketplaceOrderId;
+    @Column(name = "marketplace_order_item_id")
+    private Long marketplaceOrderItemId;
+    @Column(name = "marketplace_supplier_name")
+    private String marketplaceSupplierName;
+
     @PrePersist
     protected void onCreate() {
         // Ensure procurement status is set before persisting

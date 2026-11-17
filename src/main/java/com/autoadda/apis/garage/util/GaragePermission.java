@@ -26,6 +26,7 @@ public enum GaragePermission {
     JOB_CARD_UPDATE("Operations", "Update job card status"),
     VEHICLE_CHECKIN_DELIVERY("Operations", "Receive and deliver vehicles"),
     PART_REQUEST_MANAGE("Operations", "Raise and manage part requests"),
+    PARTS_PURCHASE("Operations", "Order and enquire parts from AutoAdda shops in the garage's name"),
 
     INVENTORY_VIEW("Inventory", "View inventory"),
     INVENTORY_MANAGE("Inventory", "Manage inventory items, stock and alerts"),
