@@ -49,6 +49,10 @@ public class GarageProcurement {
     @Column(name = "notes")
     private String notes;
 
+    /** Set when this procurement came from an AutoAdda marketplace order (part-api order item id). */
+    @Column(name = "marketplace_order_item_id")
+    private Long marketplaceOrderItemId;
+
     @ManyToOne
     @JoinColumn(name = "voice_note_id")
     private MediaFile voiceNote;
